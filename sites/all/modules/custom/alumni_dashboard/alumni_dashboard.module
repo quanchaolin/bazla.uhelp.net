@@ -1,0 +1,58 @@
+<?php
+/**
+ * @file
+ * This module will provide custom functionality for the UHELP alumni dashboard
+ */
+
+function alumni_dashboard_init() {
+  module_load_include('inc', 'alumni_dashboard',
+  		      'includes/employment_form');
+  module_load_include('inc', 'alumni_dashboard',
+  		      'includes/misc');
+  module_load_include('inc', 'alumni_dashboard',
+  		      'includes/milestones_form');
+		      
+  drupal_add_css(drupal_get_path('module', 'alumni_dashboard') .
+                 '/alumni_dashboard.css');
+
+}
+
+function alumni_dashboard_menu() {
+
+  $items = array();
+
+  $items['dashboard/alumni/employment'] =
+    array(
+	  'title' => t('My Employment History'),
+	  'type' => MENU_CALLBACK,
+	  'page callback' => 'drupal_get_form',
+	  'page arguments' => array('alumni_dashboard_employment_form'),
+	  'access arguments' => array('access content'),
+	  );
+
+  $items['dashboard/alumni/milestones'] =
+      array(
+	    'title' => t('My Achievements and Milestones'),
+	    'type' => MENU_CALLBACK,
+	    'page callback' => 'drupal_get_form',
+	    'page arguments' => array('alumni_dashboard_milestones_form'),
+	    'access arguments' => array('access content'),
+	    );
+
+  $items['dashboard/alumni/employer_autocomplete'] =
+    array(
+	  'title' => 'Autocomplete for employers',
+	  'page callback' => 'alumni_dashboard_employer_autocomplete',
+	  'access arguments' => array('access content'), 
+	  'type' => MENU_CALLBACK
+	  );
+  return $items;
+}
+  
+function alumni_dashboard_views_api() {
+  return array(
+	       'api' => 3,
+	       'path' =>
+	       drupal_get_path('module', 'alumni_dashboard').'/includes'
+	       );
+}

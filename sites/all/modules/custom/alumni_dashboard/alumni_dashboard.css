@@ -1,0 +1,19 @@
+table.employment_form_grid td, table.employment_form_grid th {
+    border: 1px solid #cccccc;
+    padding: 25px;
+    text-align: left;
+}
+
+table.milestones_form_grid td, table.milestones_form_grid th {
+    border: 1px solid #cccccc;
+    padding: 25px;
+    text-align: left;
+}
+
+tr.padded_odd {
+    background: #F5F5E9;
+}
+
+tr.padded_even {
+    background: #EEF9F4;
+}

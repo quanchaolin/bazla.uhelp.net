@@ -1,0 +1,36 @@
+<?php
+/**
+ * @file
+ * This module will provide custom functionality for the UHELP alumni dashboard
+ */
+
+function dorm_management_init() {
+  module_load_include('inc', 'dorm_management',
+  		      'includes/view_fields');
+  module_load_include('inc', 'dorm_management',
+  		      'includes/misc');
+  module_load_include('inc', 'dorm_management',
+  		      'includes/computed_fields');
+  module_load_include('inc', 'dorm_management',
+  		      'includes/entity_api');
+		      
+  drupal_add_css(drupal_get_path('module', 'dorm_management') .
+                 '/dorm_management.css');
+
+}
+
+
+function dorm_management_menu() {
+
+  $items = array();
+
+  return $items;
+}
+  
+function dorm_management_views_api() {
+  return array(
+	       'api' => 3,
+	       'path' =>
+	       drupal_get_path('module', 'dorm_management').'/includes'
+	       );
+}

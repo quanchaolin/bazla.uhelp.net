@@ -179,7 +179,7 @@ $GLOBALS['_DB_DATAOBJECT']['QUERYENDTIME'] = 0;
 // NOTE: Overload SEGFAULTS ON PHP4 + Zend Optimizer (see define before..)
 // these two are BC/FC handlers for call in PHP4/5
 
-if ( substr(phpversion(),0,1) == 5) {
+if ( substr(phpversion(),0,1) > 4) {
     class DB_DataObject_Overload
     {
         function __call($method,$args)
@@ -1236,13 +1236,6 @@ class DB_DataObject extends DB_DataObject_Overload
                 continue;
             }
 
-             // dont insert data into mysql timestamps
-            // use query() if you really want to do this!!!!
-            if ($v & DB_DATAOBJECT_MYSQLTIMESTAMP) {
-                continue;
-            }
-
-
             if ($settings)  {
                 $settings .= ', ';
             }
@@ -1266,7 +1259,7 @@ class DB_DataObject extends DB_DataObject_Overload
                 $settings .= "$kSql = NULL ";
                 continue;
             }
-          if (($v & DB_DATAOBJECT_DATE) || ($v & DB_DATAOBJECT_TIME)) {
+          if (($v & DB_DATAOBJECT_DATE) || ($v & DB_DATAOBJECT_TIME) || $v & DB_DATAOBJECT_MYSQLTIMESTAMP) {
             if (strpos($this->$k, '-') !== FALSE) {
              /*
               * per CRM-14986 we have been having ongoing problems with the format returned from $dao->find(TRUE) NOT
@@ -2377,6 +2370,7 @@ class DB_DataObject extends DB_DataObject_Overload
         global $_DB_DATAOBJECT, $queries, $user;
         $this->_connect();
 
+        // Logging the query first makes sure it gets logged even if it fails.
         CRM_Core_Error::debug_query($string);
         $DB = &$_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5];
 
@@ -2438,8 +2432,11 @@ class DB_DataObject extends DB_DataObject_Overload
         for ($tries = 0;$tries < 3;$tries++) {
 
             if ($_DB_driver == 'DB') {
-
+                if ($tries) {
+                  CRM_Core_Error::debug_log_message('Attempt: ' . $tries + 1 . ' at query : ' . $string);
+                }
                 $result = $DB->query($string);
+
             } else {
                 switch (strtolower(substr(trim($string),0,6))) {
 
@@ -2474,27 +2471,34 @@ class DB_DataObject extends DB_DataObject_Overload
             return $this->raiseError($result);
         }
 
-        /* CRM-3225 */
-        if (function_exists('variable_get') && variable_get('dev_query', 0)) {
-            // this is for drupal devel module
-            // If devel.module query logging is enabled, prepend a comment with the username and calling function
-            // to the SQL string.
-            $bt = debug_backtrace();
-            // t() may not be available yet so we don't wrap 'Anonymous'
-            $name = $user->uid ? $user->name : variable_get('anonymous', 'Anonymous');
-            $query = $bt[3]['function'] ."\n/* ". $name .' */ '. str_replace("\n ", '', $string);
-            list($usec, $sec) = explode(' ', microtime());
-            $stop = (float)$usec + (float)$sec;
-            $diff = $stop - $time;
-            $queries[] = array($query, $diff);
+        $action = strtolower(substr(trim($string),0,6));
+
+        if (!empty($_DB_DATAOBJECT['CONFIG']['debug']) || defined('CIVICRM_DEBUG_LOG_QUERY')) {
+          $timeTaken = sprintf("%0.6f", microtime(TRUE) - $time);
+          $alertLevel = $this->getAlertLevel($timeTaken);
+
+          $message = "$alertLevel QUERY DONE IN $timeTaken  seconds.";
+          if (in_array($action, array('insert', 'update', 'delete')) && $_DB_driver == 'DB') {
+            $message .= " " . $DB->affectedRows() . " row(s)s subject to $action action";
+          }
+          elseif (is_a($result, 'DB_result') && method_exists($result, 'numrows')) {
+            $message .= " Result is {$result->numRows()} rows by {$result->numCols()} columns. ";
+          }
+          elseif ($result === 1) {
+            $message .= " No further information is available for this type of query";
+          }
+          else {
+            echo $message .= " not quite sure why this query does not have more info";
+          }
+          if (defined('CIVICRM_DEBUG_LOG_QUERY')) {
+            CRM_Core_Error::debug_log_message($message, FALSE, 'sql_log');
+          }
+          else {
+            $this->debug($message, 'query', 1);
+          }
         }
 
-        if (!empty($_DB_DATAOBJECT['CONFIG']['debug'])) {
-            $t= explode(' ',microtime());
-            $_DB_DATAOBJECT['QUERYENDTIME'] = $t[0]+$t[1];
-            $this->debug('QUERY DONE IN  '.($t[0]+$t[1]-$time)." seconds", 'query',1);
-        }
-        switch (strtolower(substr(trim($string),0,6))) {
+        switch ($action) {
             case 'insert':
             case 'update':
             case 'delete':
@@ -3641,7 +3645,7 @@ class DB_DataObject extends DB_DataObject_Overload
      * @return   array of key => value for row
      */
 
-    function toArray($format = '%s', $hideEmpty = false)
+    function toArray($format = null, $hideEmpty = false)
     {
         global $_DB_DATAOBJECT;
         $ret = array();
@@ -3655,24 +3659,35 @@ class DB_DataObject extends DB_DataObject_Overload
 
             if (!isset($this->$k)) {
                 if (!$hideEmpty) {
-                    $ret[sprintf($format,$k)] = '';
+                    if ($format === null)
+                        $ret[$k] = '';
+                    else
+                        $ret[sprintf($format,$k)] = '';
                 }
                 continue;
             }
             // call the overloaded getXXXX() method. - except getLink and getLinks
             if (method_exists($this,'get'.$k) && !in_array(strtolower($k),array('links','link'))) {
-                $ret[sprintf($format,$k)] = $this->{'get'.$k}();
+                if ($format === null)
+                    $ret[$k] = $this->{'get'.$k}();
+                else
+                    $ret[sprintf($format,$k)] = $this->{'get'.$k}();
                 continue;
             }
             // should this call toValue() ???
-            $ret[sprintf($format,$k)] = $this->$k;
+            if ($format === null)
+                $ret[$k] = $this->$k;
+            else
+                $ret[sprintf($format,$k)] = $this->$k;
         }
         if (!$this->_link_loaded) {
             return $ret;
         }
         foreach($this->_link_loaded as $k) {
-            $ret[sprintf($format,$k)] = $this->$k->toArray();
-
+            if ($format === null)
+                $ret[$k] = $this->$k->toArray();
+            else
+                $ret[sprintf($format,$k)] = $this->$k->toArray();
         }
 
         return $ret;
@@ -4158,7 +4173,7 @@ class DB_DataObject extends DB_DataObject_Overload
      * @access  public
      * @return  none
      */
-    function debugLevel($v = null)
+    public static function debugLevel($v = null)
     {
         global $_DB_DATAOBJECT;
         if (empty($_DB_DATAOBJECT['CONFIG'])) {
@@ -4238,7 +4253,7 @@ class DB_DataObject extends DB_DataObject_Overload
      * @access   public
      * @return   object an error object
      */
-    function _loadConfig()
+    public static function _loadConfig()
     {
         global $_DB_DATAOBJECT;
 
@@ -4257,13 +4272,6 @@ class DB_DataObject extends DB_DataObject_Overload
     {
         global $_DB_DATAOBJECT;
 
-        if (isset($_DB_DATAOBJECT['RESULTS'][$this->_DB_resultid])) {
-            if ( is_resource( $_DB_DATAOBJECT['RESULTS'][$this->_DB_resultid]->result ) ) {
-                mysql_free_result( $_DB_DATAOBJECT['RESULTS'][$this->_DB_resultid]->result );
-            }
-            unset($_DB_DATAOBJECT['RESULTS'][$this->_DB_resultid]);
-        }
-
         if (isset($_DB_DATAOBJECT['RESULTFIELDS'][$this->_DB_resultid])) {
             unset($_DB_DATAOBJECT['RESULTFIELDS'][$this->_DB_resultid]);
         }
@@ -4276,6 +4284,17 @@ class DB_DataObject extends DB_DataObject_Overload
         if (isset($_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5])) {
             $_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5]->num_rows = array();
         }
+        if (is_array($this->_link_loaded)) {
+            foreach ($this->_link_loaded as $do) {
+                if (
+                        !empty($this->{$do}) &&
+                        is_object($this->{$do}) &&
+                       method_exists($this->{$do}, 'free')
+                    ) {
+                    $this->{$do}->free();
+                }
+            }
+        }
 
     }
 
@@ -4285,8 +4304,35 @@ class DB_DataObject extends DB_DataObject_Overload
     function _get_table() { return $this->table(); }
     function _get_keys()  { return $this->keys();  }
 
+  /**
+   * Get a string to append to the query log depending on time taken.
+   *
+   * This is to allow easier grepping for slow queries.
+   *
+   * @param float $timeTaken
+   *
+   * @return string
+   */
+  public function getAlertLevel($timeTaken) {
+    if ($timeTaken >= 20) {
+      return '(very-very-very-slow)';
+    }
+    if ($timeTaken > 10) {
+      return '(very-very-slow)';
+    }
+    if ($timeTaken > 5) {
+      return '(very-slow)';
+    }
+    if ($timeTaken > 1) {
+      return '(slow)';
+    }
+    return '';
+  }
 
-
+  public function lastInsertId() {
+    $DB = &$_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5];
+    return $DB->lastInsertId();
+  }
 
 }
 // technially 4.3.2RC1 was broken!!

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Manage the download, validation, and rendering of community messages
@@ -34,7 +34,7 @@ class CRM_Core_CommunityMessages {
   const DEFAULT_PERMISSION = 'administer CiviCRM';
 
   /**
-   * Default time to wait before retrying
+   * Default time to wait before retrying.
    */
   const DEFAULT_RETRY = 7200; // 2 hours
 
@@ -54,16 +54,13 @@ class CRM_Core_CommunityMessages {
   protected $messagesUrl;
 
   /**
-   * Create default instance
+   * Create default instance.
    *
    * @return CRM_Core_CommunityMessages
    */
   public static function create() {
     return new CRM_Core_CommunityMessages(
-      new CRM_Utils_Cache_SqlGroup(array(
-        'group' => 'community-messages',
-        'prefetch' => FALSE,
-      )),
+      Civi::cache('community_messages'),
       CRM_Utils_HttpClient::singleton()
     );
   }
@@ -77,7 +74,7 @@ class CRM_Core_CommunityMessages {
     $this->cache = $cache;
     $this->client = $client;
     if ($messagesUrl === NULL) {
-      $this->messagesUrl = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'communityMessagesUrl', NULL, '*default*');
+      $this->messagesUrl = Civi::settings()->get('communityMessagesUrl');
     }
     else {
       $this->messagesUrl = $messagesUrl;
@@ -127,9 +124,10 @@ class CRM_Core_CommunityMessages {
   }
 
   /**
-   * Download document from URL and parse as JSON
+   * Download document from URL and parse as JSON.
    *
-   * @return NULL|array parsed JSON
+   * @return NULL|array
+   *   parsed JSON
    */
   public function fetchDocument() {
     list($status, $json) = $this->client->get($this->getRenderedUrl());
@@ -160,7 +158,7 @@ class CRM_Core_CommunityMessages {
   }
 
   /**
-   * Pick a message to display
+   * Pick a message to display.
    *
    * @return NULL|array
    */
@@ -203,7 +201,7 @@ class CRM_Core_CommunityMessages {
       'ver' => CRM_Utils_System::version(),
       'uf' => $config->userFramework,
       'php' => phpversion(),
-      'sid' => md5('sid_' . (defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : '') . '_' . $config->userFrameworkBaseURL),
+      'sid' => CRM_Utils_System::getSiteID(),
       'baseUrl' => $config->userFrameworkBaseURL,
       'lang' => $config->lcMessages,
       'co' => $config->defaultContactCountry,
@@ -223,10 +221,10 @@ class CRM_Core_CommunityMessages {
    * @return bool
    */
   public function validateDocument($document) {
-    if (!isset($document['ttl']) || !is_integer($document['ttl'])) {
+    if (!isset($document['ttl']) || !is_int($document['ttl'])) {
       return FALSE;
     }
-    if (!isset($document['retry']) || !is_integer($document['retry'])) {
+    if (!isset($document['retry']) || !is_int($document['retry'])) {
       return FALSE;
     }
     if (!isset($document['messages']) || !is_array($document['messages'])) {

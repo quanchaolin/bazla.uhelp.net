@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,33 +23,27 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class generates form components for Error Handling and Debugging
- *
+ * This class generates form components for Error Handling and Debugging.
  */
 class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
 
   protected $_settings = array(
     'debug_enabled' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
     'backtrace' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
-    'fatalErrorTemplate' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
     'fatalErrorHandler' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
   );
+
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts(' Settings - Debugging and Error Handling '));
@@ -59,5 +53,5 @@ class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
 
     parent::buildQuickForm();
   }
-}
 
+}

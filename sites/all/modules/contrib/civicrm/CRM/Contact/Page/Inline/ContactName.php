@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * Page to disply contact name on top of the summary
- *
+ * Page to display contact name on top of the summary.
  */
 class CRM_Contact_Page_Inline_ContactName extends CRM_Core_Page {
 
@@ -43,12 +40,8 @@ class CRM_Contact_Page_Inline_ContactName extends CRM_Core_Page {
    * Run the page.
    *
    * This method is called after the page is created.
-   *
-   * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     // get the emails for this contact
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
 
@@ -68,5 +61,5 @@ class CRM_Contact_Page_Inline_ContactName extends CRM_Core_Page {
     // finally call parent
     parent::run();
   }
-}
 
+}

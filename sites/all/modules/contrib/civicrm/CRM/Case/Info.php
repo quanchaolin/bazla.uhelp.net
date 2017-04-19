@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class introduces component to the system and provides all the
@@ -31,18 +31,18 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Case_Info extends CRM_Core_Component_Info {
 
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   */
   protected $keyword = 'case';
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function getInfo() {
@@ -56,14 +56,15 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function getAngularModules() {
     $result = array();
     $result['crmCaseType'] = array(
       'ext' => 'civicrm',
-      'js' => array('js/angular-crmCaseType.js'),
-      'css' => array('css/angular-crmCaseType.css'),
+      'js' => array('ang/crmCaseType.js'),
+      'css' => array('ang/crmCaseType.css'),
+      'partials' => array('ang/crmCaseType'),
     );
 
     CRM_Core_Resources::singleton()->addSetting(array(
@@ -74,8 +75,8 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     return $result;
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    * @throws CRM_Core_Exception
    */
@@ -88,24 +89,49 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     return $entities;
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @param bool $getAllUnconditionally
+   * @param bool $descriptions
+   *   Whether to return permission descriptions
    *
    * @return array
    */
-  public function getPermissions($getAllUnconditionally = FALSE) {
-    return array(
-      'delete in CiviCase',
-      'administer CiviCase',
-      'access my cases and activities',
-      'access all cases and activities',
-      'add cases',
+  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+    $permissions = array(
+      'delete in CiviCase' => array(
+        ts('delete in CiviCase'),
+        ts('Delete cases'),
+      ),
+      'administer CiviCase' => array(
+        ts('administer CiviCase'),
+        ts('Define case types, access deleted cases'),
+      ),
+      'access my cases and activities' => array(
+        ts('access my cases and activities'),
+        ts('View and edit only those cases managed by this user'),
+      ),
+      'access all cases and activities' => array(
+        ts('access all cases and activities'),
+        ts('View and edit all cases (for visible contacts)'),
+      ),
+      'add cases' => array(
+        ts('add cases'),
+        ts('Open a new case'),
+      ),
     );
+
+    if (!$descriptions) {
+      foreach ($permissions as $name => $attr) {
+        $permissions[$name] = array_shift($attr);
+      }
+    }
+
+    return $permissions;
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function getReferenceCounts($dao) {
     $result = array();
@@ -139,45 +165,47 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     return $result;
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function getUserDashboardElement() {
     return array();
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function registerTab() {
-    return array('title' => ts('Cases'),
+    return array(
+      'title' => ts('Cases'),
       'url' => 'case',
       'weight' => 50,
     );
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return array
    */
   public function registerAdvancedSearchPane() {
-    return array('title' => ts('Cases'),
+    return array(
+      'title' => ts('Cases'),
       'weight' => 50,
     );
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * @return null
    */
   public function getActivityTypes() {
     return NULL;
   }
 
-  // add shortcut to Create New
   /**
+   * add shortcut to Create New.
    * @param $shortCuts
    */
   public function creatNewShortcut(&$shortCuts) {
@@ -190,11 +218,13 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       );
       if ($atype) {
         $shortCuts = array_merge($shortCuts, array(
-          array('path' => 'civicrm/case/add',
-              'query' => "reset=1&action=add&atype=$atype&context=standalone",
-              'ref' => 'new-case',
-              'title' => ts('Case'),
-            )));
+          array(
+            'path' => 'civicrm/case/add',
+            'query' => "reset=1&action=add&atype=$atype&context=standalone",
+            'ref' => 'new-case',
+            'title' => ts('Case'),
+          ),
+        ));
       }
     }
   }
@@ -205,9 +235,12 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    *
    * If CiviCase is being enabled, load the case related sample data
    *
-   * @param array $oldValue List of component names
-   * @param array $newValue List of component names
-   * @param array $metadata Specification of the setting (per *.settings.php)
+   * @param array $oldValue
+   *   List of component names.
+   * @param array $newValue
+   *   List of component names.
+   * @param array $metadata
+   *   Specification of the setting (per *.settings.php).
    */
   public static function onToggleComponents($oldValue, $newValue, $metadata) {
     if (
@@ -215,14 +248,13 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       &&
       (!$oldValue || !in_array('CiviCase', $oldValue))
     ) {
-      $pathToCaseSampleTpl =  __DIR__ . '/xml/configuration.sample/';
-      $config = CRM_Core_Config::singleton();
-      CRM_Admin_Form_Setting_Component::loadCaseSampleData($config->dsn, $pathToCaseSampleTpl . 'case_sample.mysql.tpl');
+      $pathToCaseSampleTpl = __DIR__ . '/xml/configuration.sample/';
+      CRM_Admin_Form_Setting_Component::loadCaseSampleData($pathToCaseSampleTpl . 'case_sample.mysql.tpl');
       if (!CRM_Case_BAO_Case::createCaseViews()) {
         $msg = ts("Could not create the MySQL views for CiviCase. Your mysql user needs to have the 'CREATE VIEW' permission");
         CRM_Core_Error::fatal($msg);
       }
     }
   }
-}
 
+}

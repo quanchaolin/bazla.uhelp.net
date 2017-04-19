@@ -1,4 +1,5 @@
 // https://civicrm.org/licensing
+/* global CRM:true */
 var CRM = CRM || {};
 var cj = CRM.$ = jQuery;
 CRM._ = _;
@@ -13,7 +14,13 @@ CRM._ = _;
  */
 function ts(text, params) {
   "use strict";
-  text = CRM.strings[text] || text;
+  var d = (params && params.domain) ? ('strings::' + params.domain) : null;
+  if (d && CRM[d] && CRM[d][text]) {
+    text = CRM[d][text];
+  }
+  else if (CRM.strings[text]) {
+    text = CRM.strings[text];
+  }
   if (typeof(params) === 'object') {
     for (var i in params) {
       if (typeof(params[i]) === 'string' || typeof(params[i]) === 'number') {
@@ -25,6 +32,9 @@ function ts(text, params) {
   }
   return text;
 }
+
+// Legacy code - ignore warnings
+/* jshint ignore:start */
 
 /**
  *  This function is called by default at the bottom of template files which have forms that have
@@ -39,12 +49,14 @@ function ts(text, params) {
  */
 function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
   if (elementType == null) {
-    var elementType = 'block';
+    elementType = 'block';
   }
 
+  var myElement, i;
+
   /* This loop is used to display the blocks whose IDs are present within the showBlocks array */
-  for (var i = 0; i < showBlocks.length; i++) {
-    var myElement = document.getElementById(showBlocks[i]);
+  for (i = 0; i < showBlocks.length; i++) {
+    myElement = document.getElementById(showBlocks[i]);
     /* getElementById returns null if element id doesn't exist in the document */
     if (myElement != null) {
       myElement.style.display = elementType;
@@ -55,8 +67,8 @@ function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
   }
 
   /* This loop is used to hide the blocks whose IDs are present within the hideBlocks array */
-  for (var i = 0; i < hideBlocks.length; i++) {
-    var myElement = document.getElementById(hideBlocks[i]);
+  for (i = 0; i < hideBlocks.length; i++) {
+    myElement = document.getElementById(hideBlocks[i]);
     /* getElementById returns null if element id doesn't exist in the document */
     if (myElement != null) {
       myElement.style.display = 'none';
@@ -80,13 +92,14 @@ function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
  * @param  invert               Boolean - if true, we HIDE target on value match; if false, we SHOW target on value match
  */
 function showHideByValue(trigger_field_id, trigger_value, target_element_id, target_element_type, field_type, invert) {
+  var target, j;
 
   if (field_type == 'select') {
     var trigger = trigger_value.split("|");
     var selectedOptionValue = cj('#' + trigger_field_id).val();
 
-    var target = target_element_id.split("|");
-    for (var j = 0; j < target.length; j++) {
+    target = target_element_id.split("|");
+    for (j = 0; j < target.length; j++) {
       if (invert) {
         cj('#' + target[j]).show();
       }
@@ -108,8 +121,8 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
   }
   else {
     if (field_type == 'radio') {
-      var target = target_element_id.split("|");
-      for (var j = 0; j < target.length; j++) {
+      target = target_element_id.split("|");
+      for (j = 0; j < target.length; j++) {
         if (cj('[name="' + trigger_field_id + '"]:first').is(':checked')) {
           if (invert) {
             cj('#' + target[j]).hide();
@@ -145,11 +158,11 @@ var submitcount = 0;
 function submitOnce(obj, formId, procText) {
   // if named button clicked, change text
   if (obj.value != null) {
-    obj.value = procText + " ...";
+    cj('input[name=' + obj.name + ']').val(procText + " ...");
   }
   cj(obj).closest('form').attr('data-warn-changes', 'false');
   if (document.getElementById) { // disable submit button for newer browsers
-    obj.disabled = true;
+    cj('input[name=' + obj.name + ']').attr("disabled", true);
     document.getElementById(formId).submit();
     return true;
   }
@@ -186,11 +199,15 @@ function showHideRow(index) {
   return false;
 }
 
-CRM.utils = CRM.utils || {};
-CRM.strings = CRM.strings || {};
+/* jshint ignore:end */
+
+if (!CRM.utils) CRM.utils = {};
+if (!CRM.strings) CRM.strings = {};
+if (!CRM.vars) CRM.vars = {};
 
 (function ($, _, undefined) {
   "use strict";
+  /* jshint validthis: true */
 
   // Theme classes for unattached elements
   $.fn.select2.defaults.dropdownCssClass = $.ui.dialog.prototype.options.dialogClass = 'crm-container';
@@ -200,39 +217,63 @@ CRM.strings = CRM.strings || {};
 
   // Workaround for https://github.com/ivaynberg/select2/issues/1246
   $.ui.dialog.prototype._allowInteraction = function(e) {
-    return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop, .cke_dialog').length;
+    return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop, .cke_dialog, #civicrm-menu').length;
+  };
+
+  // Implements jQuery hook.prop
+  $.propHooks.disabled = {
+    set: function (el, value, name) {
+      // Sync button enabled status with wrapper css
+      if ($(el).is('span.crm-button > input.crm-form-submit')) {
+        $(el).parent().toggleClass('crm-button-disabled', !!value);
+      }
+      // Sync button enabled status with dialog button
+      if ($(el).is('.ui-dialog input.crm-form-submit')) {
+        $(el).closest('.ui-dialog').find('.ui-dialog-buttonset button[data-identifier='+ $(el).attr('name') +']').prop('disabled', value);
+      }
+      if ($(el).is('.crm-form-date-wrapper .crm-hidden-date')) {
+        $(el).siblings().prop('disabled', value);
+      }
+    }
+  };
+
+  var scriptsLoaded = {};
+  CRM.loadScript = function(url) {
+    if (!scriptsLoaded[url]) {
+      var script = document.createElement('script');
+      scriptsLoaded[url] = $.Deferred();
+      script.onload = function () {
+        if (window.jQuery === CRM.$ && CRM.CMSjQuery) {
+          window.jQuery = CRM.CMSjQuery;
+        }
+        scriptsLoaded[url].resolve();
+      };
+      // Make jQuery global available while script is loading
+      if (window.jQuery !== CRM.$) {
+        CRM.CMSjQuery = window.jQuery;
+        window.jQuery = CRM.$;
+      }
+      script.src = url;
+      document.getElementsByTagName("head")[0].appendChild(script);
+    }
+    return scriptsLoaded[url];
   };
 
   /**
    * Populate a select list, overwriting the existing options except for the placeholder.
    * @param select jquery selector - 1 or more select elements
    * @param options array in format returned by api.getoptions
-   * @param placeholder string
+   * @param placeholder string|bool - new placeholder or false (default) to keep the old one
+   * @param value string|array - will silently update the element with new value without triggering change
    */
-  CRM.utils.setOptions = function(select, options, placeholder) {
+  CRM.utils.setOptions = function(select, options, placeholder, value) {
     $(select).each(function() {
       var
         $elect = $(this),
-        val = $elect.val() || [],
-        opts = placeholder || placeholder === '' ? '' : '[value!=""]',
-        newOptions = '',
-        theme = function(options) {
-          _.each(options, function(option) {
-            if (option.children) {
-              newOptions += '<optgroup label="' + option.value + '">';
-              theme(option.children);
-              newOptions += '</optgroup>';
-            } else {
-              var selected = ($.inArray('' + option.key, val) > -1) ? 'selected="selected"' : '';
-              newOptions += '<option value="' + option.key + '"' + selected + '>' + option.value + '</option>';
-            }
-          });
-        };
-      if (!$.isArray(val)) {
-        val = [val];
-      }
+        val = value || $elect.val() || [],
+        opts = placeholder || placeholder === '' ? '' : '[value!=""]';
       $elect.find('option' + opts).remove();
-      theme(options);
+      var newOptions = CRM.utils.renderOptions(options, val);
       if (typeof placeholder === 'string') {
         if ($elect.is('[multiple]')) {
           select.attr('placeholder', placeholder);
@@ -241,8 +282,36 @@ CRM.strings = CRM.strings || {};
         }
       }
       $elect.append(newOptions);
-      $elect.trigger('crmOptionsUpdated', $.extend({}, options)).trigger('change');
+      if (!value) {
+        $elect.trigger('crmOptionsUpdated', $.extend({}, options)).trigger('change');
+      }
     });
+  };
+
+  /**
+   * Render an option list
+   * @param options {array}
+   * @param val {string} default value
+   * @param escapeHtml {bool}
+   * @return string
+   */
+  CRM.utils.renderOptions = function(options, val, escapeHtml) {
+    var rendered = '',
+      esc = escapeHtml === false ? _.identity : _.escape;
+    if (!$.isArray(val)) {
+      val = [val];
+    }
+    _.each(options, function(option) {
+      if (option.children) {
+        rendered += '<optgroup label="' + esc(option.value) + '">' +
+        CRM.utils.renderOptions(option.children, val) +
+        '</optgroup>';
+      } else {
+        var selected = ($.inArray('' + option.key, val) > -1) ? 'selected="selected"' : '';
+        rendered += '<option value="' + esc(option.key) + '"' + selected + '>' + esc(option.value) + '</option>';
+      }
+    });
+    return rendered;
   };
 
   function chainSelect() {
@@ -265,17 +334,19 @@ CRM.strings = CRM.strings || {};
     }
   }
 
-/**
- * Compare Form Input values against cached initial value.
- *
- * @return {Boolean} true if changes have been made.
- */
+  /**
+   * Compare Form Input values against cached initial value.
+   *
+   * @return {Boolean} true if changes have been made.
+   */
   CRM.utils.initialValueChanged = function(el) {
     var isDirty = false;
-    $(':input:visible, .select2-container:visible+:input.select2-offscreen', el).not('[type=submit], [type=button], .crm-action-menu').each(function () {
-      var initialValue = $(this).data('crm-initial-value');
+    $(':input:visible, .select2-container:visible+:input:hidden', el).not('[type=submit], [type=button], .crm-action-menu, :disabled').each(function () {
+      var
+        initialValue = $(this).data('crm-initial-value'),
+        currentValue = $(this).is(':checkbox, :radio') ? $(this).prop('checked') : $(this).val();
       // skip change of value for submit buttons
-      if (initialValue !== undefined && !_.isEqual(initialValue, $(this).val())) {
+      if (initialValue !== undefined && !_.isEqual(initialValue, currentValue)) {
         isDirty = true;
       }
     });
@@ -283,19 +354,90 @@ CRM.strings = CRM.strings || {};
   };
 
   /**
+   * This provides defaults for ui.dialog which either need to be calculated or are different from global defaults
+   *
+   * @param settings
+   * @returns {*}
+   */
+  CRM.utils.adjustDialogDefaults = function(settings) {
+    settings = $.extend({width: '65%', height: '65%', modal: true}, settings || {});
+    // Support relative height
+    if (typeof settings.height === 'string' && settings.height.indexOf('%') > 0) {
+      settings.height = parseInt($(window).height() * (parseFloat(settings.height)/100), 10);
+    }
+    // Responsive adjustment - increase percent width on small screens
+    if (typeof settings.width === 'string' && settings.width.indexOf('%') > 0) {
+      var screenWidth = $(window).width(),
+        percentage = parseInt(settings.width.replace('%', ''), 10),
+        gap = 100-percentage;
+      if (screenWidth < 701) {
+        settings.width = '100%';
+      }
+      else if (screenWidth < 1400) {
+        settings.width = '' + parseInt(percentage+gap-((screenWidth - 700)/7*(gap)/100), 10) + '%';
+      }
+    }
+    return settings;
+  };
+
+  function formatCrmSelect2(row) {
+    var icon = row.icon || $(row.element).data('icon'),
+      color = row.color || $(row.element).data('color'),
+      description = row.description || $(row.element).data('description'),
+      ret = '';
+    if (icon) {
+      ret += '<i class="crm-i ' + icon + '"></i> ';
+    }
+    if (color) {
+      ret += '<span class="crm-select-item-color" style="background-color: ' + color + '"></span> ';
+    }
+    return ret + _.escape(row.text) + (description ? '<div class="crm-select2-row-description"><p>' + _.escape(description) + '</p></div>' : '');
+  }
+
+  /**
    * Wrapper for select2 initialization function; supplies defaults
    * @param options object
    */
   $.fn.crmSelect2 = function(options) {
+    if (options === 'destroy') {
+      return $(this).each(function() {
+        $(this)
+          .removeClass('crm-ajax-select')
+          .select2('destroy');
+      });
+    }
     return $(this).each(function () {
       var
         $el = $(this),
-        settings = {allowClear: !$el.hasClass('required')};
+        iconClass,
+        settings = {
+          allowClear: !$el.hasClass('required'),
+          formatResult: formatCrmSelect2,
+          formatSelection: formatCrmSelect2
+        };
       // quickform doesn't support optgroups so here's a hack :(
       $('option[value^=crm_optgroup]', this).each(function () {
         $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
         $(this).remove();
       });
+
+      // quickform does not support disabled option, so yet another hack to
+      // add disabled property for option values
+      $('option[value^=crm_disabled_opt]', this).attr('disabled', 'disabled');
+
+      // Placeholder icon - total hack hikacking the escapeMarkup function but select2 3.5 dosn't have any other callbacks for this :(
+      if ($el.is('[class*=fa-]')) {
+        settings.escapeMarkup = function (m) {
+          var out = _.escape(m),
+            placeholder = settings.placeholder || $el.data('placeholder') || $el.attr('placeholder') || $('option[value=""]', $el).text();
+          if (m.length && placeholder === m) {
+            iconClass = $el.attr('class').match(/(fa-\S*)/)[1];
+            out = '<i class="crm-i ' + iconClass + '"></i> ' + out;
+          }
+          return out;
+        };
+      }
+
       // Defaults for single-selects
       if ($el.is('select:not([multiple])')) {
         settings.minimumResultsForSearch = 10;
@@ -316,6 +458,15 @@ CRM.strings = CRM.strings || {};
    * @param options object
    */
   $.fn.crmEntityRef = function(options) {
+    if (options === 'destroy') {
+      return $(this).each(function() {
+        var entity = $(this).data('api-entity') || '';
+        $(this)
+          .off('.crmEntity')
+          .removeClass('crm-form-entityref crm-' + entity.toLowerCase() + '-ref')
+          .crmSelect2('destroy');
+      });
+    }
     options = options || {};
     options.select = options.select || {};
     return $(this).each(function() {
@@ -325,15 +476,16 @@ CRM.strings = CRM.strings || {};
         selectParams = {};
       $el.data('api-entity', entity);
       $el.data('select-params', $.extend({}, $el.data('select-params') || {}, options.select));
-      $el.data('api-params', $.extend({}, $el.data('api-params') || {}, options.api));
+      $el.data('api-params', $.extend(true, {}, $el.data('api-params') || {}, options.api));
       $el.data('create-links', options.create || $el.data('create-links'));
-      $el.addClass('crm-form-entityref crm-' + entity + '-ref');
+      $el.addClass('crm-form-entityref crm-' + entity.toLowerCase() + '-ref');
       var settings = {
-        // Use select2 ajax helper instead of CRM.api because it provides more value
+        // Use select2 ajax helper instead of CRM.api3 because it provides more value
         ajax: {
           url: CRM.url('civicrm/ajax/rest'),
+          quietMillis: 300,
           data: function (input, page_num) {
-            var params = $el.data('api-params') || {};
+            var params = getEntityRefApiParams($el);
             params.input = input;
             params.page_num = page_num;
             return {
@@ -348,10 +500,8 @@ CRM.strings = CRM.strings || {};
         },
         minimumInputLength: 1,
         formatResult: CRM.utils.formatSelect2Result,
-        formatSelection: function(row) {
-          return row.label;
-        },
-        escapeMarkup: function (m) {return m;},
+        formatSelection: formatEntityRefSelection,
+        escapeMarkup: _.identity,
         initSelection: function($el, callback) {
           var
             multiple = !!$el.data('select-params').multiple,
@@ -373,42 +523,8 @@ CRM.strings = CRM.strings || {};
           }
         }
       };
-      if ($el.data('create-links') && entity.toLowerCase() === 'contact') {
-        selectParams.formatInputTooShort = function() {
-          var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this);
-          if ($el.data('create-links') && CRM.profileCreate && CRM.profileCreate.length) {
-            txt += ' ' + ts('or') + '<br />' + formatSelect2CreateLinks($el);
-          }
-          return txt;
-        };
-        selectParams.formatNoMatches = function() {
-          var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
-          return txt + (CRM.profileCreate ? ('<br />' + formatSelect2CreateLinks($el)) : '');
-        };
-        $el.on('select2-open.crmEntity', function() {
-          var $el = $(this);
-          $('#select2-drop').off('.crmEntity').on('click.crmEntity', 'a.crm-add-entity', function(e) {
-            $el.select2('close');
-            CRM.loadForm($(this).attr('href'), {
-              dialog: {width: 500, height: 'auto'}
-            }).on('crmFormSuccess', function(e, data) {
-              if (data.status === 'success' && data.id) {
-                CRM.status(ts('%1 Created', {1: data.label}));
-                if ($el.select2('container').hasClass('select2-container-multi')) {
-                  var selection = $el.select2('data');
-                  selection.push(data);
-                  $el.select2('data', selection, true);
-                } else {
-                  $el.select2('data', data, true);
-                }
-              }
-            });
-            return false;
-          });
-        });
-      }
       // Create new items inline - works for tags
-      else if ($el.data('create-links')) {
+      if ($el.data('create-links') && entity.toLowerCase() === 'tag') {
         selectParams.createSearchChoice = function(term, data) {
           if (!_.findKey(data, {label: term})) {
             return {id: "0", term: term, label: term + ' (' + ts('new tag') + ')'};
@@ -416,9 +532,7 @@ CRM.strings = CRM.strings || {};
         };
         selectParams.tokenSeparators = [','];
         selectParams.createSearchChoicePosition = 'bottom';
-      }
-      $el.crmSelect2($.extend(settings, $el.data('select-params'), selectParams))
-        .on('select2-selecting.crmEntity', function(e) {
+        $el.on('select2-selecting.crmEntity', function(e) {
           if (e.val === "0") {
             // Create a new term
             e.object.label = e.object.term;
@@ -439,6 +553,223 @@ CRM.strings = CRM.strings || {};
               });
           }
         });
+      }
+      else {
+        selectParams.formatInputTooShort = function() {
+          var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this);
+          txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
+          return txt;
+        };
+        selectParams.formatNoMatches = function() {
+          var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
+          txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
+          return txt;
+        };
+        $el.on('select2-open.crmEntity', function() {
+          var $el = $(this);
+          renderEntityRefFilterValue($el);
+          $('#select2-drop')
+            .off('.crmEntity')
+            .on('click.crmEntity', 'a.crm-add-entity', function(e) {
+              var extra = $el.data('api-params').extra,
+                formUrl = $(this).attr('href') + '&returnExtra=display_name,sort_name' + (extra ? (',' + extra) : '');
+              $el.select2('close');
+              CRM.loadForm(formUrl, {
+                dialog: {width: 500, height: 220}
+              }).on('crmFormSuccess', function(e, data) {
+                if (data.status === 'success' && data.id) {
+                  data.label = data.extra.sort_name;
+                  CRM.status(ts('%1 Created', {1: data.extra.display_name}));
+                  if ($el.select2('container').hasClass('select2-container-multi')) {
+                    var selection = $el.select2('data');
+                    selection.push(data);
+                    $el.select2('data', selection, true);
+                  } else {
+                    $el.select2('data', data, true);
+                  }
+                }
+              });
+              return false;
+            })
+            .on('change.crmEntity', '.crm-entityref-filter-value', function() {
+              var filter = $el.data('user-filter') || {};
+              filter.value = $(this).val();
+              $(this).toggleClass('active', !!filter.value);
+              $el.data('user-filter', filter);
+              if (filter.value) {
+                // Once a filter has been chosen, rerender create links and refocus the search box
+                $el.select2('close');
+                $el.select2('open');
+              } else {
+                $('.crm-entityref-links', '#select2-drop').replaceWith(renderEntityRefCreateLinks($el));
+              }
+            })
+            .on('change.crmEntity', 'select.crm-entityref-filter-key', function() {
+              var filter = {key: $(this).val()};
+              $(this).toggleClass('active', !!filter.key);
+              $el.data('user-filter', filter);
+              renderEntityRefFilterValue($el);
+              $('.crm-entityref-filter-key', '#select2-drop').focus();
+            });
+        });
+      }
+      $el.crmSelect2($.extend(settings, $el.data('select-params'), selectParams));
+    });
+  };
+
+  /**
+   * Combine api-params with user-filter
+   * @param $el
+   * @returns {*}
+   */
+  function getEntityRefApiParams($el) {
+    var
+      params = $.extend({params: {}}, $el.data('api-params') || {}),
+      // Prevent original data from being modified - $.extend and _.clone don't cut it, they pass nested objects by reference!
+      combined = _.cloneDeep(params),
+      filter = $.extend({}, $el.data('user-filter') || {});
+    if (filter.key && filter.value) {
+      // Fieldname may be prefixed with joins
+      var fieldName = _.last(filter.key.split('.'));
+      // Special case for contact type/sub-type combo
+      if (fieldName === 'contact_type' && (filter.value.indexOf('__') > 0)) {
+        combined.params[filter.key] = filter.value.split('__')[0];
+        combined.params[filter.key.replace('contact_type', 'contact_sub_type')] = filter.value.split('__')[1];
+      } else {
+        // Allow json-encoded api filters e.g. {"BETWEEN":[123,456]}
+        combined.params[filter.key] = filter.value.charAt(0) === '{' ? $.parseJSON(filter.value) : filter.value;
+      }
+    }
+    return combined;
+  }
+
+  function copyAttributes($source, $target, attributes) {
+    _.each(attributes, function(name) {
+      if ($source.attr(name) !== undefined) {
+        $target.attr(name, $source.attr(name));
+      }
+    });
+  }
+
+  /**
+   * @see http://wiki.civicrm.org/confluence/display/CRMDOC/crmDatepicker
+   */
+  $.fn.crmDatepicker = function(options) {
+    return $(this).each(function() {
+      if ($(this).is('.crm-form-date-wrapper .crm-hidden-date')) {
+        // Already initialized - destroy
+        $(this)
+          .off('.crmDatepicker')
+          .css('display', '')
+          .removeClass('crm-hidden-date')
+          .siblings().remove();
+        $(this).unwrap();
+      }
+      if (options === 'destroy') {
+        return;
+      }
+      var
+        $dataField = $(this).wrap('<span class="crm-form-date-wrapper" />'),
+        settings = _.cloneDeep(options || {}),
+        $dateField = $(),
+        $timeField = $(),
+        $clearLink = $(),
+        hasDatepicker = settings.date !== false && settings.date !== 'yy',
+        type = hasDatepicker ? 'text' : 'number';
+
+      if (settings.allowClear !== undefined ? settings.allowClear : !$dataField.is('.required, [required]')) {
+        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ _.escape(ts('Clear')) +'"><i class="crm-i fa-times"></i></a>')
+          .insertAfter($dataField);
+      }
+      if (settings.time !== false) {
+        $timeField = $('<input>').insertAfter($dataField);
+        copyAttributes($dataField, $timeField, ['class', 'disabled']);
+        $timeField
+          .addClass('crm-form-text crm-form-time')
+          .attr('placeholder', $dataField.attr('time-placeholder') === undefined ? ts('Time') : $dataField.attr('time-placeholder'))
+          .change(updateDataField)
+          .timeEntry({
+            spinnerImage: '',
+            show24Hours: settings.time === true || settings.time === undefined ? CRM.config.timeIs24Hr : settings.time == '24'
+          });
+      }
+      if (settings.date !== false) {
+        // Render "number" field for year-only format, calendar popup for all other formats
+        $dateField = $('<input type="' + type + '">').insertAfter($dataField);
+        copyAttributes($dataField, $dateField, ['placeholder', 'style', 'class', 'disabled']);
+        $dateField.addClass('crm-form-' + type);
+        if (hasDatepicker) {
+          settings.minDate = settings.minDate ? CRM.utils.makeDate(settings.minDate) : null;
+          settings.maxDate = settings.maxDate ? CRM.utils.makeDate(settings.maxDate) : null;
+          settings.dateFormat = typeof settings.date === 'string' ? settings.date : CRM.config.dateInputFormat;
+          settings.changeMonth = _.includes(settings.dateFormat, 'm');
+          settings.changeYear = _.includes(settings.dateFormat, 'y');
+          if (!settings.yearRange && settings.minDate !== null && settings.maxDate !== null) {
+            settings.yearRange = '' + CRM.utils.formatDate(settings.minDate, 'yy') + ':' + CRM.utils.formatDate(settings.maxDate, 'yy');
+          }
+          $dateField.addClass('crm-form-date').datepicker(settings);
+        } else {
+          $dateField.attr('min', settings.minDate ? CRM.utils.formatDate(settings.minDate, 'yy') : '1000');
+          $dateField.attr('max', settings.maxDate ? CRM.utils.formatDate(settings.maxDate, 'yy') : '4000');
+        }
+        $dateField.change(updateDataField);
+      }
+      // Rudimentary validation. TODO: Roll into use of jQUery validate and ui.datepicker.validation
+      function isValidDate() {
+        // FIXME: parseDate doesn't work with incomplete date formats; skip validation if no month, day or year in format
+        var lowerFormat = settings.dateFormat.toLowerCase();
+        if (lowerFormat.indexOf('y') < 0 || lowerFormat.indexOf('m') < 0 || lowerFormat.indexOf('d') < 0) {
+          return true;
+        }
+        try {
+          $.datepicker.parseDate(settings.dateFormat, $dateField.val());
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+      function updateInputFields(e, context) {
+        var val = $dataField.val(),
+          time = null;
+        if (context !== 'userInput' && context !== 'crmClear') {
+          if (hasDatepicker) {
+            $dateField.datepicker('setDate', _.includes(val, '-') ? $.datepicker.parseDate('yy-mm-dd', val) : null);
+          } else if ($dateField.length) {
+            $dateField.val(val.slice(0, 4));
+          }
+          if ($timeField.length) {
+            if (val.length === 8) {
+              time = val;
+            } else if (val.length === 19) {
+              time = val.split(' ')[1];
+            }
+            $timeField.timeEntry('setTime', time);
+          }
+        }
+        $clearLink.css('visibility', val ? 'visible' : 'hidden');
+      }
+      function updateDataField(e, context) {
+        // The crmClear event wipes all the field values anyway, so no need to respond
+        if (context !== 'crmClear') {
+          var val = '';
+          if ($dateField.val()) {
+            if (hasDatepicker && isValidDate()) {
+              val = $.datepicker.formatDate('yy-mm-dd', $dateField.datepicker('getDate'));
+              $dateField.removeClass('crm-error');
+            } else if (!hasDatepicker) {
+              val = $dateField.val() + '-01-01';
+            } else {
+              $dateField.addClass('crm-error');
+            }
+          }
+          if ($timeField.val()) {
+            val += (val ? ' ' : '') + $timeField.timeEntry('getTime').toTimeString().substr(0, 8);
+          }
+          $dataField.val(val).trigger('change', ['userInput']);
+        }
+      }
+      $dataField.hide().addClass('crm-hidden-date').on('change.crmDatepicker', updateInputFields);
+      updateInputFields();
     });
   };
 
@@ -450,37 +781,180 @@ CRM.strings = CRM.strings || {};
     else if (row.icon_class) {
       markup += '<div class="crm-select2-icon"><div class="crm-icon ' + row.icon_class + '-icon"></div></div>';
     }
-    markup += '<div><div class="crm-select2-row-label '+(row.label_class || '')+'">' + row.label + '</div>';
-    markup += '<div class="crm-select2-row-description">';
+    markup += '<div><div class="crm-select2-row-label '+(row.label_class || '')+'">' +
+      (row.color ? '<span class="crm-select-item-color" style="background-color: ' + row.color + '"></span> ' : '') +
+      _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : '')) +
+      '</div>' +
+      '<div class="crm-select2-row-description">';
     $.each(row.description || [], function(k, text) {
-      markup += '<p>' + text + '</p>';
+      markup += '<p>' + _.escape(text) + '</p>';
     });
     markup += '</div></div></div>';
     return markup;
   };
 
-  function formatSelect2CreateLinks($el) {
+  function formatEntityRefSelection(row) {
+    return (row.color ? '<span class="crm-select-item-color" style="background-color: ' + row.color + '"></span> ' : '') +
+      _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : ''));
+  }
+
+  function renderEntityRefCreateLinks($el) {
     var
       createLinks = $el.data('create-links'),
-      api = $el.data('api-params') || {},
-      type = api.params ? api.params.contact_type : null;
-    if (createLinks === true) {
-      createLinks = type ? _.where(CRM.profileCreate, {type: type}) : CRM.profileCreate;
+      params = getEntityRefApiParams($el).params,
+      markup = '<div class="crm-entityref-links">';
+    if (!createLinks || $el.data('api-entity').toLowerCase() !== 'contact') {
+      return '';
     }
-    var markup = '';
+    if (createLinks === true) {
+      createLinks = params.contact_type ? _.where(CRM.config.entityRef.contactCreate, {type: params.contact_type}) : CRM.config.entityRef.contactCreate;
+    }
     _.each(createLinks, function(link) {
-      markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">';
-      if (link.type) {
-        markup += '<span class="icon ' + link.type + '-profile-icon"></span> ';
+      var icon;
+      switch (link.type) {
+        case 'Individual':
+          icon = 'fa-user';
+          break;
+
+        case 'Organization':
+          icon = 'fa-building';
+          break;
+
+        case 'Household':
+          icon = 'fa-home';
+          break;
       }
-      markup += link.label + '</a>';
+      markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">';
+      if (icon) {
+        markup += '<i class="crm-i ' + icon + '"></i> ';
+      }
+      markup += _.escape(link.label) + '</a>';
     });
+    markup += '</div>';
+    return markup;
+  }
+
+  function getEntityRefFilters($el) {
+    var
+      entity = $el.data('api-entity').toLowerCase(),
+      filters = $.extend([], CRM.config.entityRef.filters[entity] || []),
+      params = $.extend({params: {}}, $el.data('api-params') || {}).params,
+      result = [];
+    $.each(filters, function() {
+      var filter = $.extend({type: 'select', 'attributes': {}, entity: entity}, this);
+      if (typeof params[filter.key] === 'undefined') {
+        result.push(filter);
+      }
+      else if (filter.key == 'contact_type' && typeof params.contact_sub_type === 'undefined') {
+        filter.options = _.remove(filter.options, function(option) {
+          return option.key.indexOf(params.contact_type + '__') === 0;
+        });
+        result.push(filter);
+      }
+    });
+    return result;
+  }
+
+  /**
+   * Provide markup for entity ref filters
+   */
+  function entityRefFiltersMarkup($el) {
+    var
+      filters = getEntityRefFilters($el),
+      filter = $el.data('user-filter') || {},
+      filterSpec = filter.key ? _.find(filters, {key: filter.key}) : null;
+    if (!filters.length) {
+      return '';
+    }
+    var markup = '<div class="crm-entityref-filters">' +
+      '<select class="crm-entityref-filter-key' + (filter.key ? ' active' : '') + '">' +
+      '<option value="">' + _.escape(ts('Refine search...')) + '</option>' +
+      CRM.utils.renderOptions(filters, filter.key) +
+      '</select>' + entityRefFilterValueMarkup(filter, filterSpec) + '</div>';
     return markup;
   }
 
   /**
+   * Provide markup for entity ref filter value field
+   */
+  function entityRefFilterValueMarkup(filter, filterSpec) {
+    var markup = '';
+    if (filterSpec) {
+      var attrs = '',
+        attributes = _.cloneDeep(filterSpec.attributes);
+      if (filterSpec.type !== 'select') {
+        attributes.type = filterSpec.type;
+        attributes.value = typeof filter.value !== 'undefined' ? filter.value : '';
+      }
+      attributes.class = 'crm-entityref-filter-value' + (filter.value ? ' active' : '');
+      $.each(attributes, function (attr, val) {
+        attrs += ' ' + attr + '="' + val + '"';
+      });
+      if (filterSpec.type === 'select') {
+        markup = '<select' + attrs + '><option value="">' + _.escape(ts('- select -')) + '</option>';
+        if (filterSpec.options) {
+          markup += CRM.utils.renderOptions(filterSpec.options, filter.value);
+        }
+        markup += '</select>';
+      } else {
+        markup = '<input' + attrs + '/>';
+      }
+    }
+    return markup;
+  }
+
+  /**
+   * Render the entity ref filter value field
+   */
+  function renderEntityRefFilterValue($el) {
+    var
+      filter = $el.data('user-filter') || {},
+      filterSpec = filter.key ? _.find(getEntityRefFilters($el), {key: filter.key}) : null,
+      $keyField = $('.crm-entityref-filter-key', '#select2-drop'),
+      $valField = null;
+    if (filterSpec) {
+      $('.crm-entityref-filter-value', '#select2-drop').remove();
+      $valField = $(entityRefFilterValueMarkup(filter, filterSpec));
+      $keyField.after($valField);
+      if (filterSpec.type === 'select' && !filterSpec.options) {
+        loadEntityRefFilterOptions(filter, filterSpec, $valField, $el);
+      }
+    } else {
+      $('.crm-entityref-filter-value', '#select2-drop').hide().val('').change();
+    }
+  }
+
+  /**
+   * Fetch options for a filter via ajax api
+   */
+  function loadEntityRefFilterOptions(filter, filterSpec, $valField, $el) {
+    $valField.prop('disabled', true);
+    // Fieldname may be prefixed with joins - strip those out
+    var fieldName = _.last(filter.key.split('.'));
+    CRM.api3(filterSpec.entity, 'getoptions', {field: fieldName, context: 'search', sequential: 1})
+      .done(function(result) {
+        var entity = $el.data('api-entity').toLowerCase(),
+          globalFilterSpec = _.find(CRM.config.entityRef.filters[entity], {key: filter.key}) || {};
+        // Store options globally so we don't have to look them up again
+        globalFilterSpec.options = result.values;
+        $valField.prop('disabled', false);
+        CRM.utils.setOptions($valField, result.values);
+        $valField.val(filter.value || '');
+      });
+  }
+
+  //CRM-15598 - Override url validator method to allow relative url's (e.g. /index.htm)
+  $.validator.addMethod("url", function(value, element) {
+    if (/^\//.test(value)) {
+      // Relative url: prepend dummy path for validation.
+      value = 'http://domain.tld' + value;
+    }
+    // From jQuery Validation Plugin v1.12.0
+    return this.optional(element) || /^(https?|s?ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(value);
+  });
+
+  /**
    * Wrapper for jQuery validate initialization function; supplies defaults
-   * @param options object
    */
   $.fn.crmValidate = function(params) {
     return $(this).each(function () {
@@ -494,7 +968,7 @@ CRM.strings = CRM.strings || {};
         });
       }
     });
-  }
+  };
 
   // Initialize widgets
   $(document)
@@ -515,15 +989,50 @@ CRM.strings = CRM.strings || {};
           }
         })
         .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
+      $('table.crm-sortable', e.target).DataTable();
+      $('table.crm-ajax-table', e.target).each(function() {
+        var
+          $table = $(this),
+          script = CRM.config.resourceBase + 'js/jquery/jquery.crmAjaxTable.js',
+          $accordion = $table.closest('.crm-accordion-wrapper.collapsed, .crm-collapsible.collapsed');
+        // For tables hidden by collapsed accordions, wait.
+        if ($accordion.length) {
+          $accordion.one('crmAccordion:open', function() {
+            CRM.loadScript(script).done(function() {
+              $table.crmAjaxTable();
+            });
+          });
+        } else {
+          CRM.loadScript(script).done(function() {
+            $table.crmAjaxTable();
+          });
+        }
+      });
       if ($("input:radio[name=radio_ts]").size() == 1) {
         $("input:radio[name=radio_ts]").prop("checked", true);
       }
       $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();
       $('.crm-form-entityref:not(.select2-offscreen, .select2-container)', e.target).crmEntityRef();
       $('select.crm-chain-select-control', e.target).off('.chainSelect').on('change.chainSelect', chainSelect);
+      $('.crm-form-text[data-crm-datepicker]', e.target).each(function() {
+        $(this).crmDatepicker($(this).data('crmDatepicker'));
+      });
+      $('.crm-editable', e.target).not('thead *').each(function() {
+        var $el = $(this);
+        CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmEditable.js').done(function() {
+          $el.crmEditable();
+        });
+      });
       // Cache Form Input initial values
       $('form[data-warn-changes] :input', e.target).each(function() {
-        $(this).data('crm-initial-value', $(this).val());
+        $(this).data('crm-initial-value', $(this).is(':checkbox, :radio') ? $(this).prop('checked') : $(this).val());
+      });
+      $('textarea.crm-form-wysiwyg', e.target).each(function() {
+        if ($(this).hasClass("collapsed")) {
+          CRM.wysiwyg.createCollapsed(this);
+        } else {
+          CRM.wysiwyg.create(this);
+        }
       });
     })
     .on('dialogopen', function(e) {
@@ -533,13 +1042,15 @@ CRM.strings = CRM.strings || {};
         $el.addClass('modal-dialog');
         $('body').css({overflow: 'hidden'});
       }
+      $el.parent().find('.ui-dialog-titlebar .ui-icon-closethick').removeClass('ui-icon-closethick').addClass('fa-times');
       // Add resize button
       if ($el.parent().hasClass('crm-container') && $el.dialog('option', 'resizable')) {
-        $el.parent().find('.ui-dialog-titlebar').append($('<button class="crm-dialog-titlebar-resize ui-dialog-titlebar-close" title="'+ts('Toggle fullscreen')+'" style="right:2em;"/>').button({icons: {primary: 'ui-icon-newwin'}, text: false}));
+        $el.parent().find('.ui-dialog-titlebar').append($('<button class="crm-dialog-titlebar-resize ui-dialog-titlebar-close" title="'+ _.escape(ts('Toggle fullscreen'))+'" style="right:2em;"/>').button({icons: {primary: 'fa-expand'}, text: false}));
         $('.crm-dialog-titlebar-resize', $el.parent()).click(function(e) {
           if ($el.data('origSize')) {
             $el.dialog('option', $el.data('origSize'));
             $el.data('origSize', null);
+            $(this).button('option', 'icons', {primary: 'fa-expand'});
           } else {
             var menuHeight = $('#civicrm-menu').outerHeight();
             $el.data('origSize', {
@@ -548,7 +1059,9 @@ CRM.strings = CRM.strings || {};
               height: $el.dialog('option', 'height')
             });
             $el.dialog('option', {width: '100%', height: ($(window).height() - menuHeight), position: {my: "top", at: "top+"+menuHeight, of: window}});
+            $(this).button('option', 'icons', {primary: 'fa-compress'});
           }
+          $el.trigger('dialogresize');
           e.preventDefault();
         });
       }
@@ -562,80 +1075,21 @@ CRM.strings = CRM.strings || {};
     .on('submit', function(e) {
       // CRM-14353 - disable changes warn when submitting a form
       $('[data-warn-changes]').attr('data-warn-changes', 'false');
-    })
-   ;
+    });
 
   // CRM-14353 - Warn of unsaved changes for forms which have opted in
   window.onbeforeunload = function() {
     if (CRM.utils.initialValueChanged($('form[data-warn-changes=true]:visible'))) {
       return ts('You have unsaved changes.');
-     }
+    }
   };
-
-  /**
-   * Function to make multiselect boxes behave as fields in small screens
-   */
-  function advmultiselectResize() {
-    var amswidth = $("#crm-container form:has(table.advmultiselect)").width();
-    if (amswidth < 700) {
-      $("form table.advmultiselect td").css('display', 'block');
-    }
-    else {
-      $("form table.advmultiselect td").css('display', 'table-cell');
-    }
-    var contactwidth = $('#crm-container #mainTabContainer').width();
-    if (contactwidth < 600) {
-      $('#crm-container #mainTabContainer').addClass('narrowpage');
-      $('#crm-container #mainTabContainer.narrowpage #contactTopBar td').each(function (index) {
-        if (index > 1) {
-          if (index % 2 == 0) {
-            $(this).parent().after('<tr class="narrowadded"></tr>');
-          }
-          var item = $(this);
-          $(this).parent().next().append(item);
-        }
-      });
-    }
-    else {
-      $('#crm-container #mainTabContainer.narrowpage').removeClass('narrowpage');
-      $('#crm-container #mainTabContainer #contactTopBar tr.narrowadded td').each(function () {
-        var nitem = $(this);
-        var parent = $(this).parent();
-        $(this).parent().prev().append(nitem);
-        if (parent.children().size() == 0) {
-          parent.remove();
-        }
-      });
-      $('#crm-container #mainTabContainer.narrowpage #contactTopBar tr.added').detach();
-    }
-    var cformwidth = $('#crm-container #Contact .contact_basic_information-section').width();
-
-    if (cformwidth < 720) {
-      $('#crm-container .contact_basic_information-section').addClass('narrowform');
-      $('#crm-container .contact_basic_information-section table.form-layout-compressed td .helpicon').parent().addClass('hashelpicon');
-      if (cformwidth < 480) {
-        $('#crm-container .contact_basic_information-section').addClass('xnarrowform');
-      }
-      else {
-        $('#crm-container .contact_basic_information-section.xnarrowform').removeClass('xnarrowform');
-      }
-    }
-    else {
-      $('#crm-container .contact_basic_information-section.narrowform').removeClass('narrowform');
-      $('#crm-container .contact_basic_information-section.xnarrowform').removeClass('xnarrowform');
-    }
-  }
-
-  advmultiselectResize();
-  $(window).resize(advmultiselectResize);
 
   $.fn.crmtooltip = function () {
     $(document)
       .on('mouseover', 'a.crm-summary-link:not(.crm-processed)', function (e) {
-        $(this).addClass('crm-processed');
-        $(this).addClass('crm-tooltip-active');
+        $(this).addClass('crm-processed crm-tooltip-active');
         var topDistance = e.pageY - $(window).scrollTop();
-        if (topDistance < 300 | topDistance < $(this).children('.crm-tooltip-wrapper').height()) {
+        if (topDistance < 300 || topDistance < $(this).children('.crm-tooltip-wrapper').height()) {
           $(this).addClass('crm-tooltip-down');
         }
         if (!$(this).children('.crm-tooltip-wrapper').length) {
@@ -646,28 +1100,35 @@ CRM.strings = CRM.strings || {};
         }
       })
       .on('mouseout', 'a.crm-summary-link', function () {
-        $(this).removeClass('crm-processed');
-        $(this).removeClass('crm-tooltip-active crm-tooltip-down');
+        $(this).removeClass('crm-processed crm-tooltip-active crm-tooltip-down');
       })
       .on('click', 'a.crm-summary-link', false);
   };
 
   var helpDisplay, helpPrevious;
+  // Non-ajax example:
+  //   CRM.help('Example title', 'Here is some text to describe this example');
+  // Ajax example (will load help id "foo" from templates/CRM/bar.tpl):
+  //   CRM.help('Example title', {id: 'foo', file: 'CRM/bar'});
   CRM.help = function (title, params, url) {
+    var ajax = typeof params !== 'string';
     if (helpDisplay && helpDisplay.close) {
-      // If the same link is clicked twice, just close the display - todo use underscore method for this comparison
-      if (helpDisplay.isOpen && helpPrevious === JSON.stringify(params)) {
+      // If the same link is clicked twice, just close the display
+      if (helpDisplay.isOpen && _.isEqual(helpPrevious, params)) {
         helpDisplay.close();
         return;
       }
       helpDisplay.close();
     }
-    helpPrevious = JSON.stringify(params);
-    params.class_name = 'CRM_Core_Page_Inline_Help';
-    params.type = 'page';
-    helpDisplay = CRM.alert('...', title, 'crm-help crm-msg-loading', {expires: 0});
-    $.ajax(url || CRM.url('civicrm/ajax/inline'),
-      {
+    helpPrevious = _.cloneDeep(params);
+    helpDisplay = CRM.alert(ajax ? '...' : params, title, 'crm-help ' + (ajax ? 'crm-msg-loading' : 'info'), {expires: 0});
+    if (ajax) {
+      if (!url) {
+        url = CRM.url('civicrm/ajax/inline');
+        params.class_name = 'CRM_Core_Page_Inline_Help';
+        params.type = 'page';
+      }
+      $.ajax(url, {
         data: params,
         dataType: 'html',
         success: function (data) {
@@ -678,8 +1139,8 @@ CRM.strings = CRM.strings || {};
           $('#crm-notification-container .crm-help .notify-content:last').html('Unable to load help file.');
           $('#crm-notification-container .crm-help').removeClass('crm-msg-loading').addClass('error');
         }
-      }
-    );
+      });
+    }
   };
   /**
    * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
@@ -692,19 +1153,22 @@ CRM.strings = CRM.strings || {};
     var opts = $.extend({
       start: ts('Saving...'),
       success: ts('Saved'),
-      error: function() {
-        CRM.alert(ts('Sorry an error occurred and your information was not saved'), ts('Error'));
+      error: function(data) {
+        var msg = $.isPlainObject(data) && data.error_message;
+        CRM.alert(msg || ts('Sorry an error occurred and your information was not saved'), ts('Error'), 'error');
       }
     }, options || {});
-    var $msg = $('<div class="crm-status-box-outer status-start"><div class="crm-status-box-inner"><div class="crm-status-box-msg">' + opts.start + '</div></div></div>')
+    var $msg = $('<div class="crm-status-box-outer status-start"><div class="crm-status-box-inner"><div class="crm-status-box-msg">' + _.escape(opts.start) + '</div></div></div>')
       .appendTo('body');
     $msg.css('min-width', $msg.width());
     function handle(status, data) {
       var endMsg = typeof(opts[status]) === 'function' ? opts[status](data) : opts[status];
       if (endMsg) {
-        $msg.removeClass('status-start').addClass('status-' + status).find('.crm-status-box-msg').html(endMsg);
+        $msg.removeClass('status-start').addClass('status-' + status).find('.crm-status-box-msg').text(endMsg);
         window.setTimeout(function() {
-          $msg.fadeOut('slow', function() {$msg.remove()});
+          $msg.fadeOut('slow', function() {
+            $msg.remove();
+          });
         }, 2000);
       } else {
         $msg.remove();
@@ -719,6 +1183,27 @@ CRM.strings = CRM.strings || {};
       .fail(function(data) {
         handle('error', data);
       });
+  };
+
+  // Convert an Angular promise to a jQuery promise
+  CRM.toJqPromise = function(aPromise) {
+    var jqDeferred = $.Deferred();
+    aPromise.then(
+      function(data) { jqDeferred.resolve(data); },
+      function(data) { jqDeferred.reject(data); }
+      // should we also handle progress events?
+    );
+    return jqDeferred.promise();
+  };
+
+  CRM.toAPromise = function($q, jqPromise) {
+    var aDeferred = $q.defer();
+    jqPromise.then(
+      function(data) { aDeferred.resolve(data); },
+      function(data) { aDeferred.reject(data); }
+      // should we also handle progress events?
+    );
+    return aDeferred.promise;
   };
 
   /**
@@ -777,7 +1262,7 @@ CRM.strings = CRM.strings || {};
       message: ts('Are you sure you want to continue?'),
       url: null,
       width: 'auto',
-      modal: true,
+      height: 'auto',
       resizable: false,
       dialogClass: 'crm-container crm-confirm',
       close: function () {
@@ -788,13 +1273,18 @@ CRM.strings = CRM.strings || {};
         yes: ts('Continue')
       }
     };
+    if (options && options.url) {
+      settings.resizable = true;
+      settings.height = '50%';
+    }
     $.extend(settings, ($.isFunction(options) ? arguments[1] : options) || {});
+    settings = CRM.utils.adjustDialogDefaults(settings);
     if (!settings.buttons && $.isPlainObject(settings.options)) {
       $.each(settings.options, function(op, label) {
         buttons.push({
           text: label,
           'data-op': op,
-          icons: {primary: op === 'no' ? 'ui-icon-close' : 'ui-icon-check'},
+          icons: {primary: op === 'no' ? 'fa-times' : 'fa-check'},
           click: function() {
             var event = $.Event('crmConfirm:' + op);
             $(this).trigger(event);
@@ -835,6 +1325,12 @@ CRM.strings = CRM.strings || {};
     };
   };
 
+  CRM.addStrings = function(domain, strings) {
+    var bucket = (domain == 'civicrm' ? 'strings' : 'strings::' + domain);
+    CRM[bucket] = CRM[bucket] || {};
+    _.extend(CRM[bucket], strings);
+  };
+
   /**
    * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
@@ -847,26 +1343,26 @@ CRM.strings = CRM.strings || {};
       expires: 0
     };
     if ($(this).length) {
-      if (title == '') {
+      if (title === '') {
         var label = $('label[for="' + $(this).attr('name') + '"], label[for="' + $(this).attr('id') + '"]').not('[generated=true]');
         if (label.length) {
           label.addClass('crm-error');
           var $label = label.clone();
-          if (text == '' && $('.crm-marker', $label).length > 0) {
+          if (text === '' && $('.crm-marker', $label).length > 0) {
             text = $('.crm-marker', $label).attr('title');
           }
           $('.crm-marker', $label).remove();
           title = $label.text();
         }
       }
-      $(this).addClass('error');
+      $(this).addClass('crm-error');
     }
     var msg = CRM.alert(text, title, 'error', $.extend(extra, options));
     if ($(this).length) {
       var ele = $(this);
       setTimeout(function () {
         ele.one('change', function () {
-          msg && msg.close && msg.close();
+          if (msg && msg.close) msg.close();
           ele.removeClass('error');
           label.removeClass('crm-error');
         });
@@ -936,7 +1432,7 @@ CRM.strings = CRM.strings || {};
         if (typeof(response.crmMessages) == 'object') {
           $.each(response.crmMessages, function(n, msg) {
             CRM.alert(msg.text, msg.title, msg.type, msg.options);
-          })
+          });
         }
         if (response.backtrace) {
           CRM.console('log', response.backtrace);
@@ -973,6 +1469,9 @@ CRM.strings = CRM.strings || {};
         CRM.confirm({
           title: ts('Preview'),
           resizable: true,
+          // Prevent overlap with the menubar
+          maxHeight: $(window).height() - 30,
+          position: {my: 'center', at: 'center center+15', of: window},
           message: '<div class="crm-custom-image-popup"><img style="max-width: 100%" src="' + $(this).attr('href') + '"></div>',
           options: null
         });
@@ -988,62 +1487,67 @@ CRM.strings = CRM.strings || {};
 
       // Handle clear button for form elements
       .on('click', 'a.crm-clear-link', function() {
-        $(this).css({visibility: 'hidden'}).siblings('.crm-form-radio:checked').prop('checked', false).change();
-        $(this).siblings('input:text').val('').change();
+        $(this).css({visibility: 'hidden'}).siblings('.crm-form-radio:checked').prop('checked', false).trigger('change', ['crmClear']);
+        $(this).siblings('input:text').val('').trigger('change', ['crmClear']);
         return false;
       })
-      .on('change', 'input.crm-form-radio:checked', function() {
-        $(this).siblings('.crm-clear-link').css({visibility: ''});
+      .on('change keyup', 'input.crm-form-radio:checked, input[allowclear=1]', function(e, context) {
+        if (context !== 'crmClear' && ($(this).is(':checked') || ($(this).is('[allowclear=1]') && $(this).val()))) {
+          $(this).siblings('.crm-clear-link').css({visibility: ''});
+        }
+        if (context !== 'crmClear' && $(this).is('[allowclear=1]') && $(this).val() === '') {
+          $(this).siblings('.crm-clear-link').css({visibility: 'hidden'});
+        }
       })
 
       // Allow normal clicking of links within accordions
-      .on('click.crmAccordions', 'div.crm-accordion-header a', function (e) {
+      .on('click.crmAccordions', 'div.crm-accordion-header a, .collapsible-title a', function (e) {
         e.stopPropagation();
       })
       // Handle accordions
       .on('click.crmAccordions', '.crm-accordion-header, .crm-collapsible .collapsible-title', function (e) {
+        var action = 'open';
         if ($(this).parent().hasClass('collapsed')) {
           $(this).next().css('display', 'none').slideDown(200);
         }
         else {
           $(this).next().css('display', 'block').slideUp(200);
+          action = 'close';
         }
-        $(this).parent().toggleClass('collapsed');
+        $(this).parent().toggleClass('collapsed').trigger('crmAccordion:' + action);
         e.preventDefault();
       });
 
     $().crmtooltip();
   });
-  /**
-   * @deprecated
-   */
-  $.fn.crmAccordions = function () {
-    CRM.console('warn', 'Warning: $.crmAccordions was called. This function is deprecated and should not be used.');
-  };
+
   /**
    * Collapse or expand an accordion
    * @param speed
    */
   $.fn.crmAccordionToggle = function (speed) {
     $(this).each(function () {
+      var action = 'open';
       if ($(this).hasClass('collapsed')) {
         $('.crm-accordion-body', this).first().css('display', 'none').slideDown(speed);
       }
       else {
         $('.crm-accordion-body', this).first().css('display', 'block').slideUp(speed);
+        action = 'close';
       }
-      $(this).toggleClass('collapsed');
+      $(this).toggleClass('collapsed').trigger('crmAccordion:' + action);
     });
   };
 
   /**
    * Clientside currency formatting
    * @param number value
+   * @param [optional] boolean onlyNumber - if true, we return formatted amount without currency sign
    * @param [optional] string format - currency representation of the number 1234.56
    * @return string
    */
   var currencyTemplate;
-  CRM.formatMoney = function(value, format) {
+  CRM.formatMoney = function(value, onlyNumber, format) {
     var decimal, separator, sign, i, j, result;
     if (value === 'init' && format) {
       currencyTemplate = format;
@@ -1061,6 +1565,9 @@ CRM.strings = CRM.strings || {};
     i = parseInt(value = Math.abs(value).toFixed(2)) + '';
     j = ((j = i.length) > 3) ? j % 3 : 0;
     result = sign + (j ? i.substr(0, j) + separator : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + separator) + (2 ? decimal + Math.abs(value - i).toFixed(2).slice(2) : '');
+    if ( onlyNumber ) {
+      return result;
+    }
     return format.replace(/1.*234.*56/, result);
   };
 
@@ -1074,4 +1581,82 @@ CRM.strings = CRM.strings || {};
       }
     }
   };
+
+  // Sugar methods for window.localStorage, with a fallback for older browsers
+  var cacheItems = {};
+  CRM.cache = {
+    get: function (name, defaultValue) {
+      try {
+        if (localStorage.getItem('CRM' + name) !== null) {
+          return JSON.parse(localStorage.getItem('CRM' + name));
+        }
+      } catch(e) {}
+      return cacheItems[name] === undefined ? defaultValue : cacheItems[name];
+    },
+    set: function (name, value) {
+      try {
+        localStorage.setItem('CRM' + name, JSON.stringify(value));
+      } catch(e) {}
+      cacheItems[name] = value;
+    },
+    clear: function(name) {
+      try {
+        localStorage.removeItem('CRM' + name);
+      } catch(e) {}
+      delete cacheItems[name];
+    }
+  };
+
+
+
+  // Determine if a user has a given permission.
+  // @see CRM_Core_Resources::addPermissions
+  CRM.checkPerm = function(perm) {
+    return CRM.permissions[perm];
+  };
+
+  // Round while preserving sigfigs
+  CRM.utils.sigfig = function(n, digits) {
+    var len = ("" + n).length;
+    var scale = Math.pow(10.0, len-digits);
+    return Math.round(n / scale) * scale;
+  };
+
+  // Create a js Date object from a unix timestamp or a yyyy-mm-dd string
+  CRM.utils.makeDate = function(input) {
+    switch (typeof input) {
+      case 'object':
+        // already a date object
+        return input;
+
+      case 'string':
+        // convert iso format with or without dashes
+        if (input.indexOf('-') > 0) {
+          return $.datepicker.parseDate('yy-mm-dd', input.substr(0, 10));
+        }
+        return $.datepicker.parseDate('yymmdd', input.substr(0, 8));
+
+      case 'number':
+        // convert unix timestamp
+        return new Date(input * 1000);
+    }
+    throw 'Invalid input passed to CRM.utils.makeDate';
+  };
+
+  // Format a date for output to the user
+  // Input may be a js Date object, a unix timestamp or a yyyy-mm-dd string
+  CRM.utils.formatDate = function(input, outputFormat) {
+    return input ? $.datepicker.formatDate(outputFormat || CRM.config.dateInputFormat, CRM.utils.makeDate(input)) : '';
+  };
+
+  // Used to set appropriate text color for a given background
+  CRM.utils.colorContrast = function (hexcolor) {
+    hexcolor = hexcolor.replace(/[ #]/g, '');
+    var r = parseInt(hexcolor.substr(0, 2), 16),
+     g = parseInt(hexcolor.substr(2, 2), 16),
+     b = parseInt(hexcolor.substr(4, 2), 16),
+     yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return (yiq >= 128) ? 'black' : 'white';
+  };
+
 })(jQuery, _);

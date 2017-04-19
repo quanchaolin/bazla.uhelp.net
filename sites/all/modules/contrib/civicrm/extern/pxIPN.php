@@ -10,7 +10,9 @@
  * in creating this payment processor module
  */
 
-
+if (defined('PANTHEON_ENVIRONMENT')) {
+  ini_set('session.save_handler', 'files');
+}
 session_start();
 
 require_once '../civicrm.config.php';
@@ -35,9 +37,9 @@ $params = array(1 => array($_GET['userid'], 'String'));
 
 $dpsSettings = CRM_Core_DAO::executeQuery($query, $params);
 while ($dpsSettings->fetch()) {
-  $dpsUrl    = $dpsSettings->url_site;
-  $dpsUser   = $dpsSettings->user_name;
-  $dpsKey    = $dpsSettings->password;
+  $dpsUrl = $dpsSettings->url_site;
+  $dpsUser = $dpsSettings->user_name;
+  $dpsKey = $dpsSettings->password;
   $dpsMacKey = $dpsSettings->signature;
 }
 

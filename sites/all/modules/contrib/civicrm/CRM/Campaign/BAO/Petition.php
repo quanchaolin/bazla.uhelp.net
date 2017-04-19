@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,31 +23,32 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
   /**
-   *
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
     // expire cookie in one day
     $this->cookieExpire = (1 * 60 * 60 * 24);
   }
 
   /**
-   * Function to get Petition Details for dashboard.
+   * Get Petition Details for dashboard.
    *
-   * @static
+   * @param array $params
+   * @param bool $onlyCount
+   *
+   * @return array|int
    */
-  static function getPetitionSummary($params = array(), $onlyCount = FALSE) {
+  public static function getPetitionSummary($params = array(), $onlyCount = FALSE) {
     //build the limit and order clause.
     $limitClause = $orderByClause = $lookupTableJoins = NULL;
     if (!$onlyCount) {
@@ -155,9 +156,8 @@ SELECT  petition.id                         as id,
   /**
    * Get the petition count.
    *
-   * @static
    */
-  static function getPetitionCount() {
+  public static function getPetitionCount() {
     $whereClause = 'WHERE ( 1 )';
     $queryParams = array();
     $petitionTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'petition', 'name');
@@ -171,17 +171,16 @@ SELECT  petition.id                         as id,
   }
 
   /**
-   * takes an associative array and creates a petition signature activity
+   * Takes an associative array and creates a petition signature activity.
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object CRM_Campaign_BAO_Petition
-   * @access public
-   * @static
+   * @return CRM_Campaign_BAO_Petition
    */
-  function createSignature(&$params) {
+  public function createSignature(&$params) {
     if (empty($params)) {
-      return;
+      return NULL;
     }
 
     if (!isset($params['sid'])) {
@@ -221,21 +220,23 @@ SELECT  petition.id                         as id,
         CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_activity', $activity->id);
       }
 
-      // set permanent cookie to indicate this petition already signed on the computer
-      setcookie('signed_' . $params['sid'], $activity->id, time() + $this->cookieExpire, '/');
+      // Set browser cookie to indicate this petition was already signed.
+      $config = CRM_Core_Config::singleton();
+      $url_parts = parse_url($config->userFrameworkBaseURL);
+      setcookie('signed_' . $params['sid'], $activity->id, time() + $this->cookieExpire, $url_parts['path'], $url_parts['host'], CRM_Utils_System::isSSL());
     }
 
     return $activity;
   }
 
   /**
-   * @param $activity_id
-   * @param $contact_id
-   * @param $petition_id
+   * @param int $activity_id
+   * @param int $contact_id
+   * @param int $petition_id
    *
    * @return bool
    */
-  function confirmSignature($activity_id, $contact_id, $petition_id) {
+  public function confirmSignature($activity_id, $contact_id, $petition_id) {
     // change activity status to completed (status_id = 2)
     // I wonder why do we need contact_id when we have activity_id anyway? [chastell]
     $sql = 'UPDATE civicrm_activity SET status_id = 2 WHERE id = %1';
@@ -244,18 +245,14 @@ SELECT  petition.id                         as id,
     $params = array(
       1 => array($activity_id, 'Integer'),
       2 => array($contact_id, 'Integer'),
-      3 => array($sourceID, 'Integer')
+      3 => array($sourceID, 'Integer'),
     );
     CRM_Core_DAO::executeQuery($sql, $params);
 
     $sql = 'UPDATE civicrm_activity_contact SET contact_id = %2 WHERE activity_id = %1 AND record_type_id = %3';
     CRM_Core_DAO::executeQuery($sql, $params);
     // remove 'Unconfirmed' tag for this contact
-    $tag_name = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'tag_unconfirmed',
-      NULL,
-      'Unconfirmed'
-    );
+    $tag_name = Civi::settings()->get('tag_unconfirmed');
 
     $sql = "
 DELETE FROM civicrm_entity_tag
@@ -267,28 +264,35 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
       2 => array($tag_name, 'String'),
     );
     CRM_Core_DAO::executeQuery($sql, $params);
-
-    // set permanent cookie to indicate this users email address now confirmed
-    setcookie("confirmed_{$petition_id}",
-      $activity_id,
-      time() + $this->cookieExpire,
-      '/'
-    );
-
-    return TRUE;
+    // validate arguments to setcookie are numeric to prevent header manipulation
+    if (isset($petition_id) && is_numeric($petition_id)
+      && isset($activity_id) && is_numeric($activity_id)) {
+      // set permanent cookie to indicate this users email address now confirmed
+      $config = CRM_Core_Config::singleton();
+      $url_parts = parse_url($config->userFrameworkBaseURL);
+      setcookie("confirmed_{$petition_id}",
+        $activity_id,
+        time() + $this->cookieExpire,
+        $url_parts['path'],
+        $url_parts['host'],
+        CRM_Utils_System::isSSL()
+      );
+      return TRUE;
+    }
+    else {
+      CRM_Core_Error::fatal(ts('Petition Id and/or Activity Id is not of the type Positive.'));
+      return FALSE;
+    }
   }
 
   /**
-   * Function to get Petition Signature Total
+   * Get Petition Signature Total.
    *
-   * @param $surveyId
+   * @param int $surveyId
    *
    * @return array
-   * @internal param bool $all
-   * @internal param int $id
-   * @static
    */
-  static function getPetitionSignatureTotalbyCountry($surveyId) {
+  public static function getPetitionSignatureTotalbyCountry($surveyId) {
     $countries = array();
     $sql = "
             SELECT count(civicrm_address.country_id) as total,
@@ -307,7 +311,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $params = array(
       1 => array($surveyId, 'Integer'),
-      2 => array($sourceID, 'Integer')
+      2 => array($sourceID, 'Integer'),
     );
     $sql .= " GROUP BY civicrm_address.country_id";
     $fields = array('total', 'country_id', 'country_iso', 'country');
@@ -324,16 +328,13 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * Function to get Petition Signature Total
+   * Get Petition Signature Total.
    *
-   * @param $surveyId
+   * @param int $surveyId
    *
    * @return array
-   * @internal param bool $all
-   * @internal param int $id
-   * @static
    */
-  static function getPetitionSignatureTotal($surveyId) {
+  public static function getPetitionSignatureTotal($surveyId) {
     $surveyInfo = CRM_Campaign_BAO_Petition::getSurveyInfo((int) $surveyId);
     //$activityTypeID = $surveyInfo['activity_type_id'];
     $sql = "
@@ -356,7 +357,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
 
 
   /**
-   * @param null $surveyId
+   * @param int $surveyId
    *
    * @return array
    */
@@ -387,17 +388,14 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * Function to get Petition Signature Details
+   * Get Petition Signature Details.
    *
-   * @param $surveyId
-   * @param null $status_id
+   * @param int $surveyId
+   * @param int $status_id
    *
    * @return array
-   * @internal param bool $all
-   * @internal param int $id
-   * @static
    */
-  static function getPetitionSignature($surveyId, $status_id = NULL) {
+  public static function getPetitionSignature($surveyId, $status_id = NULL) {
 
     // sql injection protection
     $surveyId = (int) $surveyId;
@@ -467,14 +465,15 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * This function returns all entities assigned to a specific tag
+   * This function returns all entities assigned to a specific tag.
    *
-   * @param object $tag    an object of a tag.
+   * @param object $tag
+   *   An object of a tag.
    *
-   * @return  array   $contactIds    array of contact ids
-   * @access public
+   * @return array
+   *   array of contact ids
    */
-  function getEntitiesByTag($tag) {
+  public function getEntitiesByTag($tag) {
     $contactIds = array();
     $entityTagDAO = new CRM_Core_DAO_EntityTag();
     $entityTagDAO->tag_id = $tag['id'];
@@ -487,15 +486,14 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * Function to check if contact has signed this petition
+   * Check if contact has signed this petition.
    *
    * @param int $surveyId
    * @param int $contactId
    *
    * @return array
-   * @static
    */
-  static function checkSignature($surveyId, $contactId) {
+  public static function checkSignature($surveyId, $contactId) {
 
     $surveyInfo = CRM_Campaign_BAO_Petition::getSurveyInfo($surveyId);
     $signature = array();
@@ -521,7 +519,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
       2 => array($surveyId, 'Integer'),
       3 => array($surveyInfo['activity_type_id'], 'Integer'),
       4 => array($contactId, 'Integer'),
-      5 => array($sourceID, 'Integer')
+      5 => array($sourceID, 'Integer'),
     );
 
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
@@ -540,16 +538,14 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
   /**
-   * takes an associative array and sends a thank you or email verification email
+   * Takes an associative array and sends a thank you or email verification email.
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
-   * @param $sendEmailMode
+   * @param int $sendEmailMode
    *
    * @throws Exception
-   * @return void
-  @access public
-   * @static
    */
   public static function sendEmail($params, $sendEmailMode) {
 
@@ -564,11 +560,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
      */
 
     // check if the group defined by CIVICRM_PETITION_CONTACTS exists, else create it
-    $petitionGroupName = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'petition_contacts',
-      NULL,
-      'Petition Contacts'
-    );
+    $petitionGroupName = Civi::settings()->get('petition_contacts');
 
     $dao = new CRM_Contact_DAO_Group();
     $dao->title = $petitionGroupName;
@@ -651,7 +643,6 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
             )
           ) . "@$emailDomain";
 
-
         $confirmUrl = CRM_Utils_System::url('civicrm/petition/confirm',
           "reset=1&cid={$se->contact_id}&sid={$se->id}&h={$se->hash}&a={$params['activityId']}&pid={$params['sid']}",
           TRUE
@@ -688,5 +679,5 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
         break;
     }
   }
-}
 
+}

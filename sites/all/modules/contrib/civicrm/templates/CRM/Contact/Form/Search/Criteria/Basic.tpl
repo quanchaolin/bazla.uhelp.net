@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,48 +32,24 @@
       <label>{ts}Complete OR Partial Email{/ts}</label><br />
       {$form.email.html}
     </td>
-    <td>
-      {$form.uf_group_id.label} {help id="id-search-views"}<br />{$form.uf_group_id.html}
-    </td>
-    <td>
-      {if $form.component_mode}
-        {$form.component_mode.label} {help id="id-display-results"}
-        <br />
-        {$form.component_mode.html}
-        {if $form.display_relationship_type}
-          <span id="crm-display_relationship_type">{$form.display_relationship_type.html}</span>
-        {/if}
-      {else}
-          &nbsp;
-      {/if}
-    </td>
-    <td class="labels" rowspan="2">
-      <div class="crm-submit-buttons">
-        {include file="CRM/common/formButtons.tpl" location="top" buttonStyle="width:80px; text-align:center;"}
-      </div>
-      <div class="crm-submit-buttons reset-advanced-search">
-        <a href="{crmURL p='civicrm/contact/search/advanced' q='reset=1'}" id="resetAdvancedSearch" class="crm-hover-button" title="{ts}Clear all search criteria{/ts}">
-          <span class="icon ui-icon-circle-close"></span>
-          {ts}Reset Form{/ts}
-        </a>
-      </div>
-    </td>
+    {if $form.contact_type}
+      <td><label>{ts}Contact Type(s){/ts}</label><br />
+        {$form.contact_type.html}
+      </td>
+    {else}
+      <td>&nbsp;</td>
+    {/if}
   </tr>
   <tr>
-  {if $form.contact_type}
-            <td><label>{ts}Contact Type(s){/ts}</label><br />
-                {$form.contact_type.html}
-            </td>
-  {else}
-    <td>&nbsp;</td>
-  {/if}
   {if $form.group}
     <td>
       <div id='groupselect'><label>{ts}Group(s){/ts} <span class="description">(<a href="#" id='searchbygrouptype'>{ts}search by group type{/ts}</a>)</span></label>
+        <br />
         {$form.group.html}
     </div>
     <div id='grouptypeselect'>
       <label>{ts}Group Type(s){/ts} <span class="description"> (<a href="#" id='searchbygroup'>{ts}search by group{/ts}</a>)</span></label>
+      <br />
       {$form.group_type.html}
         {literal}
         <script type="text/javascript">
@@ -108,12 +84,6 @@
   {else}
     <td>&nbsp;</td>
   {/if}
-    <td>{$form.operator.label} {help id="id-search-operator"}<br />{$form.operator.html}</td>
-    <td>
-      {if $form.deleted_contacts}{$form.deleted_contacts.html} {$form.deleted_contacts.label}{else}&nbsp;{/if}
-    </td>
-  </tr>
-  <tr>
     {if $form.contact_tags}
       <td><label>{ts}Select Tag(s){/ts}</label>
         {$form.contact_tags.html}
@@ -191,18 +161,12 @@
       {$form.contact_source.html}
     </td>
     <td>
-      {if $form.uf_user}
-          {$form.uf_user.label} {$form.uf_user.html}
-          <div class="description font-italic">
-              {ts 1=$config->userFramework}Does the contact have a %1 Account?{/ts}
-          </div>
-      {else}
-          &nbsp;
-      {/if}
-    </td>
-    <td>
       {$form.job_title.label}<br />
       {$form.job_title.html}
+    </td>
+    <td colspan="3">
+      {$form.preferred_language.label}<br />
+      {$form.preferred_language.html}
     </td>
   </tr>
   <tr>
@@ -214,9 +178,15 @@
        {$form.external_identifier.label} {help id="id-external-id" file="CRM/Contact/Form/Contact"}<br />
        {$form.external_identifier.html}
     </td>
-    <td colspan="3">
-      {$form.preferred_language.label}<br />
-      {$form.preferred_language.html}
+    <td>
+      {if $form.uf_user}
+        {$form.uf_user.label} {$form.uf_user.html}
+        <div class="description font-italic">
+          {ts 1=$config->userFramework}Does the contact have a %1 Account?{/ts}
+        </div>
+      {else}
+        &nbsp;
+      {/if}
     </td>
   </tr>
 </table>

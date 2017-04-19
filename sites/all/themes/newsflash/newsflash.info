@@ -53,9 +53,9 @@ settings[newsflash_logoheight] = 100
 settings[newsflash_banner] = 1
 settings[newsflash_pickstyle] = 0
 
-; Information added by drupal.org packaging script on 2012-08-19
-version = "7.x-2.4"
+; Information added by Drupal.org packaging script on 2014-03-04
+version = "7.x-2.5"
 core = "7.x"
 project = "newsflash"
-datestamp = "1345406562"
+datestamp = "1393957107"
 

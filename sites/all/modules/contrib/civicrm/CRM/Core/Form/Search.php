@@ -1,15 +1,15 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
  | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007.                                       |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
  |                                                                    |
  | CiviCRM is distributed in the hope that it will be useful, but     |
  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
@@ -17,12 +17,13 @@
  | See the GNU Affero General Public License for more details.        |
  |                                                                    |
  | You should have received a copy of the GNU Affero General Public   |
- | License along with this program; if not, contact CiviCRM LLC       |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
  | at info[AT]civicrm[DOT]org. If you have questions about the        |
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Base class for most search forms
@@ -33,62 +34,80 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * Are we forced to run a search
    *
    * @var int
-   * @access protected
    */
   protected $_force;
 
   /**
-   * name of search button
+   * Name of search button
    *
    * @var string
-   * @access protected
    */
   protected $_searchButtonName;
 
   /**
-   * name of action button
+   * Name of action button
    *
    * @var string
-   * @access protected
    */
   protected $_actionButtonName;
 
   /**
-   * form values that we will be using
+   * Form values that we will be using
    *
    * @var array
-   * @access public
    */
   public $_formValues;
 
   /**
-   * have we already done this search
+   * Have we already done this search
    *
-   * @access protected
    * @var boolean
    */
   protected $_done;
 
   /**
-   * what context are we being invoked from
+   * What context are we being invoked from
    *
-   * @access protected
    * @var string
    */
   protected $_context = NULL;
 
   /**
-   * Common buildform tasks required by all searches
+   * The list of tasks or actions that a searcher can perform on a result set.
+   *
+   * @var array
    */
-  function buildQuickform() {
-    $resources = CRM_Core_Resources::singleton();
+  protected $_taskList = array();
 
-    if ($resources->ajaxPopupsEnabled) {
-      // Script needed by some popups
-      $this->assign('includeWysiwygEditor', TRUE);
-    }
+  /**
+   * Declare entity reference fields as they will need to be converted.
+   *
+   * The entity reference format looks like '2,3' whereas the Query object expects array(2, 3)
+   * or array('IN' => array(2, 3). The latter is the one we are moving towards standardising on.
+   *
+   * @var array
+   */
+  protected $entityReferenceFields = array();
 
-    $resources->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header');
+  /**
+   * Builds the list of tasks or actions that a searcher can perform on a result set.
+   *
+   * To modify the task list, child classes should alter $this->_taskList,
+   * preferably by extending this method.
+   *
+   * @return array
+   */
+  protected function buildTaskList() {
+    return $this->_taskList;
+  }
+
+  /**
+   * Common buildForm tasks required by all searches.
+   */
+  public function buildQuickform() {
+    CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header')
+      ->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
 
     $this->addButtons(array(
       array(
@@ -99,33 +118,85 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     ));
 
     $this->addClass('crm-search-form');
+
+    $tasks = $this->buildTaskList();
+    $this->addTaskMenu($tasks);
   }
 
   /**
-   * Add checkboxes for each row plus a master checkbox
+   * Add checkboxes for each row plus a master checkbox.
+   *
+   * @param array $rows
    */
-  function addRowSelectors($rows) {
+  public function addRowSelectors($rows) {
     $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('class' => 'select-rows'));
-    foreach ($rows as $row) {
-      $this->addElement('checkbox', $row['checkbox'], NULL, NULL, array('class' => 'select-row'));
+    if (!empty($rows)) {
+      foreach ($rows as $row) {
+        if (CRM_Utils_Array::value('checkbox', $row)) {
+          $this->addElement('checkbox', $row['checkbox'], NULL, NULL, array('class' => 'select-row'));
+        }
+      }
     }
   }
 
   /**
-   * Add actions menu to search results form
-   * @param $tasks
+   * Add actions menu to search results form.
+   *
+   * @param array $tasks
    */
-  function addTaskMenu($tasks) {
-    if (is_array($tasks) && !empty($tasks)) {
-      $tasks = array('' => ts('Actions')) + $tasks;
-      $this->add('select', 'task', NULL, $tasks, FALSE, array('class' => 'crm-select2 crm-action-menu huge crm-search-result-actions'));
-      $this->add('submit', $this->_actionButtonName, ts('Go'), array('class' => 'hiddenElement crm-search-go-button'));
-
-      // Radio to choose "All items" or "Selected items only"
-      $selectedRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', array('checked' => 'checked'));
-      $allRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all');
-      $this->assign('ts_sel_id', $selectedRowsRadio->_attributes['id']);
-      $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
+  public function addTaskMenu($tasks) {
+    $taskMetaData = array();
+    foreach ($tasks as $key => $task) {
+      $taskMetaData[$key] = array('title' => $task);
     }
+    parent::addTaskMenu($taskMetaData);
   }
+
+  /**
+   * Add the sort-name field to the form.
+   *
+   * There is a setting to determine whether email is included in the search & we look this up to determine
+   * which text to choose.
+   *
+   * Note that for translation purposes the full string works better than using 'prefix' hence we use override-able functions
+   * to define the string.
+   */
+  protected function addSortNameField() {
+    $this->addElement(
+      'text',
+      'sort_name',
+      civicrm_api3('setting', 'getvalue', array('name' => 'includeEmailInName', 'group' => 'Search Preferences')) ? $this->getSortNameLabelWithEmail() : $this->getSortNameLabelWithOutEmail(),
+      CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name')
+    );
+  }
+
+  /**
+   * Get the label for the sortName field if email searching is on.
+   *
+   * (email searching is a setting under search preferences).
+   *
+   * @return string
+   */
+  protected function getSortNameLabelWithEmail() {
+    return ts('Name or Email');
+  }
+
+  /**
+   * Get the label for the sortName field if email searching is off.
+   *
+   * (email searching is a setting under search preferences).
+   *
+   * @return string
+   */
+  protected function getSortNameLabelWithOutEmail() {
+    return ts('Name');
+  }
+
+  /**
+   * Explicitly declare the form context for addField().
+   */
+  public function getDefaultContext() {
+    return 'search';
+  }
+
 }

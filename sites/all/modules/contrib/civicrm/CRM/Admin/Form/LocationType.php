@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,27 +23,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class generates form components for Location Type
- *
+ * This class generates form components for Location Type.
  */
 class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
 
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -77,17 +71,19 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
 
     $this->add('checkbox', 'is_active', ts('Enabled?'));
     $this->add('checkbox', 'is_default', ts('Default?'));
-    if ($this->_action == CRM_Core_Action::UPDATE && CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', $this->_id, 'is_reserved')) {
-      $this->freeze(array('name', 'description', 'is_active'));
+
+    if ($this->_action & CRM_Core_Action::UPDATE) {
+      if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', $this->_id, 'is_reserved')) {
+        $this->freeze(array('name', 'description', 'is_active'));
+      }
+      if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', $this->_id, 'is_default')) {
+        $this->freeze(array('is_default'));
+      }
     }
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
     CRM_Utils_System::flushCache('CRM_Core_DAO_LocationType');
@@ -114,7 +110,7 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
 
     if ($params['is_default']) {
       $query = "UPDATE civicrm_location_type SET is_default = 0";
-      CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($query);
     }
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
@@ -124,8 +120,8 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
     $locationType->save();
 
     CRM_Core_Session::setStatus(ts("The location type '%1' has been saved.",
-        array(1 => $locationType->name)
-      ), ts('Saved'), 'success');
+      array(1 => $locationType->name)
+    ), ts('Saved'), 'success');
   }
 
 }

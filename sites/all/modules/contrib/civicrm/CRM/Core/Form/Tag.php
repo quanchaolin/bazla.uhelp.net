@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,41 +23,41 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class generates form element for free tag widget
- *
+ * This class generates form element for free tag widget.
  */
 class CRM_Core_Form_Tag {
   public $_entityTagValues;
 
   /**
-   * Function to build tag widget if correct parent is passed
+   * Build tag widget if correct parent is passed
    *
-   * @param CRM_Core_Form $form form object
-   * @param string $parentNames parent name ( tag name)
-   * @param string $entityTable entitytable 'eg: civicrm_contact'
-   * @param int $entityId entityid  'eg: contact id'
-   * @param boolean $skipTagCreate true if tag need be created using ajax
-   * @param boolean $skipEntityAction true if need to add entry in entry table via ajax
-   * @param string $tagsetElementName if you need to create tagsetlist with specific name
-   *
-   * @internal param bool $searchMode true if widget is used in search eg: advanced search
-   * @return void
-   * @access public
-   * @static
+   * @param CRM_Core_Form $form
+   *   Form object.
+   * @param string $parentNames
+   *   Parent name ( tag name).
+   * @param string $entityTable
+   *   Entitytable 'eg: civicrm_contact'.
+   * @param int $entityId
+   *   Entityid 'eg: contact id'.
+   * @param bool $skipTagCreate
+   *   True if tag need be created using ajax.
+   * @param bool $skipEntityAction
+   *   True if need to add entry in entry table via ajax.
+   * @param string $tagsetElementName
+   *   If you need to create tagsetlist with specific name.
    */
-  static function buildQuickForm(&$form, $parentNames, $entityTable, $entityId = NULL, $skipTagCreate = FALSE,
-    $skipEntityAction = FALSE, $tagsetElementName = NULL ) {
+  public static function buildQuickForm(
+    &$form, $parentNames, $entityTable, $entityId = NULL, $skipTagCreate = FALSE,
+    $skipEntityAction = FALSE, $tagsetElementName = NULL) {
     $tagset = $form->_entityTagValues = array();
     $form->assign("isTagset", FALSE);
     $mode = NULL;
@@ -117,18 +117,17 @@ class CRM_Core_Form_Tag {
   }
 
   /**
-   * Function to save entity tags when it is not save used AJAX
+   * Save entity tags when it is not save used AJAX.
    *
-   * @param array   $params      associated array
-   * @param int     $entityId    entity id, eg: contact id, activity id, case id, file id
-   * @param string  $entityTable entity table
-   * @param object  $form        form object
-   *
-   * @return void
-   * @access public
-   * @static
+   * @param array $params
+   * @param int $entityId
+   *   Entity id, eg: contact id, activity id, case id, file id.
+   * @param string $entityTable
+   *   Entity table.
+   * @param CRM_Core_Form $form
+   *   Form object.
    */
-  static function postProcess(&$params, $entityId, $entityTable = 'civicrm_contact', &$form) {
+  public static function postProcess(&$params, $entityId, $entityTable = 'civicrm_contact', &$form = NULL) {
     if ($form && !empty($form->_entityTagValues)) {
       $existingTags = $form->_entityTagValues;
     }
@@ -188,5 +187,5 @@ class CRM_Core_Form_Tag {
       }
     }
   }
-}
 
+}

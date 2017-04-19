@@ -15,14 +15,14 @@
       <?php if ($logo): ?>
       <div id="logo-title">
       <!-- logo -->
-        <a href="<?php print $front_page ?>" title="<?php print t('Home'); ?>"> <img src="<?php print $logo; ?>" alt="<?php print t('Home'); ?>" id="logo" /> </a>
+        <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>"> <img src="<?php print $logo; ?>" alt="<?php print t('Home'); ?>" id="logo" /> </a>
       <!-- /logo -->
       </div>
       <?php endif; ?>
       <div id="name-and-slogan"><!-- name and sloagan -->
         <?php if ($site_name): ?>
         <!-- site-name -->
-          <h1 class='site-name'> <a href="<?php print $front_page ?>" title="<?php print t('Home'); ?>"> <?php print $site_name; ?> </a> </h1>
+          <h1 class='site-name'> <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>"> <?php print $site_name; ?> </a> </h1>
         <!-- /site-name -->
         <?php endif; ?>
         <?php if ($site_slogan): ?>
@@ -280,4 +280,4 @@
     </div>
   <?php endif; ?>
 </div>
-<!-- /page NF VER 2.4-->
+<!-- /page NF VER 2.5-->

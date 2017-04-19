@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,15 +49,25 @@
       {strip}
         {* handle enable/disable actions*}
         {include file="CRM/common/enableDisableApi.tpl"}
-        {include file="CRM/common/crmeditable.tpl"}
         <table id="options" class="row-highlight">
           <thead>
           <tr>
             <th>{ts}Option Label{/ts}</th>
             <th>{ts}Option Amount{/ts}</th>
+            <th>{ts}Non-deductible Amount{/ts}</th>
+            <th>{ts}Pre Help{/ts}</th>
+            <th>{ts}Post Help{/ts}</th>
+            {if $isEvent}
+              <th>{ts}Participant Count{/ts}</th>
+              <th>{ts}Maximum{/ts}</th>
+            {/if}
             <th>{ts}Default{/ts}</th>
             <th>{ts}Financial Type{/ts}</th>
             <th>{ts}Order{/ts}</th>
+            {if $getTaxDetails}
+              <th>{ts}Tax Label{/ts}</th>
+              <th>{ts}Tax Amount{/ts}</th>
+            {/if}
             <th>{ts}Enabled?{/ts}</th>
             <th></th>
           </tr>
@@ -67,9 +77,23 @@
             <tr id="price_field_value-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
               <td class="crm-price-option-label crm-editable" data-field="label">{$row.label}</td>
               <td class="crm-price-option-value">{$row.amount|crmMoney}</td>
+              <td class="crm-price-option-non-deductible-amount">{$row.non_deductible_amount|crmMoney}</td>
+              <td class="crm-price-option-pre-help">{$row.help_pre}</td>
+              <td class="crm-price-option-post-help">{$row.help_post}</td>
+              {if $isEvent}
+                <td class="crm-price-option-count">{$row.count}</td>
+                <td class="crm-price-option-max">{$row.max_value}</td>
+              {/if}
               <td class="crm-price-option-is_default">{if $row.is_default}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}</td>
               <td class="nowrap crm-price-option-financial-type-id">{$row.financial_type_id}</td>
               <td class="nowrap crm-price-option-order">{$row.weight}</td>
+              {if $getTaxDetails}
+                <td>{if $row.tax_rate != '' }
+                      {$taxTerm} ({$row.tax_rate|string_format:"%.2f"}%)
+                    {/if}
+                </td>
+                <td>{$row.tax_amount|crmMoney}</td>
+              {/if}
               <td id="row_{$row.id}_status" class="crm-price-option-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
               <td>{$row.action|replace:'xx':$row.id}</td>
             </tr>
@@ -89,8 +113,8 @@
   {/if}
   {if $addMoreFields && !$isReserved}
     <div class="action-link">
-      <a href="{crmURL q="reset=1&action=add&fid=$fid&sid=$sid"}" class="button"><span><div class="icon add-icon"></div> {ts 1=$fieldTitle}New Option for '%1'{/ts}</span></a>
-      <a href="{crmURL p="civicrm/admin/price/field" q="reset=1&sid=$sid"}" class="button cancel no-popup"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
+      {crmButton q="reset=1&action=add&fid=$fid&sid=$sid" icon="plus-circle"}{ts 1=$fieldTitle}New Option for '%1'{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/price/field" q="reset=1&sid=$sid" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
     </div>
   {/if}
 {/if}

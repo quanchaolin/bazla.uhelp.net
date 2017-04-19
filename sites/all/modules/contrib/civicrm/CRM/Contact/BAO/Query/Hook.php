@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,18 +23,16 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * Delegate query functions based on hook system
+ * Delegate query functions based on hook system.
  */
 class CRM_Contact_BAO_Query_Hook {
 
@@ -44,11 +42,9 @@ class CRM_Contact_BAO_Query_Hook {
   protected $_queryObjects = NULL;
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object.
    *
    * @return object
-   * @static
-   *
    */
   public static function singleton() {
     static $singleton = NULL;
@@ -58,11 +54,12 @@ class CRM_Contact_BAO_Query_Hook {
     return $singleton;
   }
 
- /**
-  * Get or build the list of search objects (via hook)
-  *
-  * @return array of CRM_Contact_BAO_Query_Interface objects
-  */
+  /**
+   * Get or build the list of search objects (via hook).
+   *
+   * @return array
+   *   Array of CRM_Contact_BAO_Query_Interface objects
+   */
   public function getSearchQueryObjects() {
     if ($this->_queryObjects === NULL) {
       $this->_queryObjects = array();
@@ -94,8 +91,10 @@ class CRM_Contact_BAO_Query_Hook {
   }
 
   /**
-   * @param $query
-   * @param $fnName
+   * Alter search query.
+   *
+   * @param string $query
+   * @param string $fnName
    */
   public function alterSearchQuery(&$query, $fnName) {
     foreach (self::getSearchQueryObjects() as $obj) {
@@ -104,7 +103,7 @@ class CRM_Contact_BAO_Query_Hook {
   }
 
   /**
-   * @param $fieldName
+   * @param string $fieldName
    * @param $mode
    * @param $side
    *
@@ -146,7 +145,7 @@ class CRM_Contact_BAO_Query_Hook {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $type
    */
   public function buildAdvancedSearchPaneForm(&$form, $type) {
@@ -164,4 +163,5 @@ class CRM_Contact_BAO_Query_Hook {
       $obj->setAdvancedSearchPaneTemplatePath($paneTemplatePathArray, $type);
     }
   }
+
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,13 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
+ * @copyright CiviCRM LLC (c) 2004-2017
  *
  * The XMLRepository is responsible for loading XML for case-types.
  * It includes any bulk operations that apply across the list of all XML
@@ -65,7 +64,10 @@ class CRM_Case_XMLRepository {
   }
 
   /**
-   * @param array<String,SimpleXMLElement> $xml
+   * Class constructor.
+   *
+   * @param array $allCaseTypes
+   * @param array $xml
    */
   public function __construct($allCaseTypes = NULL, $xml = array()) {
     $this->allCaseTypes = $allCaseTypes;
@@ -73,8 +75,12 @@ class CRM_Case_XMLRepository {
   }
 
   /**
+   * Retrieve case.
+   *
    * @param string $caseType
-   * @return SimpleXMLElement|FALSE
+   *
+   * @return FALSE|\SimpleXMLElement
+   * @throws \CRM_Core_Exception
    */
   public function retrieve($caseType) {
     // check if xml definition is defined in db
@@ -98,7 +104,8 @@ class CRM_Case_XMLRepository {
       $fileXml = $this->retrieveFile($caseType);
       if ($fileXml) {
         $this->xml[$caseType] = $fileXml;
-      } else {
+      }
+      else {
         return FALSE;
       }
     }
@@ -106,6 +113,8 @@ class CRM_Case_XMLRepository {
   }
 
   /**
+   * Retrieve file.
+   *
    * @param string $caseType
    * @return SimpleXMLElement|FALSE
    */
@@ -136,10 +145,14 @@ class CRM_Case_XMLRepository {
   }
 
   /**
+   * Find xml file.
+   *
    * @param string $caseType
-   * @return null|string file path
+   * @return null|string
+   *   file path
    */
-  public function findXmlFile($caseType) { // first check custom templates directory
+  public function findXmlFile($caseType) {
+    // first check custom templates directory
     $fileName = NULL;
 
     if (!$fileName || !file_exists($fileName)) {
@@ -254,10 +267,11 @@ class CRM_Case_XMLRepository {
    * Determine the number of times a particular activity-type is
    * referenced in CiviCase XML.
    *
-   * @param string $activityType symbolic-name of an activity type
+   * @param string $activityType
+   *   Symbolic-name of an activity type.
    * @return int
    */
-  function getActivityReferenceCount($activityType) {
+  public function getActivityReferenceCount($activityType) {
     $p = new CRM_Case_XMLProcessor_Process();
     $count = 0;
     foreach ($this->getAllCaseTypes() as $caseTypeName) {
@@ -273,10 +287,11 @@ class CRM_Case_XMLRepository {
    * Determine the number of times a particular activity-type is
    * referenced in CiviCase XML.
    *
-   * @param string $relationshipTypeName symbolic-name of a relationship-type
+   * @param string $relationshipTypeName
+   *   Symbolic-name of a relationship-type.
    * @return int
    */
-  function getRelationshipReferenceCount($relationshipTypeName) {
+  public function getRelationshipReferenceCount($relationshipTypeName) {
     $p = new CRM_Case_XMLProcessor_Process();
     $count = 0;
     foreach ($this->getAllCaseTypes() as $caseTypeName) {

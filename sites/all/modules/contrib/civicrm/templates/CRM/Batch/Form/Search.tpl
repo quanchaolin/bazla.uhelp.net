@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,12 +33,12 @@
         {ts}Complete OR partial batch name.{/ts}
         </span>
       </td>
-      <td>{$form.buttons.html}</td>
+      <td>{include file="CRM/common/formButtons.tpl"}</td>
     </tr>
   </table>
 </div>
 <div class="crm-submit-buttons">
-  <a accesskey="N" href="{crmURL p='civicrm/batch/add' q='reset=1&action=add'}" id="newBatch" class="button"><span><div class="icon add-icon"></div>{ts}New Data Entry Batch{/ts}</span></a><br/>
+  {crmButton accesskey="N" p="civicrm/batch/add" q="reset=1&action=add" id="newBatch" icon="crm-i fa-plus-circle"}{ts}New Data Entry Batch{/ts}{/crmButton}<br/>
 </div>
 <table class="crm-batch-selector">
   <thead>

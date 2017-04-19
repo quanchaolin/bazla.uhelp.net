@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
    {include file="CRM/SMS/Form/Provider.tpl"}
 {else}
   {capture assign=wikiLink}{docURL page="Setting up a SMS Provider for CiviSMS" text="(How to add a SMS Provider)" resource="wiki"}{/capture}
-  <div id="help">
+  <div class="help">
     {ts}You can configure one or more SMS Providers for your CiviCRM installation. To learn more about the procedure to install SMS extension and Provider, refer{/ts} {$wikiLink}
   </div>
 
@@ -37,7 +37,6 @@
     {strip}
         {* handle enable/disable actions*}
        {include file="CRM/common/enableDisableApi.tpl"}
-       {include file="CRM/common/crmeditable.tpl"}
         <br/><table class="selector row-highlight">
         <tr class="columnheader">
             <th >{ts}Provider Details{/ts}</th>
@@ -69,6 +68,6 @@
 
   {/if}
   <div class="action-link">
-    <a href="{crmURL p='civicrm/admin/sms/provider' q="action=add&reset=1"}" class="button"><span><div class="icon add-icon"></div>{ts}Add SMS Provider{/ts}</span></a>
+    {crmButton p='civicrm/admin/sms/provider' q="action=add&reset=1" icon="plus-circle"}{ts}Add SMS Provider{/ts}{/crmButton}
   </div>
 {/if}

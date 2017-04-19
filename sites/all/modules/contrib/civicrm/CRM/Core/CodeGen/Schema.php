@@ -4,15 +4,18 @@
  * Create SQL files to create and populate a new schema.
  */
 class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
+
   /**
+   * CRM_Core_CodeGen_Schema constructor.
    *
+   * @param \CRM_Core_CodeGen_Main $config
    */
-  function __construct() {
-    parent::__construct();
+  public function __construct($config) {
+    parent::__construct($config);
     $this->locales = $this->findLocales();
   }
 
-  function run() {
+  public function run() {
     CRM_Core_CodeGen_Util_File::createDir($this->config->sqlCodePath);
 
     $this->generateCreateSql();
@@ -31,7 +34,7 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
   /**
    * @param string $fileName
    */
-  function generateCreateSql($fileName = 'civicrm.mysql') {
+  public function generateCreateSql($fileName = 'civicrm.mysql') {
     echo "Generating sql file\n";
     $template = new CRM_Core_CodeGen_Util_Template('sql');
 
@@ -47,7 +50,7 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
   /**
    * @param string $fileName
    */
-  function generateDropSql($fileName = 'civicrm_drop.mysql') {
+  public function generateDropSql($fileName = 'civicrm_drop.mysql') {
     echo "Generating sql drop tables file\n";
     $dropOrder = array_reverse(array_keys($this->tables));
     $template = new CRM_Core_CodeGen_Util_Template('sql');
@@ -55,13 +58,13 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
     $template->run('drop.tpl', $this->config->sqlCodePath . $fileName);
   }
 
-  function generateNavigation() {
+  public function generateNavigation() {
     echo "Generating navigation file\n";
     $template = new CRM_Core_CodeGen_Util_Template('sql');
     $template->run('civicrm_navigation.tpl', $this->config->sqlCodePath . "civicrm_navigation.mysql");
   }
 
-  function generateLocaleDataSql() {
+  public function generateLocaleDataSql() {
     $template = new CRM_Core_CodeGen_Util_Template('sql');
 
     global $tsLocale;
@@ -91,7 +94,7 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
     $tsLocale = $oldTsLocale;
   }
 
-  function generateSample() {
+  public function generateSample() {
     $template = new CRM_Core_CodeGen_Util_Template('sql');
     $sections = array(
       'civicrm_sample.tpl',
@@ -105,18 +108,12 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
   /**
    * @return array
    */
-  function findLocales() {
+  public function findLocales() {
     require_once 'CRM/Core/Config.php';
     $config = CRM_Core_Config::singleton(FALSE);
     $locales = array();
-    if (substr($config->gettextResourceDir, 0, 1) === '/') {
-      $localeDir = $config->gettextResourceDir;
-    }
-    else {
-      $localeDir = '../' . $config->gettextResourceDir;
-    }
+    $localeDir = CRM_Core_I18n::getResourceDir();
     if (file_exists($localeDir)) {
-      $config->gettextResourceDir = $localeDir;
       $locales = preg_grep('/^[a-z][a-z]_[A-Z][A-Z]$/', scandir($localeDir));
     }
 
@@ -132,4 +129,5 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
 
     return $locales;
   }
+
 }

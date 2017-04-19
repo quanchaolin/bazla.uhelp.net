@@ -1,4 +1,35 @@
 <?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+ */
+
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2017
+ */
 
 /**
  * Class CRM_Utils_Cache_Arraycache
@@ -8,16 +39,17 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
   /**
    * The cache storage container, an in memory array by default
    */
-  private $_cache;
+  protected $_cache;
 
   /**
-   * Constructor
+   * Constructor.
    *
-   * @param array $config an array of configuration params
+   * @param array $config
+   *   An array of configuration params.
    *
    * @return \CRM_Utils_Cache_Arraycache
    */
-  function __construct($config) {
+  public function __construct($config) {
     $this->_cache = array();
   }
 
@@ -25,7 +57,7 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
    * @param string $key
    * @param mixed $value
    */
-  function set($key, &$value) {
+  public function set($key, &$value) {
     $this->_cache[$key] = $value;
   }
 
@@ -34,20 +66,20 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
    *
    * @return mixed
    */
-  function get($key) {
+  public function get($key) {
     return CRM_Utils_Array::value($key, $this->_cache);
   }
 
   /**
    * @param string $key
    */
-  function delete($key) {
+  public function delete($key) {
     unset($this->_cache[$key]);
   }
 
-  function flush() {
+  public function flush() {
     unset($this->_cache);
     $this->_cache = array();
   }
-}
 
+}

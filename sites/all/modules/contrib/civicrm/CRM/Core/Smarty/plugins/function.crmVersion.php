@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -41,14 +41,17 @@
  *
  * {crmVersion redact=auto assign=ver}The version is {$ver}.
  * @endcode
+ *
+ * @param $params
+ * @param $smarty
+ *
+ * @return string
  */
 function smarty_function_crmVersion($params, &$smarty) {
   $version = CRM_Utils_System::version();
 
-  $redact = !CRM_Core_Permission::check('access CiviCRM');
-  if ($redact) {
-    $parts = explode('.', $version);
-    $version = $parts[0] . '.' . $parts[1] . '.x';
+  if (!CRM_Core_Permission::check('access CiviCRM')) {
+    $version = CRM_Utils_System::majorVersion();
   }
 
   if (isset($params['assign'])) {

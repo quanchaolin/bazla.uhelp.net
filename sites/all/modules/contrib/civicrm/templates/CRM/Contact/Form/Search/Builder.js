@@ -2,16 +2,29 @@
 (function($, CRM) {
   'use strict';
 
+  /* jshint validthis: true */
   /**
    * Handle user input - field or operator selection.
    *
-   * Decide whether to display select drop down, regular text or date 
+   * Decide whether to display select drop down, regular text or date
    * field for the given field and row.
    */
   function handleUserInputField() {
     var row = $(this).closest('tr');
     var field = $('select[id^=mapper][id$="_1"]', row).val();
-    var op = $('select[id^=operator]', row).val();
+    var operator = $('select[id^=operator]', row);
+    var op = operator.val();
+    
+    var patt = /_1$/; // pattern to check if the change event came from field name
+    if (field !== null && patt.test(this.id)) {
+      if ($.inArray(field, CRM.searchBuilder.stringFields) >= 0) {
+        // string operators
+        buildOperator(operator, CRM.searchBuilder.stringOperators);
+      } else {
+        // general operators
+        buildOperator(operator, CRM.searchBuilder.generalOperators);
+      }
+    }
 
     // These Ops don't get any input field.
     var noFieldOps = ['', 'IS EMPTY', 'IS NOT EMPTY', 'IS NULL', 'IS NOT NULL'];
@@ -39,6 +52,20 @@
   }
 
   /**
+   * Add appropriate operator to selected field
+   * @param operator: jQuery object
+   * @param options: array
+   */
+  function buildOperator(operator, options) {
+    var selected = operator.val();
+    operator.html('');
+    $.each(options, function(value, label) {
+      operator.append('<option value="' + value + '">' + label + '</option>');
+    });
+    operator.val(selected);
+  }
+
+  /**
    * Add select list if appropriate for this operation
    * @param row: jQuery object
    * @param field: string
@@ -63,7 +90,7 @@
     $('input[id^=value]', row)
       .hide()
       .after('<select class="crm-form-' + multiSelect.substr(0, 5) + 'select required" ' + multiSelect + '><option value="">' + ts('Loading') + '...</option></select>');
-    
+
     fetchOptions(row, field);
   }
 
@@ -122,8 +149,12 @@
       }
     }
     $.each(CRM.searchBuilder.fieldOptions[field], function(key, option) {
-      var selected = ($.inArray(''+option.key, options) > -1) ? 'selected="selected"' : '';
-      select.append('<option value="' + option.key + '"' + selected + '>' + option.value + '</option>');
+      var optionKey = option.key;
+      if ($.inArray(field, CRM.searchBuilder.searchByLabelFields) >= 0) {
+        optionKey = option.value;
+      }
+      var selected = ($.inArray(''+optionKey, options) > -1) ? 'selected="selected"' : '';
+      select.append('<option value="' + optionKey + '"' + selected + '>' + option.value + '</option>');
     });
     select.change();
   }
@@ -179,7 +210,7 @@
       $('tr:not(.crm-search-builder-add-row)', block).each(function(rowNo) {
         var row = $(this);
         if ($('select:first', row).val() === '') {
-          if (!skippedRow && (rowNo == 0 || blockNo + 1 == newBlock)) {
+          if (!skippedRow && (rowNo === 0 || blockNo + 1 == newBlock)) {
             skippedRow = true;
           }
           else {
@@ -234,7 +265,7 @@
       .on('change', '.crm-search-value select', function() {
         var value = $(this).val() || '';
         if ($(this).attr('multiple') == 'multiple' && value.length) {
-          value = '(' + value.join(',') + ')';
+          value = value.join(',');
         }
         $(this).siblings('input').val(value);
       })

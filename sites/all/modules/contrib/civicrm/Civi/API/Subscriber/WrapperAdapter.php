@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,16 +23,17 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\API\Subscriber;
+
 use Civi\API\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * This is a wrapper for the legacy "API Wrapper" interface which allows
  * wrappers to run through the new kernel. It translates from dispatcher events
- * ('api.prepare', 'api.respond') to wrapper calls ('fromApiInput', 'toApiOutput').
+ * ('civi.api.prepare', 'civi.api.respond') to wrapper calls ('fromApiInput', 'toApiOutput').
  */
 class WrapperAdapter implements EventSubscriberInterface {
 
@@ -53,13 +54,15 @@ class WrapperAdapter implements EventSubscriberInterface {
 
   /**
    * @param array $defaults
+   *   array(\API_Wrapper).
    */
-  function __construct($defaults = array()) {
+  public function __construct($defaults = array()) {
     $this->defaults = $defaults;
   }
 
   /**
    * @param \Civi\API\Event\PrepareEvent $event
+   *   API preparation event.
    */
   public function onApiPrepare(\Civi\API\Event\PrepareEvent $event) {
     $apiRequest = $event->getApiRequest();
@@ -74,6 +77,7 @@ class WrapperAdapter implements EventSubscriberInterface {
 
   /**
    * @param \Civi\API\Event\RespondEvent $event
+   *   API response event.
    */
   public function onApiRespond(\Civi\API\Event\RespondEvent $event) {
     $apiRequest = $event->getApiRequest();
@@ -89,6 +93,7 @@ class WrapperAdapter implements EventSubscriberInterface {
 
   /**
    * @param array $apiRequest
+   *   The full API request.
    * @return array<\API_Wrapper>
    */
   public function getWrappers($apiRequest) {
@@ -98,4 +103,5 @@ class WrapperAdapter implements EventSubscriberInterface {
     }
     return $apiRequest['wrappers'];
   }
+
 }

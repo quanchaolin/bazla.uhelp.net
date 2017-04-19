@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,34 +23,30 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * form to process actions on the field aspect of Custom
+ * Form to process actions on the field aspect of Custom.
  */
 class CRM_UF_Form_Field extends CRM_Core_Form {
 
   /**
-   * the uf group id saved to the session for an update
+   * The uf group id saved to the session for an update.
    *
    * @var int
-   * @access protected
    */
   protected $_gid;
 
   /**
-   * The field id, used when editing the field
+   * The field id, used when editing the field.
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
@@ -58,48 +54,42 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * The set of fields that we can view/edit in the user field framework
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 
   /**
-   * the title for field
+   * The title for field.
    *
    * @var int
-   * @access protected
    */
   protected $_title;
 
   /**
-   * The set of fields sent to the select element
+   * The set of fields sent to the select element.
    *
    * @var array
-   * @access protected
    */
   protected $_selectFields;
 
   /**
-   * to store fields with if locationtype exits status
+   * store fields with if locationtype exits status.
    *
    * @var array
-   * @access protected
    */
   protected $_hasLocationTypes;
 
   /**
-   * is this profile has searchable field
+   * Is this profile has searchable field.
    * or is any field having in selector true.
    *
    * @var boolean.
-   * @access protected
    */
   protected $_hasSearchableORInSelector;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
@@ -115,9 +105,12 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext($url);
-      $breadCrumb = array(array('title' => ts('CiviCRM Profile Fields'),
+      $breadCrumb = array(
+        array(
+          'title' => ts('CiviCRM Profile Fields'),
           'url' => $url,
-        ));
+        ),
+      );
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
     }
 
@@ -183,26 +176,24 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Delete Profile Field'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+        array(
+          'type' => 'next',
+          'name' => ts('Delete Profile Field'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      ));
       return;
     }
 
@@ -300,7 +291,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $defaultLocation = $this->_location_types[$defaultLocationType->id];
       unset($this->_location_types[$defaultLocationType->id]);
       $this->_location_types = array(
-        $defaultLocationType->id => $defaultLocation) + $this->_location_types;
+        $defaultLocationType->id => $defaultLocation,
+      ) + $this->_location_types;
     }
 
     $this->_location_types = array('Primary') + $this->_location_types;
@@ -374,8 +366,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
 
     $this->_defaults = array();
-    $js              = "<script type='text/javascript'>\n";
-    $formName        = "document.{$this->_name}";
+    $js = "<script type='text/javascript'>\n";
+    $formName = "document.{$this->_name}";
 
     $alreadyMixProfile = FALSE;
     if (CRM_Core_BAO_UFField::checkProfileType($this->_gid)) {
@@ -420,7 +412,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       }
     }
 
-    // CRM_Core_Error::debug(array($sel1, $sel2, $sel3, $sel4));
     $sel->setOptions(array($sel1, $sel2, $sel3, $sel4));
 
     // proper interpretation of spec in CRM-8732
@@ -442,8 +433,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     //CRM-4363
     $js = array('onChange' => "mixProfile();");
     // should the field appear in selectors (as a column)?
-    $this->add('checkbox', 'in_selector', ts('Results Column?'), NULL, NULL, $js);
-    $this->add('checkbox', 'is_searchable', ts('Searchable?'), NULL, NULL, $js);
+    $this->add('advcheckbox', 'in_selector', ts('Results Column?'), NULL, NULL, $js);
+    $this->add('advcheckbox', 'is_searchable', ts('Searchable?'), NULL, NULL, $js);
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFField');
 
@@ -454,14 +445,11 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $this->add('textarea', 'help_pre', ts('Field Pre Help'), $attributes['help_pre']);
     $this->add('textarea', 'help_post', ts('Field Post Help'), $attributes['help_post']);
 
-    $this->add('checkbox', 'is_required', ts('Required?'));
+    $this->add('advcheckbox', 'is_required', ts('Required?'));
 
-    $this->add('checkbox', 'is_multi_summary', ts('Include in multi-record listing?'));
-    $this->add('checkbox', 'is_active', ts('Active?'));
-    $this->add('checkbox', 'is_view', ts('View Only?'));
-
-    // $this->add( 'checkbox', 'is_registration', ts( 'Display in Registration Form?' ) );
-    //$this->add( 'checkbox', 'is_match'       , ts( 'Key to Match Contacts?'        ) );
+    $this->add('advcheckbox', 'is_multi_summary', ts('Include in multi-record listing?'));
+    $this->add('advcheckbox', 'is_active', ts('Active?'));
+    $this->add('advcheckbox', 'is_view', ts('View Only?'));
 
     $this->add('text', 'label', ts('Field Label'), $attributes['label']);
 
@@ -472,24 +460,23 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     // add buttons
     $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-          'js' => $js,
-        ),
-        array(
-          'type' => 'next',
-          'name' => ts('Save and New'),
-          'subName' => 'new',
-          'js' => $js,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+      array(
+        'type' => 'next',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+        'js' => $js,
+      ),
+      array(
+        'type' => 'next',
+        'name' => ts('Save and New'),
+        'subName' => 'new',
+        'js' => $js,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
 
     $this->addFormRule(array('CRM_UF_Form_Field', 'formRule'), $this);
 
@@ -505,17 +492,16 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
-    $ids = array('uf_group' => $this->_gid);
+
     if ($this->_action & CRM_Core_Action::DELETE) {
       $fieldValues = array('uf_group_id' => $this->_gid);
       CRM_Utils_Weight::delWeight('CRM_Core_DAO_UFField', $this->_id, $fieldValues);
-      $deleted     = CRM_Core_BAO_UFField::del($this->_id);
+      $deleted = CRM_Core_BAO_UFField::del($this->_id);
 
       //update group_type every time. CRM-3608
       if ($this->_gid && $deleted) {
@@ -530,14 +516,14 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     // store the submitted values in an array
     $params = $this->controller->exportValues('Field');
+    $params['uf_group_id'] = $this->_gid;
     if ($params['visibility'] == 'User and User Admin Only') {
       $params['is_searchable'] = $params['in_selector'] = 0;
     }
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $ids['uf_field'] = $this->_id;
+      $params['id'] = $this->_id;
     }
-
 
     $name = NULL;
     if (isset($params['field_name'][1]) && isset($this->_selectFields[$params['field_name'][1]])) {
@@ -551,13 +537,13 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
 
     //check for duplicate fields
-    if ($params["field_name"][0] != "Formatting" && CRM_Core_BAO_UFField::duplicateField($params, $ids)) {
+    if ($params["field_name"][0] != "Formatting" && CRM_Core_BAO_UFField::duplicateField($params, array('uf_group' => $params['uf_group_id'], 'uf_field' => $params['id']))) {
       CRM_Core_Session::setStatus(ts('The selected field already exists in this profile.'), ts('Field Not Added'), 'error');
       return;
     }
     else {
       $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
-      $ufField = CRM_Core_BAO_UFField::add($params, $ids);
+      $ufField = CRM_Core_BAO_UFField::add($params);
 
       //reset other field is searchable and in selector settings, CRM-4363
       if ($this->_hasSearchableORInSelector &&
@@ -569,7 +555,10 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $config = CRM_Core_Config::singleton();
       $showBestResult = FALSE;
       if (in_array($ufField->field_name, array(
-        'country', 'state_province')) && count($config->countryLimit) > 1) {
+        'country',
+        'state_province',
+      )) && count($config->countryLimit) > 1
+      ) {
         // get state or country field weight if exists
         $field = 'state_province';
         if ($ufField->field_name == 'state_province') {
@@ -597,51 +586,56 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         CRM_Core_BAO_UFGroup::updateGroupTypes($this->_gid, $fieldsType);
       }
       CRM_Core_Session::setStatus(ts('Your CiviCRM Profile Field \'%1\' has been saved to \'%2\'.',
-          array(1 => $name, 2 => $this->_title)
-        ), ts('Profile Field Saved'), 'success');
+        array(1 => $name, 2 => $this->_title)
+      ), ts('Profile Field Saved'), 'success');
     }
     $buttonName = $this->controller->getButtonName();
 
     $session = CRM_Core_Session::singleton();
     if ($buttonName == $this->getButtonName('next', 'new')) {
-      CRM_Core_Session::setStatus(ts(' You can add another profile field.'), '', 'info');
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/uf/group/field/add',
-          "reset=1&action=add&gid={$this->_gid}&sbr={$showBestResult}"
-        ));
+        "reset=1&action=add&gid={$this->_gid}&sbr={$showBestResult}"
+      ));
     }
     else {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/uf/group/field',
-          "reset=1&action=browse&gid={$this->_gid}"
-        ));
+        "reset=1&action=browse&gid={$this->_gid}"
+      ));
       $session->set('showBestResult', $showBestResult);
     }
   }
 
   /**
-   * validation rule for subtype.
+   * Validation rule for subtype.
    *
-   * @param array $groupType contains all groupTypes.
-   *
-   * @param  string  $fieldType type of field.
-   *
+   * @param string $fieldType
+   *   Type of field.
+   * @param array $groupType
+   *   Contains all groupTypes.
    * @param array $errors
-   *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   *   List of errors to be posted back to the form.
    */
-  static function formRuleSubType($fieldType, $groupType, $errors) {
+  public static function formRuleSubType($fieldType, $groupType, &$errors) {
     if (in_array($fieldType, array(
-      'Participant', 'Contribution', 'Membership', 'Activity'))) {
+      'Participant',
+      'Contribution',
+      'Membership',
+      'Activity',
+    ))) {
       $individualSubTypes = CRM_Contact_BAO_ContactType::subTypes('Individual');
       foreach ($groupType as $value) {
         if (!in_array($value, $individualSubTypes) &&
           !in_array($value, array(
-            'Participant', 'Contribution', 'Membership',
-              'Individual', 'Contact', 'Activity',
-            ))
+            'Participant',
+            'Contribution',
+            'Membership',
+            'Individual',
+            'Contact',
+            'Activity',
+            'Formatting',
+          ))
         ) {
-          $errors['field_name'] = ts('Cannot add or update profile field "%1" with combination of Household or Organization or any subtypes of Household or Organisation.', array(1 => $fieldType));
+          $errors['field_name'] = ts('Cannot add or update profile field "%1" with combination of Household or Organization or any subtypes of Household or Organization.', array(1 => $fieldType));
           break;
         }
       }
@@ -652,7 +646,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         if (!is_array($basicType)) {
           $basicType = array($basicType);
         }
-        if (!in_array($fieldType, $basicType)) {
+        if (!in_array($fieldType, $basicType) && $fieldType != 'Contact') {
           $errors['field_name'] = ts('Cannot add or update profile field type "%1" with combination of subtype other than "%1".',
             array(1 => $fieldType)
           );
@@ -662,21 +656,29 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * validation rule for custom data extends entity column values.
+   * Validation rule for custom data extends entity column values.
    *
-   * @param Object  $customField Custom field
-   * @param Integer $gid         Group Id.
-   * @param String  $fieldType   Group type of the field
-   * @param Array   $errors      Collect errors
+   * @param Object $customField
+   *   Custom field.
+   * @param int $gid
+   *   Group Id.
+   * @param string $fieldType
+   *   Group type of the field.
+   * @param array $errors
+   *   Collect errors.
    *
-   * @return Array  list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRuleCustomDataExtentColumnValue($customField, $gid, $fieldType, &$errors) {
+  public static function formRuleCustomDataExtentColumnValue($customField, $gid, $fieldType, &$errors) {
     // fix me : check object $customField
     if (in_array($fieldType, array(
-          'Participant', 'Contribution', 'Membership', 'Activity', 'Case'))) {
+      'Participant',
+      'Contribution',
+      'Membership',
+      'Activity',
+      'Case',
+    ))) {
       $params = array('id' => $customField->custom_group_id);
       $customGroup = array();
       CRM_Core_BAO_CustomGroup::retrieve($params, $customGroup);
@@ -710,15 +712,17 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   /**
    * Validation rule to prevent multiple fields of primary location type within the same communication type.
    *
-   * @param Array   $fields            Submitted fields
-   * @param String  $profileFieldName  Group Id.
-   * @param Array   $groupFields       List of fields already in the group
-   * @param Array   $errors            Collect errors
+   * @param array $fields
+   *   Submitted fields.
+   * @param string $profileFieldName
+   *   Group Id.
+   * @param array $groupFields
+   *   List of fields already in the group.
+   * @param array $errors
+   *   Collect errors.
    *
-   * @static
-   * @access public
    */
-  static function formRulePrimaryCheck($fields, $profileFieldName, $groupFields, &$errors) {
+  public static function formRulePrimaryCheck($fields, $profileFieldName, $groupFields, &$errors) {
     //FIXME: This may need to also apply to website fields if they are refactored to allow more than one per profile
     $checkPrimary = array('phone' => 'civicrm_phone.phone', 'phone_and_ext' => 'civicrm_phone.phone');
     $whereCheck = NULL;
@@ -735,35 +739,35 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
       foreach ($groupFields as $groupField) {
         // if it is a phone
-        if ($groupField['where'] == $whereCheck && is_null($groupField['location_type_id']) && $groupField['field_id']  != $fieldID) {
+        if ($groupField['where'] == $whereCheck && is_null($groupField['location_type_id']) && $groupField['field_id'] != $fieldID) {
           $primaryOfSameTypeFound = $groupField['title'];
           break;
         }
       }
       if ($primaryOfSameTypeFound) {
-        $errors['field_name'] = ts('You have already added a primary location field of this type: %1', $primaryOfSameTypeFound);
+        $errors['field_name'] = ts('You have already added a primary location field of this type: %1', array(1 => $primaryOfSameTypeFound));
       }
     }
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @param $files
    * @param $self
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($fields, $files, $self) {
-    $is_required     = CRM_Utils_Array::value('is_required', $fields, FALSE);
+  public static function formRule($fields, $files, $self) {
+    $is_required = CRM_Utils_Array::value('is_required', $fields, FALSE);
     $is_registration = CRM_Utils_Array::value('is_registration', $fields, FALSE);
-    $is_view         = CRM_Utils_Array::value('is_view', $fields, FALSE);
-    $in_selector     = CRM_Utils_Array::value('in_selector', $fields, FALSE);
-    $is_active       = CRM_Utils_Array::value('is_active', $fields, FALSE);
+    $is_view = CRM_Utils_Array::value('is_view', $fields, FALSE);
+    $in_selector = CRM_Utils_Array::value('in_selector', $fields, FALSE);
+    $is_active = CRM_Utils_Array::value('is_active', $fields, FALSE);
 
     $errors = array();
     if ($is_view && $is_registration) {
@@ -779,8 +783,13 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
 
     if ($in_selector && in_array($entityName, array(
-      'Contribution', 'Participant', 'Membership', 'Activity'))) {
-      $errors['in_selector'] = ts("'In Selector' cannot be checked for %1 fields.", array(1 => $entityName));
+      'Contribution',
+      'Participant',
+      'Membership',
+      'Activity',
+    ))
+    ) {
+      $errors['in_selector'] = ts("'Results Column' cannot be checked for %1 fields.", array(1 => $entityName));
     }
 
     $isCustomField = FALSE;
@@ -967,7 +976,10 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         if (CRM_Contact_BAO_ContactType::isaSubType($fieldType)) {
           if (CRM_Contact_BAO_ContactType::isaSubType($profileType)) {
             if ($fieldType != $profileType) {
-              $errors['field_name'] = ts('Cannot add or update profile field type "%1" with combination of "%2".', array(1 => $fieldType, 2 => $profileType));
+              $errors['field_name'] = ts('Cannot add or update profile field type "%1" with combination of "%2".', array(
+                1 => $fieldType,
+                2 => $profileType,
+              ));
             }
           }
           else {
@@ -976,7 +988,10 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
               $profileType != $basicType &&
               $profileType != 'Contact'
             ) {
-              $errors['field_name'] = ts('Cannot add or update profile field type "%1" with combination of "%2".', array(1 => $fieldType, 2 => $profileType));
+              $errors['field_name'] = ts('Cannot add or update profile field type "%1" with combination of "%2".', array(
+                1 => $fieldType,
+                2 => $profileType,
+              ));
             }
           }
         }
@@ -990,4 +1005,5 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
     return empty($errors) ? TRUE : $errors;
   }
+
 }

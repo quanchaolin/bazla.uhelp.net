@@ -1,10 +1,9 @@
 <?php
-
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.5                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2014                                |
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -24,23 +23,22 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
- * File for the CiviCRM APIv3 Case functions
+ * This api exposes CiviCRM Case objects.
  * Developed by woolman.org
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Case
- * @copyright CiviCRM LLC (c) 2004-2014
- *
  */
 
 
 /**
- * Open a new case, add client and manager roles, and add standard timeline
+ * Open a new case, add client and manager roles, and standard timeline.
  *
- * @param  array (
+ * @param array $params
+ *
+ * @code
  * //REQUIRED:
  * 'case_type_id' => int OR
  * 'case_type' => str (provide one or the other)
@@ -55,12 +53,11 @@
  * 'start_date' => str datestamp // defaults to: date('YmdHis')
  * 'duration' => int // in minutes
  * 'details' => str // html format
+ * @endcode
  *
  * @throws API_Exception
- * @return array api result array
- *
- * @access public
- * {@getfields case_create}
+ * @return array
+ *   api result array
  */
 function civicrm_api3_case_create($params) {
 
@@ -68,7 +65,11 @@ function civicrm_api3_case_create($params) {
     return civicrm_api3_case_update($params);
   }
 
-  civicrm_api3_verify_mandatory($params, NULL, array('contact_id', 'subject', array('case_type', 'case_type_id')));
+  civicrm_api3_verify_mandatory($params, NULL, array(
+    'contact_id',
+    'subject',
+    array('case_type', 'case_type_id'))
+  );
   _civicrm_api3_case_format_params($params);
 
   // If format_params didn't find what it was looking for, return error
@@ -97,7 +98,7 @@ function civicrm_api3_case_create($params) {
 
   foreach ((array) $params['contact_id'] as $cid) {
     $contactParams = array('case_id' => $caseBAO->id, 'contact_id' => $cid);
-    CRM_Case_BAO_Case::addCaseToContact($contactParams);
+    CRM_Case_BAO_CaseContact::create($contactParams);
   }
 
   // Initialize XML processor with $params
@@ -124,29 +125,53 @@ function civicrm_api3_case_create($params) {
   $values = array();
   _civicrm_api3_object_to_array($caseBAO, $values[$caseBAO->id]);
 
-  return civicrm_api3_create_success($values, $params, 'case', 'create', $caseBAO);
+  return civicrm_api3_create_success($values, $params, 'Case', 'create', $caseBAO);
 }
 
 /**
- * Adjust Metadata for Get Action
+ * Adjust Metadata for Get Action.
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Parameters determined by getfields.
  */
 function _civicrm_api3_case_get_spec(&$params) {
-  $params['contact_id']['api.aliases'] = array('client_id');
-  $params['contact_id']['title'] = 'Case Client';
+  $params['contact_id'] = array(
+    'api.aliases' => array('client_id'),
+    'title' => 'Case Client',
+    'description' => 'Contact id of one or more clients to retrieve cases for',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['activity_id'] = array(
+    'title' => 'Case Activity',
+    'description' => 'Id of an activity in the case',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['tag_id'] = array(
+    'title' => 'Tags',
+    'description' => 'Find activities with specified tags.',
+    'type' => 1,
+    'FKClassName' => 'CRM_Core_DAO_Tag',
+    'FKApiName' => 'Tag',
+    'supports_joins' => TRUE,
+  );
 }
 
 /**
- * Adjust Metadata for Create Action
+ * Adjust Metadata for Create Action.
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_case_create_spec(&$params) {
-  $params['contact_id']['api.aliases'] = array('client_id');
-  $params['contact_id']['title'] = 'Case Client';
-  $params['contact_id']['api.required'] = 1;
+  $params['contact_id'] = array(
+    'api.aliases' => array('client_id'),
+    'title' => 'Case Client',
+    'description' => 'Contact id of case client(s)',
+    'api.required' => 1,
+    'type' => CRM_Utils_Type::T_INT,
+  );
   $params['status_id']['api.default'] = 1;
+  $params['status_id']['api.aliases'] = array('case_status');
   $params['creator_id']['api.default'] = 'user_contact_id';
   $params['creator_id']['type'] = CRM_Utils_Type::T_INT;
   $params['creator_id']['title'] = 'Case Created By';
@@ -154,118 +179,122 @@ function _civicrm_api3_case_create_spec(&$params) {
   $params['medium_id'] = array(
     'name' => 'medium_id',
     'title' => 'Activity Medium',
+    'type' => CRM_Utils_Type::T_INT,
   );
 }
 
 /**
- * Adjust Metadata for Update action
+ * Adjust Metadata for Update action.
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_case_update_spec(&$params) {
   $params['id']['api.required'] = 1;
 }
 
 /**
- * Adjust Metadata for Delete action
+ * Adjust Metadata for Delete action.
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_case_delete_spec(&$params) {
   $params['id']['api.required'] = 1;
 }
 
 /**
- * Get details of a particular case, or search for cases, depending on params
+ * Get details of a particular case, or search for cases, depending on params.
  *
  * Please provide one (and only one) of the four get/search parameters:
  *
- * @param array (
- * 'id' => if set, will get all available info about a case, including contacts and activities
+ * @param array $params
+ *   'id' => if set, will get all available info about a case, including contacts and activities
  *
- * // if no case_id provided, this function will use one of the following search parameters:
- * 'client_id' => finds all cases with a specific client
- * 'activity_id' => returns the case containing a specific activity
- * 'contact_id' => finds all cases associated with a contact (in any role, not just client)
- *
- * {@getfields case_get}
+ *   // if no case_id provided, this function will use one of the following search parameters:
+ *   'client_id' => finds all cases with a specific client
+ *   'activity_id' => returns the case containing a specific activity
+ *   'contact_id' => finds all cases associated with a contact (in any role, not just client)
  *
  * @throws API_Exception
- * @return array (get mode, case_id provided): Array with case details, case roles, case activity ids, (search mode, case_id not provided): Array of cases found@access public
- * @todo Erik Hommel 16 dec 2010 check if all DB fields are returned
+ * @return array
+ *   (get mode, case_id provided): Array with case details, case roles, case activity ids, (search mode, case_id not provided): Array of cases found
  */
 function civicrm_api3_case_get($params) {
   $options = _civicrm_api3_get_options_from_params($params);
-  //search by client
+  $sql = CRM_Utils_SQL_Select::fragment();
+
+  // Add clause to search by client
   if (!empty($params['contact_id'])) {
-    $ids = array();
-    foreach ((array) $params['contact_id'] as $cid) {
-      if (is_numeric($cid)) {
-        $ids = array_merge($ids, CRM_Case_BAO_Case::retrieveCaseIdsByContactId($cid, TRUE));
+    // Legacy support - this field historically supports a nonstandard format of array(1,2,3) as a synonym for array('IN' => array(1,2,3))
+    if (is_array($params['contact_id'])) {
+      $operator = CRM_Utils_Array::first(array_keys($params['contact_id']));
+      if (!in_array($operator, \CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+        $params['contact_id'] = array('IN' => $params['contact_id']);
       }
     }
-    $cases = array();
-    foreach ($ids as $id) {
-      if ($case = _civicrm_api3_case_read($id, $options)) {
-        $cases[$id] = $case;
-      }
+    else {
+      $params['contact_id'] = array('=' => $params['contact_id']);
     }
-    return civicrm_api3_create_success($cases, $params, 'case', 'get');
+    $clause = CRM_Core_DAO::createSQLFilter('contact_id', $params['contact_id']);
+    $sql->where("a.id IN (SELECT case_id FROM civicrm_case_contact WHERE $clause)");
   }
 
-  //search by activity
+  // Add clause to search by activity
   if (!empty($params['activity_id'])) {
-    if (!is_numeric($params['activity_id'])) {
+    if (!CRM_Utils_Rule::positiveInteger($params['activity_id'])) {
       throw new API_Exception('Invalid parameter: activity_id. Must provide a numeric value.');
     }
-    $caseId = CRM_Case_BAO_Case::getCaseIdByActivityId($params['activity_id']);
-    if (!$caseId) {
-      return civicrm_api3_create_success(array(), $params, 'case', 'get');
+    $activityId = $params['activity_id'];
+    $originalId = CRM_Core_DAO::getFieldValue('CRM_Activity_BAO_Activity', $activityId, 'original_id');
+    if ($originalId) {
+      $activityId .= ',' . $originalId;
     }
-    $case = array($caseId => _civicrm_api3_case_read($caseId, $options));
-    return civicrm_api3_create_success($case, $params, 'case', 'get');
+    $sql
+      ->join('civicrm_case_activity', 'INNER JOIN civicrm_case_activity ON civicrm_case_activity.case_id = a.id')
+      ->where("civicrm_case_activity.activity_id IN ($activityId)");
   }
 
-  //search by contacts
-  if ($contact = CRM_Utils_Array::value('contact_id', $params)) {
-    if (!is_numeric($contact)) {
-      throw new API_Exception('Invalid parameter: contact_id.  Must provide a numeric value.');
+  // Clause to search by tag
+  if (!empty($params['tag_id'])) {
+    $dummySpec = array();
+    _civicrm_api3_validate_integer($params, 'tag_id', $dummySpec, 'Case');
+    if (!is_array($params['tag_id'])) {
+      $params['tag_id'] = array('=' => $params['tag_id']);
     }
-
-    $sql = "
-SELECT DISTINCT case_id
-  FROM civicrm_relationship
- WHERE (contact_id_a = $contact
-    OR contact_id_b = $contact)
-   AND case_id IS NOT NULL";
-    $dao = CRM_Core_DAO::executeQuery($sql);
-
-    $cases = array();
-    while ($dao->fetch()) {
-      $cases[$dao->case_id] = _civicrm_api3_case_read($dao->case_id, $options);
+    $clause = \CRM_Core_DAO::createSQLFilter('tag_id', $params['tag_id']);
+    if ($clause) {
+      $sql->where('a.id IN (SELECT entity_id FROM civicrm_entity_tag WHERE entity_table = "civicrm_case" AND !clause)', array('!clause' => $clause));
     }
-    return civicrm_api3_create_success($cases, $params, 'case', 'get');
   }
 
-  // For historic reasons we always return these when an id is provided
-  $caseId = CRM_Utils_Array::value('id', $params);
-  if ($caseId) {
-    $options['return'] = array('contacts' => 1, 'activities' => 1);
-  }
+  $cases = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), array('sequential' => 0) + $params, TRUE, 'Case', $sql);
 
-  $foundcases =  _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Case');
-  $cases = array();
-  foreach ($foundcases['values'] as $foundcase) {
-      if ($case = _civicrm_api3_case_read($foundcase['id'], $options)) {
-        $cases[$foundcase['id']] = $case;
-      }
+  if (empty($options['is_count']) && !empty($cases['values'])) {
+    // For historic reasons we return these by default only when fetching a case by id
+    if (!empty($params['id']) && empty($options['return'])) {
+      $options['return'] = array(
+        'contacts' => 1,
+        'activities' => 1,
+        'contact_id' => 1,
+      );
     }
 
-  return civicrm_api3_create_success($cases, $params, 'case', 'get');
+    _civicrm_api3_case_read($cases['values'], $options);
+
+    // We disabled sequential to keep the list indexed for case_read(). Now add it back.
+    if (!empty($params['sequential'])) {
+      $cases['values'] = array_values($cases['values']);
+    }
+  }
+
+  return $cases;
 }
 
 /**
- * Deprecated. Use activity API instead
+ * Deprecated API.
+ *
+ * Use activity API instead.
  *
  * @param array $params
  *
@@ -280,8 +309,11 @@ function civicrm_api3_case_activity_create($params) {
 }
 
 /**
+ * Declare deprecated api functions.
+ *
  * @deprecated api notice
- * @return array of deprecated actions
+ * @return array
+ *   Array of deprecated actions
  */
 function _civicrm_api3_case_deprecation() {
   return array('activity_create' => 'Case api "activity_create" action is deprecated. Use the activity api instead.');
@@ -290,21 +322,24 @@ function _civicrm_api3_case_deprecation() {
 /**
  * Update a specified case.
  *
- * @param  array (
- * //REQUIRED:
- * 'case_id' => int
+ * @param array $params
+ *   //REQUIRED:
+ *   'case_id' => int
  *
- * //OPTIONAL
- * 'status_id' => int
- * 'start_date' => str datestamp
- * 'contact_id' => int // case client
+ *   //OPTIONAL
+ *   'status_id' => int
+ *   'start_date' => str datestamp
+ *   'contact_id' => int // case client
  *
  * @throws API_Exception
- * @return array api result array
- *
- * @access public
+ * @return array
+ *   api result array
  */
 function civicrm_api3_case_update($params) {
+  if (!isset($params['case_id']) && isset($params['id'])) {
+    $params['case_id'] = $params['id'];
+  }
+
   //check parameters
   civicrm_api3_verify_mandatory($params, NULL, array('id'));
 
@@ -348,90 +383,112 @@ function civicrm_api3_case_update($params) {
   $dao->save();
 
   $case = array();
-
   _civicrm_api3_object_to_array($dao, $case);
-  $values[$dao->id] = $case;
 
-  return civicrm_api3_create_success($values, $params, 'case', 'update', $dao);
+  return civicrm_api3_create_success(array($dao->id => $case), $params, 'Case', 'update', $dao);
 }
 
 /**
  * Delete a specified case.
  *
- * @param  array (
- * //REQUIRED:
- * 'id' => int
+ * @param array $params
  *
- * //OPTIONAL
- * 'move_to_trash' => bool (defaults to false)
+ * @code
+ *   //REQUIRED:
+ *   'id' => int
+ *
+ *   //OPTIONAL
+ *   'move_to_trash' => bool (defaults to false)
+ * @endcode
  *
  * @throws API_Exception
- * @return boolean: true if success, else false
- * {@getfields case_delete}
- * @access public
+ * @return bool
+ *   true if success, else false
  */
 function civicrm_api3_case_delete($params) {
   //check parameters
   civicrm_api3_verify_mandatory($params, NULL, array('id'));
 
   if (CRM_Case_BAO_Case::deleteCase($params['id'], CRM_Utils_Array::value('move_to_trash', $params, FALSE))) {
-    return civicrm_api3_create_success($params, $params, 'case', 'delete');
+    return civicrm_api3_create_success($params, $params, 'Case', 'delete');
   }
   else {
     throw new API_Exception('Could not delete case.');
   }
 }
 
-/***********************************/
-/*                                 */
-/*     INTERNAL FUNCTIONS          */
-/*                                 */
-/***********************************/
-
 /**
- * Internal function to retrieve a case.
+ * Augment case results with extra data.
  *
- * @param int $caseId
- *
- * @param $options
- *
- * @internal param $params
- *
- * @internal param $options
- *
- * @return array (reference) case object
+ * @param array $cases
+ * @param array $options
  */
-function _civicrm_api3_case_read($caseId, $options) {
-  $return = CRM_Utils_Array::value('return', $options, array());
-  $dao = new CRM_Case_BAO_Case();
-  $dao->id = $caseId;
-  if ($dao->find(TRUE)) {
-    $case = array();
-    _civicrm_api3_object_to_array($dao, $case);
-    // Legacy support for client_id - TODO: in apiv4 remove 'client_id'
-    $case['client_id'] = $case['contact_id'] = $dao->retrieveContactIdsByCaseId($caseId);
-
-    if (!empty($return['contacts'])) {
-      //get case contacts
-      $contacts = CRM_Case_BAO_Case::getcontactNames($caseId);
-      $relations = CRM_Case_BAO_Case::getRelatedContacts($caseId);
-      $case['contacts'] = array_merge($contacts, $relations);
+function _civicrm_api3_case_read(&$cases, $options) {
+  foreach ($cases as &$case) {
+    if (empty($options['return']) || !empty($options['return']['contact_id'])) {
+      // Legacy support for client_id - TODO: in apiv4 remove 'client_id'
+      $case['client_id'] = $case['contact_id'] = CRM_Case_BAO_Case::retrieveContactIdsByCaseId($case['id']);
     }
-    if (!empty($return['activities'])) {
-      //get case activities
+    if (!empty($options['return']['contacts'])) {
+      //get case contacts
+      $contacts = CRM_Case_BAO_Case::getcontactNames($case['id']);
+      $relations = CRM_Case_BAO_Case::getRelatedContacts($case['id']);
+      $case['contacts'] = array_unique(array_merge($contacts, $relations), SORT_REGULAR);
+    }
+    if (!empty($options['return']['activities'])) {
+      // add case activities array - we'll populate them in bulk below
       $case['activities'] = array();
-      $query = "SELECT activity_id FROM civicrm_case_activity WHERE case_id = $caseId";
-      $dao = CRM_Core_DAO::executeQuery($query);
-      while ($dao->fetch()) {
-        $case['activities'][] = $dao->activity_id;
+    }
+    // Properly render this joined field
+    if (!empty($options['return']['case_type_id.definition'])) {
+      if (!empty($case['case_type_id.definition'])) {
+        list($xml) = CRM_Utils_XML::parseString($case['case_type_id.definition']);
+      }
+      else {
+        $caseTypeId = !empty($case['case_type_id']) ? $case['case_type_id'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $case['id'], 'case_type_id');
+        $caseTypeName = !empty($case['case_type_id.name']) ? $case['case_type_id.name'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'name');
+        $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseTypeName);
+      }
+      $case['case_type_id.definition'] = array();
+      if ($xml) {
+        $case['case_type_id.definition'] = CRM_Case_BAO_CaseType::convertXmlToDefinition($xml);
       }
     }
-    return $case;
+  }
+  // Bulk-load activities
+  if (!empty($options['return']['activities'])) {
+    $query = "SELECT case_id, activity_id FROM civicrm_case_activity WHERE case_id IN (%1)";
+    $params = array(1 => array(implode(',', array_keys($cases)), 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES));
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    while ($dao->fetch()) {
+      $cases[$dao->case_id]['activities'][] = $dao->activity_id;
+    }
+  }
+  // Bulk-load tags. Supports joins onto the tag entity.
+  $tagGet = array('tag_id', 'entity_id');
+  foreach (array_keys($options['return']) as $key) {
+    if (strpos($key, 'tag_id.') === 0) {
+      $tagGet[] = $key;
+      $options['return']['tag_id'] = 1;
+    }
+  }
+  if (!empty($options['return']['tag_id'])) {
+    $tags = civicrm_api3('EntityTag', 'get', array(
+      'entity_table' => 'civicrm_case',
+      'entity_id' => array('IN' => array_keys($cases)),
+      'return' => $tagGet,
+      'options' => array('limit' => 0),
+    ));
+    foreach ($tags['values'] as $tag) {
+      $key = (int) $tag['entity_id'];
+      unset($tag['entity_id'], $tag['id']);
+      $cases[$key]['tag_id'][$tag['tag_id']] = $tag;
+    }
   }
 }
 
 /**
- * Internal function to format create params for processing
+ * Internal function to format create params for processing.
  *
  * @param array $params
  */
@@ -445,10 +502,54 @@ function _civicrm_api3_case_format_params(&$params) {
     if (!$params['case_type_id']) {
       $caseTypeLabels = CRM_Case_PseudoConstant::caseType('title', FALSE);
       $params['case_type_id'] = array_search($params['case_type'], $caseTypeLabels);
-      $params['case_type'] = $caseTypes[$params['case_type_id']]; // label => name
+      $params['case_type'] = $caseTypes[$params['case_type_id']];
     }
   }
   elseif (empty($params['case_type'])) {
     $params['case_type'] = $caseTypes[$params['case_type_id']];
   }
+}
+
+/**
+ * It actually works a lot better to use the CaseContact api instead of the Case api
+ * for entityRef fields so we can perform the necessary joins,
+ * so we pass off getlist requests to the CaseContact api.
+ *
+ * @param array $params
+ * @return mixed
+ */
+function civicrm_api3_case_getList($params) {
+  require_once 'api/v3/Generic/Getlist.php';
+  require_once 'api/v3/CaseContact.php';
+  //CRM:19956 - Assign case_id param if both id and case_id is passed to retrieve the case
+  if (!empty($params['id']) && !empty($params['params']) && !empty($params['params']['case_id'])) {
+    $params['params']['case_id'] = array('IN' => $params['id']);
+    unset($params['id']);
+  }
+  $params['id_field'] = 'case_id';
+  $params['label_field'] = $params['search_field'] = 'contact_id.sort_name';
+  $params['description_field'] = array(
+    'case_id',
+    'case_id.case_type_id.title',
+    'case_id.subject',
+    'case_id.status_id',
+    'case_id.start_date',
+  );
+  $apiRequest = array(
+    'version' => 3,
+    'entity' => 'CaseContact',
+    'action' => 'getlist',
+    'params' => $params,
+  );
+  return civicrm_api3_generic_getList($apiRequest);
+}
+
+/**
+ * Needed due to the above override
+ * @param $params
+ * @param $apiRequest
+ */
+function _civicrm_api3_case_getlist_spec(&$params, $apiRequest) {
+  require_once 'api/v3/Generic/Getlist.php';
+  _civicrm_api3_generic_getlist_spec($params, $apiRequest);
 }

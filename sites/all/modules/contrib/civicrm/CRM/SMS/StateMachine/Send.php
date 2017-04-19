@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,32 +23,28 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
  * State machine for managing different states of the Import process.
- *
  */
 class CRM_SMS_StateMachine_Send extends CRM_Core_StateMachine {
 
   /**
-   * class constructor
+   * Class constructor.
    *
    * @param object $controller
    * @param \const|int $action
    *
-   * @internal param \CRM_SMS_Controller $object
    * @return \CRM_SMS_StateMachine_Send CRM_SMS_StateMachine
    */
-  function __construct($controller, $action = CRM_Core_Action::NONE) {
+  public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
     $this->_pages = array(
@@ -59,5 +55,5 @@ class CRM_SMS_StateMachine_Send extends CRM_Core_StateMachine {
 
     $this->addSequentialPages($this->_pages, $action);
   }
-}
 
+}

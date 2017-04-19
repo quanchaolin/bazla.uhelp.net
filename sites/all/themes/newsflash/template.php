@@ -49,6 +49,9 @@ function newsflash_preprocess_html(&$variables) {
   }
 
   // Start processing the inline CSS
+
+  $ldir = $variables['language']->dir;
+
   $page_width = theme_get_setting('newsflash_width');
   if (!$page_width) {
     $page_width = '95%';
@@ -58,20 +61,34 @@ function newsflash_preprocess_html(&$variables) {
 
   $left_sidebar_width = theme_get_setting('newsflash_leftsidebarwidth');
   if ($left_sidebar_width) {
-    $css .= "body.sidebar-first #main, body.two-sidebars #main { margin-left: -${left_sidebar_width}px; }\n";
-    $css .= "body.sidebar-first #squeeze, body.two-sidebars #squeeze { margin-left: ${left_sidebar_width}px; }\n";
-    $css .= "#sidebar-left { width: ${left_sidebar_width}px; }\n";
+    if ($ldir == 'rtl') {
+      $css .= "body.sidebar-first #main, body.two-sidebars #main { margin-left: 0px; margin-right: -${left_sidebar_width}px !important; }\n";
+      $css .= "body.sidebar-first #squeeze, body.two-sidebars #squeeze { margin-left: 0px; margin-right: ${left_sidebar_width}px !important;; }\n";
+    }
+    
+    if ($ldir == 'ltr') {
+      $css .= "body.sidebar-first #main, body.two-sidebars #main { margin-left: -${left_sidebar_width}px !important; margin-right: 0px;}\n";
+      $css .= "body.sidebar-first #squeeze, body.two-sidebars #squeeze { margin-left: ${left_sidebar_width}px !important; margin-right: 0px; }\n";
+    }
+      $css .= "#sidebar-left { width: ${left_sidebar_width}px; }\n";
   }
 
   $right_sidebar_width = theme_get_setting('newsflash_rightsidebarwidth');
   if ($right_sidebar_width) {
-    $css .= "body.sidebar-second #main, body.two-sidebars #main { margin-right: -${right_sidebar_width}px; }\n";
-    $css .= "body.sidebar-second #squeeze, body.two-sidebars #squeeze { margin-right: ${right_sidebar_width}px; }\n";
+    if ($ldir == 'rtl') {
+      $css .= "body.sidebar-second #main, body.two-sidebars #main { margin-right: 0px; margin-left: -${right_sidebar_width}px !important; }\n";
+      $css .= "body.sidebar-second #squeeze, body.two-sidebars #squeeze { margin-right: 0px; margin-left: ${right_sidebar_width}px !important; }\n";
+    }
+    
+    if ($ldir == 'ltr') {
+      $css .= "body.sidebar-second #main, body.two-sidebars #main { margin-right: -${right_sidebar_width}px !important; margin-left: 0px;}\n";
+      $css .= "body.sidebar-second #squeeze, body.two-sidebars #squeeze { margin-right: ${right_sidebar_width}px !important; margin-left: 0px; }\n";
+    }
     $css .= "#sidebar-right { width: ${right_sidebar_width}px; }\n";
   }
 
   if (theme_get_setting('newsflash_fontfamily')) {
-    $css .= 'body { font-family: ' . (theme_get_setting('newsflash_fontfamily') != 'Custom' ? theme_get_setting('newsflash_fontfamily') : theme_get_setting('newsflash_customfont')) . "; }\n";
+    $css .= 'body { font-family: ' . (theme_get_setting('newsflash_fontfamily') != 'Custom' ? theme_get_setting('newsflash_fontfamily') : str_replace(array("&quot;", '\\', '/', '&#039;', '(', ')', ':', ';'), array('"', ''), check_plain(theme_get_setting('newsflash_customfont')))) . "; }\n";
   }
 
   if (theme_get_setting('newsflash_usecustomlogosize')) {

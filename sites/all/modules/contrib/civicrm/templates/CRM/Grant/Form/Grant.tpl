@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,15 +25,11 @@
 *}
 {* this template is used for adding/editing/deleting grant *}
 
-{if $cdType}
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
-
 <div class="crm-block crm-form-block crm-grant-form-block">
   {if $action eq 8}
      <div class="messages status">
          <p><div class="icon inform-icon"></div>&nbsp;
-         {ts}Are you sure you want to delete this Grant?{/ts} {ts}This operation cannot be undone.{/ts}</p>
+         {ts}Are you sure you want to delete this Grant?{/ts} {ts}This action cannot be undone.{/ts}</p>
          <p>{include file="CRM/Grant/Form/Task.tpl"}</p>
      </div>
   {else}
@@ -135,5 +131,3 @@
    {/if}
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-
-{/if} {* closing of main custom data if *}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
+
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2017
+ */
 
 /**
  * Class CRM_Utils_Constant
@@ -43,8 +49,10 @@ class CRM_Utils_Constant {
   public static function value($name, $default = NULL) {
     if (defined($name)) {
       return constant($name);
-    } else {
+    }
+    else {
       return $default;
     }
   }
+
 }

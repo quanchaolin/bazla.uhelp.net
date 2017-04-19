@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,31 +23,29 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class generates form components for Address Section
+ * This class generates form components for Address Section.
  */
 class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
-  function preProcess() {
+  public function preProcess() {
 
     CRM_Utils_System::setTitle(ts('Settings - Addresses'));
 
     // Address Standardization
     $addrProviders = array(
-      '' => '- select -') + CRM_Core_SelectValues::addressProvider();
+      '' => '- select -',
+    ) + CRM_Core_SelectValues::addressProvider();
 
     $this->_varNames = array(
-      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
         'address_options' => array(
           'html_type' => 'checkboxes',
           'title' => ts('Address Fields'),
@@ -65,26 +63,30 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
           'description' => NULL,
           'weight' => 3,
         ),
+        'hideCountryMailingLabels' => array(
+          'html_type' => 'YesNo',
+          'title' => 'Hide Country in Mailing Labels when same as domain country',
+          'weight' => 4,
+        ),
       ),
-      CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME => array(
         'address_standardization_provider' => array(
           'html_type' => 'select',
           'title' => ts('Provider'),
           'option_values' => $addrProviders,
-          'weight' => 4,
+          'weight' => 5,
         ),
         'address_standardization_userid' => array(
           'html_type' => 'text',
           'title' => ts('User ID'),
           'description' => NULL,
-          'weight' => 5,
+          'weight' => 6,
         ),
         'address_standardization_url' => array(
           'html_type' => 'text',
           'title' => ts('Web Service URL'),
           'description' => NULL,
-          'weight' => 6,
+          'weight' => 7,
         ),
       ),
     );
@@ -95,42 +97,17 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $defaults['address_standardization_provider'] = $this->_config->address_standardization_provider;
     $defaults['address_standardization_userid'] = $this->_config->address_standardization_userid;
     $defaults['address_standardization_url'] = $this->_config->address_standardization_url;
 
-
     $this->addressSequence = isset($newSequence) ? $newSequence : "";
 
-    if (empty($this->_config->address_format)) {
-      $defaults['address_format'] = "
-{contact.street_address}
-{contact.supplemental_address_1}
-{contact.supplemental_address_2}
-{contact.city}{, }{contact.state_province}{ }{contact.postal_code}
-{contact.country}
-";
-    }
-    else {
-      $defaults['address_format'] = $this->_config->address_format;
-    }
-
-    if (empty($this->_config->mailing_format)) {
-      $defaults['mailing_format'] = "
-{contact.addressee}
-{contact.street_address}
-{contact.supplemental_address_1}
-{contact.supplemental_address_2}
-{contact.city}{, }{contact.state_province}{ }{contact.postal_code}
-{contact.country}
-";
-    }
-    else {
-      $defaults['mailing_format'] = $this->_config->mailing_format;
-    }
-
+    $defaults['address_format'] = $this->_config->address_format;
+    $defaults['mailing_format'] = $this->_config->mailing_format;
+    $defaults['hideCountryMailingLabels'] = $this->_config->hideCountryMailingLabels;
 
     parent::cbsDefaultValues($defaults);
 
@@ -138,10 +115,7 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
   }
 
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
@@ -160,7 +134,7 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
    *
    * @return bool
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $p = $fields['address_standardization_provider'];
     $u = $fields['address_standardization_userid'];
     $w = $fields['address_standardization_url'];
@@ -183,11 +157,7 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
     if ($this->_action == CRM_Core_Action::VIEW) {
@@ -195,7 +165,6 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
     }
 
     $this->_params = $this->controller->exportValues($this->_name);
-
 
     // check if county option has been set
     $options = CRM_Core_OptionGroup::values('address_options', FALSE, FALSE, TRUE);
@@ -219,6 +188,5 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
 
     $this->postProcessCommon();
   }
-  //end of function
-}
 
+}

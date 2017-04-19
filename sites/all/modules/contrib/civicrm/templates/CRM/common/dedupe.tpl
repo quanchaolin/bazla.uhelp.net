@@ -1,11 +1,11 @@
 {* common dupe contacts processing *}
-<div id='processDupes' class="success-status" style="display:none;"></div>
+<div id='processDupes' style="display:none;"></div>
 {literal}
 <script type='text/javascript'>
 
 cj( '#processDupes' ).hide( );
 
-function processDupes( cid, oid, oper, context, reloadURL ) {
+function processDupes(cid, oid, oper, context, reloadURL) {
         //currently we are doing in a single way.
         //later we might want two way operations.
 

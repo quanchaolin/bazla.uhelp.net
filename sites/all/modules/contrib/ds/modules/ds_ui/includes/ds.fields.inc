@@ -114,7 +114,7 @@ function ds_custom_manage($field_key = '') {
 }
 
 /**
- * Shared form for all all fields.
+ * Shared form for all fields.
  */
 function ds_shared_form(&$form, $field) {
   ctools_include('export');
@@ -139,7 +139,7 @@ function ds_shared_form(&$form, $field) {
     '#type' => 'textfield',
     '#default_value' => $field->label,
     '#description' => t('The human-readable label of the field.'),
-    '#maxlength' => 32,
+    '#maxlength' => 128,
     '#required' => TRUE,
     '#size' => 30,
   );
@@ -173,9 +173,10 @@ function ds_shared_form(&$form, $field) {
 
   $form['ui_limit'] = array(
     '#title' => t('Limit field'),
-    '#description' => t('Limit this field on field UI per bundles and/or view modes. The values are in the form of $bundle|$view_mode. You may use * to select all. Enter one value per line.'),
+    '#description' => t('Limit this field on field UI per bundles and/or view modes. The values are in the form of $bundle|$view_mode, where $view_mode may be either a view mode set to use custom settings, or \'default\'. You may use * to select all, e.g article|*, *|full or *|*. Enter one value per line.'),
     '#type' => 'textarea',
     '#default_value' => $field->ui_limit,
+    '#element_validate' => array('ds_ui_limit_validate'),
   );
 
   $form['submit'] = array(
@@ -189,6 +190,73 @@ function ds_shared_form(&$form, $field) {
   $form['#submit'][] = 'ds_shared_form_submit';
 
   return $field;
+}
+
+/**
+ * Element validation function for ui limit field.
+ */
+function ds_ui_limit_validate($element, &$form_state, $form) {
+  // Get all enabled entity types.
+  $entity_types = array_filter($form_state['values']['entities']);
+
+  if (!empty($element['#value'])) {
+    $ui_limit = $element['#value'];
+
+    $lines = explode("\n", str_replace("\r", "\n", $ui_limit));
+    // Ensure that all strings are trimmed and filter out empty lines.
+    $lines = array_filter(array_map('trim', $lines));
+
+    $error = FALSE;
+    foreach ($lines as $line) {
+      // Each line should hold a pipe character to seperate bundle and view_mode.
+      if (strpos($line, '|') === FALSE) {
+        $error = TRUE;
+        continue;
+      }
+
+      list($bundle, $view_mode) = explode('|', $line);
+
+      if (empty($bundle) || empty($view_mode) || !_ds_check_existing_ui_limit($entity_types, $bundle, $view_mode)) {
+        $error = TRUE;
+      }
+    }
+    if ($error) {
+      form_error($element, t('The values are in the form of $bundle|$view_mode, where $view_mode may be either a view mode set to use custom settings, or \'default\'.'));
+    }
+
+    // Set trimmed and validated entry back as value.
+    form_set_value($element, implode("\n", $lines), $form_state);
+  }
+}
+
+/**
+ * Helper function to check if bundle + view_mode combination exists.
+ */
+function _ds_check_existing_ui_limit($entity_types, $bundle, $view_mode) {
+  $exists = FALSE;
+  foreach ($entity_types as $entity_type) {
+    $info = entity_get_info($entity_type);
+
+    // Combine allowed bundles and entity specific ones.
+    $bundle_allowed = array('*');
+    $bundles = array_merge($bundle_allowed, array_keys($info['bundles']));
+
+    // Combine allowed view_modes and entity specific ones.
+    $view_mode_allowed = array('*', 'default');
+    $view_modes = array_merge($view_mode_allowed, array_keys($info['view modes']));
+
+    if (in_array($bundle, $bundles) &&
+      in_array($view_mode, $view_modes)) {
+
+      $exists = TRUE;
+      break;
+    }
+  }
+  if (!$exists) {
+    drupal_set_message(t('Incorrect field limit combination: @bundle|@view_mode', array('@bundle' => $bundle, '@view_mode' => $view_mode)), 'error');
+  }
+
+  return $exists;
 }
 
 /**
@@ -209,7 +277,7 @@ function ds_shared_form_validate($form, &$form_state) {
   $field->properties = array();
   $field->field = $form_state['values']['field'];
   $field->label = $form_state['values']['name'];
-  $field->ui_limit = str_replace("\r", '', $form_state['values']['ui_limit']);
+  $field->ui_limit = $form_state['values']['ui_limit'];
 
   $entities = $form_state['values']['entities'];
   foreach ($entities as $key => $value) {
@@ -245,6 +313,8 @@ function ds_shared_form_submit($form, &$form_state) {
  * Manage a custom field.
  */
 function ds_edit_custom_field_form($form, &$form_state, $custom_field = '') {
+  drupal_set_title(empty($custom_field) ? t('Add a code field') : t('Edit code field'));
+
   $custom_field = ds_shared_form($form, $custom_field);
 
   $form['code'] = array(
@@ -268,9 +338,7 @@ function ds_edit_custom_field_form($form, &$form_state, $custom_field = '') {
 
     $form['tokens'] = array(
       '#title' => t('Tokens'),
-      '#type' => 'fieldset',
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
+      '#type' => 'container',
       '#states' => array(
         'invisible' => array(
           'input[name="use_token"]' => array('checked' => FALSE),
@@ -281,6 +349,7 @@ function ds_edit_custom_field_form($form, &$form_state, $custom_field = '') {
       '#theme' => 'token_tree',
       '#token_types' => 'all',
       '#global_types' => FALSE,
+      '#dialog' => TRUE,
     );
   }
   else {
@@ -305,6 +374,8 @@ function ds_custom_field_form_validate($form, &$form_state) {
  * Manage a CTools field.
  */
 function ds_edit_ctools_field_form($form, &$form_state, $ctools_field = '') {
+  drupal_set_title(empty($ctools_field) ? t('Add a dynamic field') : t('Edit dynamic field'));
+
   $custom_field = ds_shared_form($form, $ctools_field);
   $form['info'] = array(
     '#markup' => t('The content of this field is configurable on the "Manage display" screens.'),
@@ -327,6 +398,8 @@ function ds_ctools_field_form_validate($form, &$form_state) {
  * Manage a Preprocess field.
  */
 function ds_edit_preprocess_field_form($form, &$form_state, $preprocess_field = '') {
+  drupal_set_title(empty($preprocess_field) ? t('Add a preprocess field') : t('Edit preprocess field'));
+
   $custom_field = ds_shared_form($form, $preprocess_field);
   $form['info'] = array(
     '#markup' => t('The machine name of this field must reflect the key in the variables, e.g. "submitted". So in most cases, it is very likely you will have to manually edit the machine name as well, which can not be changed anymore after saving. Note that this field type works best on Nodes.'),
@@ -347,6 +420,8 @@ function ds_preprocess_field_form_validate($form, &$form_state) {
  * Manage a custom block.
  */
 function ds_edit_block_field_form($form, &$form_state, $custom_block = '') {
+  drupal_set_title(empty($custom_block) ? t('Add a block field') : t('Edit block field'));
+
   $custom_block = ds_shared_form($form, $custom_block);
 
   $blocks = array();
@@ -359,6 +434,9 @@ function ds_edit_block_field_form($form, &$form_state, $custom_block = '') {
     }
   }
   ksort($blocks);
+  foreach($blocks as &$subarray) {
+    asort($subarray);
+  }
 
   $form['block_identity']['block'] = array(
     '#type' => 'select',

@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.5                                                |
+-- | CiviCRM version 4.7                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2014                                |
+-- | Copyright CiviCRM LLC (c) 2004-2017                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -76,6 +76,7 @@ DROP TABLE IF EXISTS `civicrm_case_contact`;
 DROP TABLE IF EXISTS `civicrm_case`;
 DROP TABLE IF EXISTS `civicrm_membership_block`;
 DROP TABLE IF EXISTS `civicrm_membership_type`;
+DROP TABLE IF EXISTS `civicrm_payment_token`;
 DROP TABLE IF EXISTS `civicrm_payment_processor`;
 DROP TABLE IF EXISTS `civicrm_contribution_widget`;
 DROP TABLE IF EXISTS `civicrm_premiums_product`;
@@ -103,6 +104,7 @@ DROP TABLE IF EXISTS `civicrm_group_contact_cache`;
 DROP TABLE IF EXISTS `civicrm_subscription_history`;
 DROP TABLE IF EXISTS `civicrm_group`;
 DROP TABLE IF EXISTS `civicrm_acl_cache`;
+DROP TABLE IF EXISTS `civicrm_status_pref`;
 DROP TABLE IF EXISTS `civicrm_word_replacement`;
 DROP TABLE IF EXISTS `civicrm_print_label`;
 DROP TABLE IF EXISTS `civicrm_setting`;
@@ -130,6 +132,7 @@ DROP TABLE IF EXISTS `civicrm_custom_field`;
 DROP TABLE IF EXISTS `civicrm_custom_group`;
 DROP TABLE IF EXISTS `civicrm_country`;
 DROP TABLE IF EXISTS `civicrm_cache`;
+DROP TABLE IF EXISTS `civicrm_cxn`;
 DROP TABLE IF EXISTS `civicrm_pcp`;
 DROP TABLE IF EXISTS `civicrm_queue_item`;
 DROP TABLE IF EXISTS `civicrm_pledge_block`;
@@ -155,6 +158,7 @@ DROP TABLE IF EXISTS `civicrm_currency`;
 DROP TABLE IF EXISTS `civicrm_premiums`;
 DROP TABLE IF EXISTS `civicrm_mailing_bounce_pattern`;
 DROP TABLE IF EXISTS `civicrm_mailing_bounce_type`;
+DROP TABLE IF EXISTS `civicrm_mailing_abtest`;
 DROP TABLE IF EXISTS `civicrm_mailing_component`;
 DROP TABLE IF EXISTS `civicrm_entity_batch`;
 DROP TABLE IF EXISTS `civicrm_batch`;
@@ -165,6 +169,7 @@ DROP TABLE IF EXISTS `civicrm_acl_contact_cache`;
 DROP TABLE IF EXISTS `civicrm_contact`;
 DROP TABLE IF EXISTS `civicrm_acl_entity_role`;
 DROP TABLE IF EXISTS `civicrm_acl`;
+DROP TABLE IF EXISTS `civicrm_recurring_entity`;
 DROP TABLE IF EXISTS `civicrm_action_mapping`;
 DROP TABLE IF EXISTS `civicrm_prevnext_cache`;
 DROP TABLE IF EXISTS `civicrm_persistent`;

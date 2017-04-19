@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,23 +23,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This file is used to build the form configuring mass sms details
+ * This file is used to build the form configuring mass sms details.
  */
 class CRM_SMS_Form_Upload extends CRM_Core_Form {
   public $_mailingID;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_mailingID = $this->get('mailing_id');
     if (CRM_Core_Permission::check('administer CiviCRM')) {
       $this->assign('isAdmin', 1);
@@ -47,17 +45,12 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form.
-   * the default values are retrieved from the database
-   *
-   * @access public
-   *
-   * @return void
+   * Set default values for the form.
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE, NULL);
 
-    //need to differentiate new/reuse mailing, CRM-2873
+    // Need to differentiate new/reuse mailing, CRM-2873.
     $reuseMailing = FALSE;
     if ($mailingID) {
       $reuseMailing = TRUE;
@@ -79,8 +72,8 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       $dao->find(TRUE);
       $dao->storeValues($dao, $defaults);
 
-      //we don't want to retrieve template details once it is
-      //set in session
+      // We don't want to retrieve template details once it is
+      // set in session.
       $templateId = $this->get('template');
       $this->assign('templateSelected', $templateId ? $templateId : 0);
       if (isset($defaults['msg_template_id']) && !$templateId) {
@@ -101,7 +94,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       }
     }
 
-    //fix for CRM-2873
+    // Fix for CRM-2873.
     if (!$reuseMailing) {
       $textFilePath = $this->get('textFilePath');
       if ($textFilePath &&
@@ -120,14 +113,11 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
-    $config  = CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
     $options = array();
     $tempVar = FALSE;
 
@@ -172,12 +162,13 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     $this->addFormRule(array('CRM_SMS_Form_Upload', 'formRule'), $this);
 
     $buttons = array(
-      array('type' => 'back',
-        'name' => ts('<< Previous'),
+      array(
+        'type' => 'back',
+        'name' => ts('Previous'),
       ),
       array(
         'type' => 'upload',
-        'name' => ts('Next >>'),
+        'name' => ts('Next'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
       ),
@@ -230,11 +221,13 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $params['contact_id'] = $session->get('userID');
     $composeFields = array(
-      'SMStemplate', 'SMSsaveTemplate',
-      'SMSupdateTemplate', 'SMSsaveTemplateName',
+      'SMStemplate',
+      'SMSsaveTemplate',
+      'SMSupdateTemplate',
+      'SMSsaveTemplateName',
     );
     $msgTemplate = NULL;
-    //mail template is composed
+    // Mail template is composed.
     if ($formValues['upload_type']) {
       $composeParams = array();
       foreach ($composeFields as $key) {
@@ -279,35 +272,34 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
     $ids['mailing_id'] = $this->_mailingID;
 
-    //get the from email address
+    // Get the from email address.
     $params['sms_provider_id'] = $formValues['sms_provider_id'];
 
-    //get the from Name
+    // Get the from Name.
     $params['from_name'] = CRM_Core_DAO::getFieldValue('CRM_SMS_DAO_Provider', $params['sms_provider_id'], 'username');
 
-    //Build SMS in mailing table
+    // Build SMS in mailing table.
     CRM_Mailing_BAO_Mailing::create($params, $ids);
   }
 
   /**
-   * Function for validation
+   * Validation.
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param array $params
+   *   (ref.) an assoc array of name/value pairs.
    *
    * @param $files
    * @param $self
    *
-   * @return mixed true or array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   mixed true or array of errors
    */
-  static function formRule($params, $files, $self) {
+  public static function formRule($params, $files, $self) {
     if (!empty($_POST['_qf_Import_refresh'])) {
       return TRUE;
     }
     $errors = array();
     $template = CRM_Core_Smarty::singleton();
-
 
     $domain = CRM_Core_BAO_Domain::getDomain();
 
@@ -316,13 +308,14 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     $mailing->find(TRUE);
 
     $session = CRM_Core_Session::singleton();
-    $values = array('contact_id' => $session->get('userID'),
+    $values = array(
+      'contact_id' => $session->get('userID'),
       'version' => 3,
     );
     require_once 'api/api.php';
     $contact = civicrm_api('contact', 'get', $values);
 
-    //CRM-4524
+    // CRM-4524.
     $contact = reset($contact['values']);
 
     $verp = array_flip(array('optOut', 'reply', 'unsubscribe', 'resubscribe', 'owner'));
@@ -334,7 +327,6 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     foreach ($urls as $key => $value) {
       $urls[$key]++;
     }
-
 
     $skipTextFile = $self->get('skipTextFile');
 
@@ -377,9 +369,8 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
       $dataErrors = array();
 
-      /* Do a full token replacement on a dummy verp, the current
-             * contact and domain, and the first organization. */
-
+      // Do a full token replacement on a dummy verp, the current
+      // contact and domain, and the first organization.
 
       // here we make a dummy mailing object so that we
       // can retrieve the tokens that we need to replace
@@ -388,10 +379,10 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       // be a suggestion from someone on how to
       // make it a bit more elegant
 
-      $dummy_mail        = new CRM_Mailing_BAO_Mailing();
-      $mess              = "body_text";
+      $dummy_mail = new CRM_Mailing_BAO_Mailing();
+      $mess = "body_text";
       $dummy_mail->$mess = $str;
-      $tokens            = $dummy_mail->getTokens();
+      $tokens = $dummy_mail->getTokens();
 
       $str = CRM_Utils_Token::replaceSubscribeInviteTokens($str);
       $str = CRM_Utils_Token::replaceDomainTokens($str, $domain, NULL, $tokens['text']);
@@ -413,7 +404,8 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       }
       if (!empty($dataErrors)) {
         $errors['textFile'] = ts('The following errors were detected in %1:', array(
-          1 => $name)) . ' <ul>' . implode('', $dataErrors) . '</ul>';
+          1 => $name,
+        )) . ' <ul>' . implode('', $dataErrors) . '</ul>';
       }
     }
 
@@ -426,14 +418,23 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
   }
 
   /**
-   * Display Name of the form
+   * Display Name of the form.
    *
-   * @access public
    *
    * @return string
    */
   public function getTitle() {
     return ts('SMS Content');
   }
-}
 
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    $tokens = CRM_Core_SelectValues::contactTokens();
+    return $tokens;
+  }
+
+}

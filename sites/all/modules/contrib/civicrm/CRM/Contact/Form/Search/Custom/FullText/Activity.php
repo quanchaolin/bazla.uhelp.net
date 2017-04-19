@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,27 +23,33 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contact_Form_Search_Custom_FullText_Activity extends CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
 
-  function __construct() {
+  /**
+   * Class constructor.
+   */
+  public function __construct() {
     parent::__construct('Activity', ts('Activities'));
   }
 
-  function isActive() {
+  /**
+   * Is search active for this user.
+   *
+   * @return bool
+   */
+  public function isActive() {
     return CRM_Core_Permission::check('view all activities');
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function fillTempTable($queryText, $entityIDTableName, $toTable, $queryLimit, $detailLimit) {
     $queries = $this->prepareQueries($queryText, $entityIDTableName);
@@ -58,9 +64,11 @@ class CRM_Contact_Form_Search_Custom_FullText_Activity extends CRM_Contact_Form_
   /**
    * @param string $queryText
    * @param string $entityIDTableName
-   * @return array list tables/queries (for runQueries)
+   *
+   * @return array
+   *   list tables/queries (for runQueries)
    */
-  function prepareQueries($queryText, $entityIDTableName) {
+  public function prepareQueries($queryText, $entityIDTableName) {
     // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
 
     $contactSQL = array();
@@ -116,6 +124,13 @@ AND    (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
     return $tables;;
   }
 
+  /**
+   * Move IDs.
+   *
+   * @param string $fromTable
+   * @param string $toTable
+   * @param int $limit
+   */
   public function moveIDs($fromTable, $toTable, $limit) {
     $sql = "
 INSERT INTO {$toTable}
@@ -133,7 +148,6 @@ INNER JOIN  civicrm_contact c1 ON cac.contact_id = c1.id
 LEFT JOIN  civicrm_case_activity cca ON cca.activity_id = ca.id
 LEFT JOIN  civicrm_case_contact ccc ON ccc.case_id = cca.case_id
 WHERE (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
-GROUP BY ca.id
 {$this->toLimit($limit)}
 ";
     CRM_Core_DAO::executeQuery($sql);

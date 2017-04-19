@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -83,7 +83,7 @@
 
         <table id="payLaterOptions" class="form-layout">
             <tr class="crm-event-manage-fee-form-block-pay_later_text">
-               <td class="label">{$form.pay_later_text.label}<span class="marker"> *</span> </td>
+               <td class="label">{$form.pay_later_text.label}<span class="crm-marker"> *</span> </td>
                <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='pay_later_text' id=$id}{/if}{$form.pay_later_text.html|crmAddClass:big}
                </td>
             </tr>
@@ -92,21 +92,27 @@
                <td class="description">{ts}Text displayed next to the checkbox for the 'pay later' option on the contribution form. You may include HTML formatting tags.{/ts}</td>
             </tr>
             <tr class="crm-event-manage-fee-form-block-pay_later_receipt">
-               <td class="label">{$form.pay_later_receipt.label}<span class="marker"> *</span> </td>
+               <td class="label">{$form.pay_later_receipt.label}<span class="crm-marker"> *</span> </td>
                <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='pay_later_receipt' id=$id}{/if}{$form.pay_later_receipt.html|crmAddClass:big}
                </td>
             </tr>
-      <tr>
+            <tr>
                 <td>&nbsp;</td>
                 <td class="description">{ts}Instructions added to Confirmation and Thank-you pages when the user selects the 'pay later' option (e.g. 'Mail your check to ... within 3 business days.').{/ts}
                 </td>
             </tr>
-
+            <tr>
+               <td class="extra-long-fourty label">{$form.is_billing_required.html}</td>
+               <td>
+                 {$form.is_billing_required.label}<br />
+                 <span class="description">{ts}Check this box to require users who select the pay later option to provide billing name and address.{/ts}</span>
+               </td>
+            </tr>
         </table>
 
         <table id="contributionType" class="form-layout">
             <tr class="crm-event-manage-fee-form-block-fee_label">
-               <td class="label">{$form.fee_label.label}<span class="marker"> *</span>
+               <td class="label">{$form.fee_label.label}<span class="crm-marker"> *</span>
                </td>
                <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='fee_label' id=$id}{/if}{$form.fee_label.html}
                </td>
@@ -117,12 +123,12 @@
                </td>
             </tr>
             <tr class="crm-event-manage-fee-form-block-financial_type_id">
-               <td class="label">{$form.financial_type_id.label}<span class="marker"> *</span></td>
+               <td class="label">{$form.financial_type_id.label}<span class="crm-marker"> *</span></td>
                <td>{$form.financial_type_id.html}</td>
             </tr>
             <tr>
                <td>&nbsp;</td>
-               <td class="description">{ts}This financial type will be assigned to payments made by participants when they register online.{/ts}
+               <td class="description">{ts}This financial type will be assigned to payments made by participants when they register online. If using a price set below note that the contribution record will have this financial type, however line items will be processed using the actual financial type selected for the price set item.{/ts}
                </td>
             </tr>
         </table>

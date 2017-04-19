@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Case_XMLProcessor {
 
@@ -101,7 +99,7 @@ class CRM_Case_XMLProcessor {
    *
    * @return array
    */
-  function &allActivityTypes($indexName = TRUE, $all = FALSE) {
+  public function &allActivityTypes($indexName = TRUE, $all = FALSE) {
     if (self::$activityTypes === NULL) {
       self::$activityTypes = CRM_Case_PseudoConstant::caseActivityType($indexName, $all);
     }
@@ -111,7 +109,7 @@ class CRM_Case_XMLProcessor {
   /**
    * @return array
    */
-  function &allRelationshipTypes() {
+  public function &allRelationshipTypes() {
     if (self::$relationshipTypes === NULL) {
       $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE);
 
@@ -131,5 +129,5 @@ class CRM_Case_XMLProcessor {
     self::$activityTypes = NULL;
     self::$relationshipTypes = NULL;
   }
-}
 
+}

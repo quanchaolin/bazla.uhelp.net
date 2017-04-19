@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,24 +23,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * Base class for settings forms
- *
+ * Base class for settings forms.
  */
 class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   protected $_system = FALSE;
   protected $_contactID = NULL;
-  protected $_action = NULL;
+  public $_action = NULL;
 
   protected $_checkbox = NULL;
 
@@ -50,7 +47,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
   protected $_params = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive',
       $this, FALSE
     );
@@ -88,10 +85,10 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
       $this->_config->contact_id = $this->_contactID;
     }
 
+    $settings = Civi::settings();
     foreach ($this->_varNames as $groupName => $settingNames) {
-      $values = CRM_Core_BAO_Setting::getItem($groupName);
-      foreach ($values as $name => $value) {
-        $this->_config->$name = $value;
+      foreach ($settingNames as $settingName => $options) {
+        $this->_config->$settingName = $settings->get($settingName);
       }
     }
     $session->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
@@ -100,7 +97,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     foreach ($this->_varNames as $groupName => $settings) {
@@ -115,7 +112,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   /**
    * @param $defaults
    */
-  function cbsDefaultValues(&$defaults) {
+  public function cbsDefaultValues(&$defaults) {
 
     foreach ($this->_varNames as $groupName => $groupValues) {
       foreach ($groupValues as $settingName => $fieldValue) {
@@ -139,14 +136,10 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-
 
     if (!empty($this->_varNames)) {
       foreach ($this->_varNames as $groupName => $groupValues) {
@@ -181,6 +174,10 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
               $this->addRadio($fieldName, $fieldValue['title'], $options, NULL, '&nbsp;&nbsp;');
               break;
 
+            case 'YesNo':
+              $this->addRadio($fieldName, $fieldValue['title'], array(0 => 'No', 1 => 'Yes'), NULL, '&nbsp;&nbsp;');
+              break;
+
             case 'checkboxes':
               $options = array_flip(CRM_Core_OptionGroup::values($fieldName, FALSE, FALSE, TRUE));
               $newOptions = array();
@@ -201,6 +198,10 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
                 $fieldValue['title'],
                 $fieldValue['option_values']
               );
+              break;
+
+            case 'wysiwyg':
+              $this->add('wysiwyg', $fieldName, $fieldValue['title'], $fieldValue['attributes']);
               break;
 
             case 'entity_reference':
@@ -232,11 +233,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
     $config = CRM_Core_Config::singleton();
@@ -248,14 +245,9 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
     $this->postProcessCommon();
   }
-  //end of function
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcessCommon() {
     foreach ($this->_varNames as $groupName => $groupValues) {
@@ -266,8 +258,8 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
               is_array($this->_params[$settingName])
             ) {
               $this->_config->$settingName = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-                array_keys($this->_params[$settingName])
-              ) . CRM_Core_DAO::VALUE_SEPARATOR;
+                  array_keys($this->_params[$settingName])
+                ) . CRM_Core_DAO::VALUE_SEPARATOR;
             }
             else {
               $this->_config->$settingName = NULL;
@@ -281,6 +273,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
           case 'text':
           case 'select':
           case 'radio':
+          case 'YesNo':
           case 'entity_reference':
             $this->_config->$settingName = CRM_Utils_Array::value($settingName, $this->_params);
             break;
@@ -300,15 +293,13 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
     foreach ($this->_varNames as $groupName => $groupValues) {
       foreach ($groupValues as $settingName => $fieldValue) {
         $settingValue = isset($this->_config->$settingName) ? $this->_config->$settingName : NULL;
-        CRM_Core_BAO_Setting::setItem($settingValue,
-          $groupName,
-          $settingName
-        );
+        Civi::settings()->set($settingName, $settingValue);
       }
     }
+    // Update any settings stored in dynamic js
+    CRM_Core_Resources::singleton()->resetCacheCode();
 
     CRM_Core_Session::setStatus(ts('Your changes have been saved.'), ts('Saved'), 'success');
   }
 
 }
-

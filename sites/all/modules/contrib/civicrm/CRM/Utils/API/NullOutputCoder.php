@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,15 +23,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Work-around for CRM-13120 - The "create" action incorrectly returns string literal "null"
  * when the actual value is NULL or "". Rewrite the output.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 require_once 'api/Wrapper.php';
@@ -57,19 +56,17 @@ class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
   }
 
   /**
-   * This function is going to filter the
-   * submitted values across XSS vulnerability.
+   * Going to filter the submitted values across XSS vulnerability.
    *
    * @param array|string $values
-   *
-   * @internal param bool $castToString If TRUE, all scalars will be filtered (and therefore cast to strings)
-   *    If FALSE, then non-string values will be preserved
    */
   public function encodeInput(&$values) {
   }
 
   /**
-   * @param $values
+   * Decode output.
+   *
+   * @param array $values
    * @param bool $castToString
    */
   public function decodeOutput(&$values, $castToString = FALSE) {
@@ -86,20 +83,21 @@ class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
   }
 
   /**
-   * {@inheritDoc}
-   */
-  /**
-   * @param $apiRequest
-   * @param $result
+   * To api output.
    *
-   * @return modified
+   * @param array $apiRequest
+   * @param array $result
+   *
+   * @return array
    */
   public function toApiOutput($apiRequest, $result) {
     $lowerAction = strtolower($apiRequest['action']);
     if ($lowerAction === 'create') {
       return parent::toApiOutput($apiRequest, $result);
-    } else {
+    }
+    else {
       return $result;
     }
   }
+
 }

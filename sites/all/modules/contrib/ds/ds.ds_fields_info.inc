@@ -24,12 +24,8 @@ function ds_ds_fields_info($entity_type) {
         'properties' => $field->properties,
       );
       if (!empty($field->ui_limit)) {
-        $fields[$entity_type][$key]['ui_limit'] = explode("\n", $field->ui_limit);
-        // Ensure that all strings are trimmed, eg. don't have
-        // extra spaces, \r chars etc.
-        foreach ($fields[$entity_type][$key]['ui_limit'] as $k => $v) {
-          $fields[$entity_type][$key]['ui_limit'][$k] = trim($v);
-        }
+        $lines = explode("\n", $field->ui_limit);
+        $fields[$entity_type][$key]['ui_limit'] = $lines;
       }
     }
   }
@@ -79,10 +75,11 @@ function ds_ds_fields_info($entity_type) {
     'properties' => array(
       'settings' => array(
         'link text' => array('type' => 'textfield'),
+        'link class' => array('type' => 'textfield', 'description' => t('Put a class on the link. Eg: btn btn-default')),
         'wrapper' => array('type' => 'textfield', 'description' => t('Eg: h1, h2, p')),
         'class' => array('type' => 'textfield', 'description' => t('Put a class on the wrapper. Eg: block-title')),
       ),
-      'default' => array('link text' => 'Read more', 'wrapper' => '', 'class' => '', 'link' => 1),
+      'default' => array('link text' => 'Read more', 'link class' => '', 'wrapper' => '', 'class' => '', 'link' => 1),
     )
   );
 
@@ -111,6 +108,18 @@ function ds_ds_fields_info($entity_type) {
     'function' => 'ds_render_date_field',
     'properties' => array(
       'formatters' => $date_formatters,
+      'entity_render_key' => 'created',
+    ),
+  );
+
+  // Updated time.
+  $fields['node']['changed_date'] = array(
+    'title' => t('Last modified'),
+    'field_type' => DS_FIELD_TYPE_FUNCTION,
+    'function' => 'ds_render_date_field',
+    'properties' => array(
+      'formatters' => $date_formatters,
+      'entity_render_key' => 'changed',
     ),
   );
 
@@ -200,6 +209,7 @@ function ds_ds_fields_info($entity_type) {
       'function' => 'ds_render_date_field',
       'properties' => array(
         'formatters' => $date_formatters,
+        'entity_render_key' => 'created',
       ),
     );
 

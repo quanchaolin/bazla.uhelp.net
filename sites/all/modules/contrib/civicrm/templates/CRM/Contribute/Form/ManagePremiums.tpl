@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,6 +34,7 @@
      {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="previewPremium"}
   {else}
      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+  {crmRegion name="contribute-form-managepremiums-standard-fields"}
   <table class="form-layout-compressed">
      <tr class="crm-contribution-form-block-name">
   <td class="label">{$form.name.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_product' field='name' id=$productId}{/if}
@@ -65,10 +66,10 @@
     {if $thumbnailUrl}<tr class="odd-row"><td class="describe-image" colspan="2"><strong>Current Image Thumbnail</strong><br /><img src="{$thumbnailUrl}" /></td></tr>{/if}
     <tr class="crm-contribution-form-block-imageOption"><td>{$form.imageOption.image.html}</td><td>{$form.uploadFile.html}</td></tr>
   <tr class="crm-contribution-form-block-imageOption-thumbnail"><td colspan="2">{$form.imageOption.thumbnail.html}</td></tr>
-    <tr id="imageURL"{if $action eq 2}class="show-row" {else} class="hide-row" {/if}>
+    <tr id="imageURL"{if $action neq 2} class="hiddenElement"{/if}>
         <td class="label">{$form.imageUrl.label}</td><td>{$form.imageUrl.html|crmAddClass:huge}</td>
     </tr>
-    <tr id="thumbnailURL"{if $action eq 2}class="show-row" {else} class="hide-row" {/if}>
+    <tr id="thumbnailURL"{if $action neq 2} class="hiddenElement"{/if}>
         <td class="label">{$form.thumbnailUrl.label}</td><td>{$form.thumbnailUrl.html|crmAddClass:huge}</td>
     </tr>
   <tr><td colspan="2">{$form.imageOption.default_image.html}</td></tr>
@@ -118,6 +119,8 @@
        <td class="html-adjust">{$form.is_active.html}</td>
     </tr>
   </table>
+  {/crmRegion}
+  {crmRegion name="contribute-form-managepremiums-other-fields"}
   <fieldset id="time-delimited" class="crm-collapsible {if empty($showSubscriptions)}collapsed{/if}">
     <legend class="collapsible-title">{ts}Subscription or Service Settings{/ts}</legend>
     <div>
@@ -149,6 +152,7 @@
       </table>
     </div>
   </fieldset>
+  {/crmRegion}
  {/if}
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

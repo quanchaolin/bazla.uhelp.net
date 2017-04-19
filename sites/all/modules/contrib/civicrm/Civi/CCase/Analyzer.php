@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,9 +23,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 namespace Civi\CCase;
 
+/**
+ * Class Analyzer
+ *
+ * @package Civi\CCase
+ */
 class Analyzer {
   /**
    * @var int
@@ -57,6 +62,9 @@ class Analyzer {
    */
   private $indices;
 
+  /**
+   * @param $caseId
+   */
   public function __construct($caseId) {
     $this->caseId = $caseId;
     $this->flush();
@@ -65,8 +73,10 @@ class Analyzer {
   /**
    * Determine if case includes an activity of given type/status
    *
-   * @param string $type eg "Phone Call", "Interview Prospect", "Background Check"
-   * @param string $status eg "Scheduled", "Completed"
+   * @param string $type
+   *   Eg "Phone Call", "Interview Prospect", "Background Check".
+   * @param string $status
+   *   Eg "Scheduled", "Completed".
    * @return bool
    */
   public function hasActivity($type, $status = NULL) {
@@ -82,7 +92,7 @@ class Analyzer {
       $activityStatusGroup = civicrm_api3('option_group', 'get', array('name' => 'activity_status'));
       $activityStatus = array(
         'name' => $status,
-        'option_group_id' => $activityStatusGroup['id']
+        'option_group_id' => $activityStatusGroup['id'],
       );
       $activityStatusID = civicrm_api3('option_value', 'get', $activityStatus);
       $activityStatusID = $activityStatusID['values'][$activityStatusID['id']]['value'];
@@ -96,9 +106,10 @@ class Analyzer {
   }
 
   /**
-   * Get a list of all activities in the case
+   * Get a list of all activities in the case.
    *
-   * @return array list of activity records (api/v3 format)
+   * @return array
+   *   list of activity records (api/v3 format)
    */
   public function getActivities() {
     if ($this->activities === NULL) {
@@ -120,7 +131,7 @@ class Analyzer {
   }
 
   /**
-   * Get a single activity record by type
+   * Get a single activity record by type.
    *
    * @param string $type
    * @throws \Civi\CCase\Exception\MultipleActivityException
@@ -164,6 +175,7 @@ class Analyzer {
 
   /**
    * @return string
+   * @throws \CRM_Core_Exception
    */
   public function getCaseType() {
     if ($this->caseType === NULL) {
@@ -180,8 +192,10 @@ class Analyzer {
   /**
    * Get a list of all activities in the case (indexed by some property/properties)
    *
-   * @param array $keys list of properties by which to index activities
-   * @return array list of activity records (api/v3 format), indexed by $keys
+   * @param array $keys
+   *   List of properties by which to index activities.
+   * @return array
+   *   list of activity records (api/v3 format), indexed by $keys
    */
   public function getActivityIndex($keys) {
     $key = implode(";", $keys);
@@ -192,7 +206,7 @@ class Analyzer {
   }
 
   /**
-   * @return SimpleXMLElement|NULL
+   * @return \SimpleXMLElement|NULL
    */
   public function getXml() {
     if ($this->xml === NULL) {
@@ -202,9 +216,7 @@ class Analyzer {
   }
 
   /**
-   * Flush any cached information
-   *
-   * @return void
+   * Flush any cached information.
    */
   public function flush() {
     $this->case = NULL;
@@ -212,4 +224,5 @@ class Analyzer {
     $this->activities = NULL;
     $this->indices = array();
   }
+
 }

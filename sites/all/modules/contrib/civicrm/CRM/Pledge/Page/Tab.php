@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,26 +23,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   public $_permission = NULL;
   public $_contactId = NULL;
 
   /**
-   * This function is called when action is browse
-   *
-   * return null
-   * @access public
+   * called when action is browse.
    */
-  function browse() {
+  public function browse() {
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_Search', ts('Pledges'), $this->_action);
     $controller->setEmbedded(TRUE);
     $controller->reset();
@@ -65,12 +60,11 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * This function is called when action is view
+   * called when action is view.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function view() {
+  public function view() {
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_PledgeView',
       'View Pledge',
       $this->_action
@@ -83,12 +77,11 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * This function is called when action is update or new
+   * called when action is update or new.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function edit() {
+  public function edit() {
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_Pledge',
       'Create Pledge',
       $this->_action
@@ -100,10 +93,10 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
     return $controller->run();
   }
 
-  function preProcess() {
-    $context       = CRM_Utils_Request::retrieve('context', 'String', $this);
+  public function preProcess() {
+    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
-    $this->_id     = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     if ($context == 'standalone') {
       $this->_action = CRM_Core_Action::ADD;
@@ -126,12 +119,11 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * This function is the main function that is called when the page loads, it decides the which action has to be taken for the page.
+   * the main function that is called when the page loads, it decides the which action has to be taken for the page.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     // check if we can process credit card registration
@@ -158,11 +150,16 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
     return parent::run();
   }
 
+  /**
+   * Get context.
+   *
+   * @param $form
+   */
   public static function setContext(&$form) {
     $context = CRM_Utils_Request::retrieve('context', 'String', $form, FALSE, 'search');
 
     $qfKey = CRM_Utils_Request::retrieve('key', 'String', $form);
-    //validate the qfKey
+    // validate the qfKey
     if (!CRM_Utils_Rule::qfKey($qfKey)) {
       $qfKey = NULL;
     }
@@ -219,5 +216,5 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext($url);
   }
-}
 
+}

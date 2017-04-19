@@ -164,7 +164,7 @@ ALTER TABLE civicrm_pledge DROP honor_type_id;
 -- CRM-13964 and CRM-13965
 SELECT @option_group_id_cs   := max(id) from civicrm_option_group where name = 'contribution_status';
 SELECT @option_val_id_cs_wt  := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_cs;
-SELECT @option_val_id_cs_val := MAX(value) FROM civicrm_option_value WHERE option_group_id = @option_group_id_cs;
+SELECT @option_val_id_cs_val := MAX(ROUND(value)) FROM civicrm_option_value WHERE option_group_id = @option_group_id_cs;
 
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
@@ -267,7 +267,7 @@ SET @devellastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
 ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-( {$domainID}, 'civicrm/api/explorer', '{ts escape="sql" skip="true"}API Explorer{/ts}','API Explorer', 'administer CiviCRM', '', @devellastID, '1', NULL, 1 ),
+( {$domainID}, 'civicrm/api', '{ts escape="sql" skip="true"}API Explorer{/ts}','API Explorer', 'administer CiviCRM', '', @devellastID, '1', NULL, 1 ),
 ( {$domainID}, 'http://wiki.civicrm.org/confluence/display/CRMDOC/Develop', '{ts escape="sql" skip="true"}Developer Docs{/ts}', 'Developer Docs', 'administer CiviCRM', '', @devellastID, '1', NULL, 3 );
 
 -- CRM-14435
@@ -428,7 +428,7 @@ SELECT 'SnapChat' AS website
     UNION ALL
 SELECT 'Vine' AS website
 ) AS temp
-LEFT JOIN civicrm_option_value co ON LOWER(co.name) = LOWER(temp.website)
+LEFT JOIN civicrm_option_value co ON co.name = temp.website
 AND option_group_id = @option_web_id
 WHERE co.id IS NULL;
 
@@ -481,7 +481,7 @@ CASE
    THEN 'Ineligible'
   ELSE 'Submitted'
 END
-WHERE option_group_id = @option_grant_status and LOWER(name) IN ('granted', 'pending', 'approved', 'rejected');
+WHERE option_group_id = @option_grant_status and name IN ('granted', 'pending', 'approved', 'rejected');
 
 SELECT @grant_value := max(cast(value as UNSIGNED)) FROM civicrm_option_value WHERE option_group_id = @option_grant_status;
 SELECT @grant_weight := max(weight) FROM civicrm_option_value WHERE option_group_id = @option_grant_status;
@@ -498,7 +498,7 @@ SELECT 'Awaiting Information' AS grantstatus
     UNION ALL
 SELECT 'Withdrawn' AS grantstatus
 ) AS temp
-LEFT JOIN civicrm_option_value co ON LOWER(co.name) = LOWER(temp.grantstatus)
+LEFT JOIN civicrm_option_value co ON co.name = temp.grantstatus
 AND option_group_id = @option_grant_status
 WHERE co.id IS NULL;
 
@@ -539,4 +539,3 @@ ADD UNIQUE INDEX `UI_line_item_value` (`entity_table`, `entity_id`, `contributio
 
 -- update case type menu
 UPDATE civicrm_navigation set url = 'civicrm/a/#/caseType' WHERE url LIKE 'civicrm/admin/options/case_type%';
-

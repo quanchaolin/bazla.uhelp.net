@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,17 +23,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
-
   /**
    * @var int Time to live (seconds).
    *
@@ -41,7 +38,12 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
    */
   private $ttl = 43200;
 
-  function run() {
+  /**
+   * Run page.
+   *
+   * @throws \Exception
+   */
+  public function run() {
     if (!preg_match('/^[^\/]+\.(jpg|jpeg|png|gif)$/i', $_GET['photo'])) {
       CRM_Core_Error::fatal('Malformed photo name');
     }
@@ -49,17 +51,19 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
     // FIXME Optimize performance of image_url query
     $sql = "SELECT id FROM civicrm_contact WHERE image_url like %1;";
     $params = array(
-      1 => array("%" . $_GET['photo'], 'String')
+      1 => array("%" . $_GET['photo'], 'String'),
     );
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    $cid = NULL;
     while ($dao->fetch()) {
       $cid = $dao->id;
     }
     if ($cid) {
       $config = CRM_Core_Config::singleton();
+      $fileExtension = strtolower(pathinfo($_GET['photo'], PATHINFO_EXTENSION));
       $this->download(
         $config->customFileUploadDir . $_GET['photo'],
-        'image/' . pathinfo($_GET['photo'], PATHINFO_EXTENSION),
+        'image/' . ($fileExtension == 'jpg' ? 'jpeg' : $fileExtension),
         $this->ttl
       );
       CRM_Utils_System::civiExit();
@@ -70,6 +74,8 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
   }
 
   /**
+   * Download image.
+   *
    * @param string $file
    *   Local file path.
    * @param string $mimeType
@@ -80,15 +86,16 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
     if (!file_exists($file)) {
       header("HTTP/1.0 404 Not Found");
       return;
-    } elseif (!is_readable($file)) {
+    }
+    elseif (!is_readable($file)) {
       header('HTTP/1.0 403 Forbidden');
       return;
     }
-    header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', CRM_Utils_Time::getTimeRaw() + $ttl));
-    header("Content-Type: $mimeType");
-    header("Content-Disposition: inline; filename=\"" . basename($file) . "\"");
-    header("Cache-Control: max-age=$ttl, public");
-    header('Pragma: public');
+    CRM_Utils_System::setHttpHeader('Expires', gmdate('D, d M Y H:i:s \G\M\T', CRM_Utils_Time::getTimeRaw() + $ttl));
+    CRM_Utils_System::setHttpHeader("Content-Type", $mimeType);
+    CRM_Utils_System::setHttpHeader("Content-Disposition", "inline; filename=\"" . basename($file) . "\"");
+    CRM_Utils_System::setHttpHeader("Cache-Control", "max-age=$ttl, public");
+    CRM_Utils_System::setHttpHeader('Pragma', 'public');
     readfile($file);
   }
 

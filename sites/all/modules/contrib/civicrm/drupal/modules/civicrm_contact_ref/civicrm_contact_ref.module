@@ -177,9 +177,7 @@ function civicrm_contact_ref_field_widget_form(&$form, &$form_state, $field, $in
   $element += array(
     '#type' => 'textfield',
     '#autocomplete_path' => $instance['widget']['settings']['autocomplete_path'] . '/' . $field['field_name'],
-//    '#size' => $instance['widget']['settings']['size'],
-//TEMP change by Eric
-    '#size' => "100",
+    '#size' => $instance['widget']['settings']['size'],
     '#maxlength' => 1024,
     '#default_value' => empty($defaultValues[$delta]) ? '' : $defaultValues[$delta],
     '#element_validate' => array('civicrm_contact_ref_autocomplete_validate'),
@@ -353,8 +351,9 @@ function _civicrm_contact_ref_potential_references_standard($field, $string = ''
   }
 
   if (!empty($contactSubTypes)) {
-    $contactSubTypes = implode("','", $contactSubTypes);
-    $whereClause[] = "contact_sub_type IN ( '{$contactSubTypes}' )";
+    foreach ($contactSubTypes as $subType) {
+      $whereClause[] = "contact_sub_type LIKE '%" . CRM_Core_DAO::VALUE_SEPARATOR . $subType . CRM_Core_DAO::VALUE_SEPARATOR . "%'";
+    }
   }
 
   $whereClause = empty($whereClause) ? '' : '(' . implode(' OR ', $whereClause) . ') AND';
@@ -371,13 +370,9 @@ function _civicrm_contact_ref_potential_references_standard($field, $string = ''
     }
   }
 
- $q = "
- SELECT civicrm_contact.sort_name,  civicrm_value_address_details_14.commune_45,
- civicrm_state_province.name, civicrm_contact.id
- FROM civicrm_contact LEFT JOIN civicrm_address
- ON civicrm_contact.id = civicrm_address.contact_id
- LEFT JOIN civicrm_state_province ON civicrm_address.state_province_id = civicrm_state_province.id 
- LEFT JOIN civicrm_value_address_details_14 ON civicrm_address.id = civicrm_value_address_details_14.entity_id 
+  $q = "
+    SELECT sort_name, id
+    FROM civicrm_contact
     WHERE $whereClause
     sort_name IS NOT NULL
     AND sort_name NOT LIKE ''
@@ -396,9 +391,7 @@ function _civicrm_contact_ref_potential_references_standard($field, $string = ''
   while ($dao->fetch()) {
     $references[$dao->id] = array(
       'title' => $dao->sort_name,
-//TEMP change by eric
-      'rendered' => $dao->sort_name." :: ".$dao->commune_45,
-//      'rendered' => $dao->sort_name,
+      'rendered' => $dao->sort_name,
     );
   }
 
@@ -408,11 +401,15 @@ function _civicrm_contact_ref_potential_references_standard($field, $string = ''
 /**
  * Helper function for formatters.
  *
- * Store node titles collected in the curent request.
+ * Store node titles collected in the current request.
+ *
+ * @param int $cid
+ * @param string $field
+ * @return string|null
  */
 function _civicrm_contact_ref_titles($cid, $field = 'display_name') {
-  if (!civicrm_initialize()) {
-    return;
+  if (!civicrm_initialize() || !$cid) {
+    return NULL;
   }
   static $titles = array();
 

@@ -24,6 +24,7 @@ function uhelp_init() {
   module_load_include('inc', 'uhelp', 'includes/create_accounts');
   module_load_include('inc', 'uhelp', 'includes/nodeapi');
   module_load_include('inc', 'uhelp', 'includes/computed_fields');
+  module_load_include('inc', 'uhelp', 'includes/page');
   module_load_include('inc', 'uhelp', 'includes/view_headers');
   module_load_include('inc', 'uhelp', 'includes/rules');
   module_load_include('inc', 'uhelp', 'includes/view_fields');
@@ -33,6 +34,17 @@ function uhelp_init() {
 }
 
 function uhelp_menu() {
+  $items = array();
+
+  $items['user/%/internships'] =
+    array(
+	  'title' => t('My Internships'),
+	  'description' => 'Profile tab for Internships',
+	  'access arguments' => array('access content'),
+	  'page callback' => '_uhelp_internships_page',
+	  'page arguments' => array(1),
+	  'type' => MENU_LOCAL_TASK,
+	);  
   $items['moodle-import/classes'] = array(
     'title' => 'Import Classes from Moodle',
     'page callback' => 'uhelp_get_moodle_courses_and_teachers',
@@ -97,7 +109,7 @@ function computed_field_field_dorm_student_display_name_compute(&$entity_field, 
   return $contact['values'][$cidtouse]['display_name'];
 }
 
-function uhelp_form_alter(&$form, &$form_state, $form_id) { 
+function uhelp_form_alter(&$form, &$form_state, $form_id) {
   if (isset($form['#node_edit_form']) && $form['#node_edit_form'] && 
       $form['type']['#value'] == 'university_class') {
     $form['title'] = array(

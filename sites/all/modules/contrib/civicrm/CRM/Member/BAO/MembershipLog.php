@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,32 +23,28 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
 class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
 
   /**
-   * function to add the membership log record
+   * Add the membership log record.
    *
-   * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   * @param array $params
+   *   Properties of the log item.
    *
-   * @access public
-   * @static
-   *
-   * @return object
+   * @return CRM_Member_DAO_MembershipLog|CRM_Core_Error
    */
-  static function add(&$params, &$ids) {
+  public static function add($params) {
     $membershipLog = new CRM_Member_DAO_MembershipLog();
     $membershipLog->copyValues($params);
-
     $membershipLog->save();
     $membershipLog->free();
 
@@ -56,25 +52,24 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
   }
 
   /**
-   * Function to delete membership log record
+   * Delete membership log record.
    *
-   * @param $membershipID
+   * @param int $membershipID
    *
    * @return mixed
-   * @internal param int $membershipTypeId
-   * @static
    */
-
-  static function del($membershipID) {
+  public static function del($membershipID) {
     $membershipLog = new CRM_Member_DAO_MembershipLog();
     $membershipLog->membership_id = $membershipID;
     return $membershipLog->delete();
   }
 
   /**
-   * @param $contactID
+   * Reset the modified ID to NULL for log items by the given contact ID.
+   *
+   * @param int $contactID
    */
-  static function resetModifiedID($contactID) {
+  public static function resetModifiedID($contactID) {
     $query = "
 UPDATE civicrm_membership_log
    SET modified_id = null
@@ -83,5 +78,5 @@ UPDATE civicrm_membership_log
     $params = array(1 => array($contactID, 'Integer'));
     CRM_Core_DAO::executeQuery($query, $params);
   }
-}
 
+}

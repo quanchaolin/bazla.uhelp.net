@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,24 +23,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class provides the functionality to create PDF letter for a group of
- * contacts or a single contact.
+ * This class provides the functionality to create PDF letter for a group of contacts or a single contact.
  */
 class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
 
   /**
-   * all the existing templates in the system
+   * All the existing templates in the system.
    *
    * @var array
    */
@@ -51,12 +48,9 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
   public $_cid = NULL;
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
+   * Build all the data structures needed to build the form.
    */
-  function preProcess() {
+  public function preProcess() {
     $this->skipOnHold = $this->skipDeceased = FALSE;
     CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
     // store case id if present
@@ -84,13 +78,13 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    *
    * access        public
    *
-   * @return array reference to the array of default values
-   *
+   * @return array
+   *   reference to the array of default values
    */
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     if (isset($this->_activityId)) {
       $params = array('id' => $this->_activityId);
@@ -105,11 +99,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * Build the form
-   *
-   * @access public
-   *
-   * @return void
+   * Build the form object.
    */
   public function buildQuickForm() {
     //enable form element
@@ -130,18 +120,19 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
       'contribution_recur_id' => ts('Contact and Recurring'),
       'financial_type_id' => ts('Contact and Financial Type'),
       'campaign_id' => ts('Contact and Campaign'),
-      'payment_instrument_id' => 'Contact and Payment Instrument',
+      'payment_instrument_id' => ts('Contact and Payment Method'),
     );
     $this->addElement('select', 'group_by', ts('Group contributions by'), $options, array(), "<br/>", FALSE);
     // this was going to be free-text but I opted for radio options in case there was a script injection risk
-    $separatorOptions = array('comma' => 'Comma', 'td' => 'Table Cell' );
+    $separatorOptions = array('comma' => 'Comma', 'td' => 'Horizontal Table Cell', 'tr' => 'Vertical Table Cell', 'br' => 'Line Break');
+
     $this->addElement('select', 'group_by_separator', ts('Separator (grouped contributions)'), $separatorOptions);
     $emailOptions = array(
       '' => ts('Generate PDFs for printing (only)'),
       'email' => ts('Send emails where possible. Generate printable PDFs for contacts who cannot receive email.'),
       'both' => ts('Send emails where possible. Generate printable PDFs for all contacts.'),
     );
-    if(CRM_Core_Config::singleton()->doNotAttachPDFReceipt)  {
+    if (CRM_Core_Config::singleton()->doNotAttachPDFReceipt) {
       $emailOptions['pdfemail'] = ts('Send emails with an attached PDF where possible. Generate printable PDFs for contacts who cannot receive email.');
       $emailOptions['pdfemail_both'] = ts('Send emails with an attached PDF where possible. Generate printable PDFs for all contacts.');
     }
@@ -149,7 +140,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
 
     $this->addButtons(array(
         array(
-          'type' => 'submit',
+          'type' => 'upload',
           'name' => ts('Make Thank-you Letters'),
           'isDefault' => TRUE,
         ),
@@ -163,14 +154,21 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
     CRM_Contribute_Form_Task_PDFLetterCommon::postProcess($this);
   }
-}
 
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    $tokens = CRM_Core_SelectValues::contactTokens();
+    $tokens = array_merge(CRM_Core_SelectValues::contributionTokens(), $tokens);
+    return $tokens;
+  }
+
+}

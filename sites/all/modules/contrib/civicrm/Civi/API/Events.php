@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 namespace Civi\API;
 
 /**
@@ -34,45 +34,48 @@ namespace Civi\API;
  *
  * Event subscribers which are concerned about the order of execution should assign
  * a weight to their subscription (such as W_EARLY, W_MIDDLE, or W_LATE).
+ * W_LATE).
  */
 class Events {
 
   /**
    * Determine whether the API request is allowed for the current user.
-   * For successful execution, at least one listener must invoke $event->authorize().
+   * For successful execution, at least one listener must invoke
+   * $event->authorize().
    *
    * @see AuthorizeEvent
    */
-  const AUTHORIZE = 'api.authorize';
+  const AUTHORIZE = 'civi.api.authorize';
 
   /**
    * Determine which API provider executes the given request. For successful
-   * execution, at least one listener must invoke $event->setProvider($provider).
+   * execution, at least one listener must invoke
+   * $event->setProvider($provider).
    *
    * @see ResolveEvent
    */
-  const RESOLVE = 'api.resolve';
+  const RESOLVE = 'civi.api.resolve';
 
   /**
    * Apply pre-execution logic
    *
    * @see PrepareEvent
    */
-  const PREPARE = 'api.prepare';
+  const PREPARE = 'civi.api.prepare';
 
   /**
    * Apply post-execution logic
    *
    * @see RespondEvent
    */
-  const RESPOND = 'api.respond';
+  const RESPOND = 'civi.api.respond';
 
   /**
-   * Handle any exceptions
+   * Handle any exceptions.
    *
    * @see ExceptionEvent
    */
-  const EXCEPTION = 'api.exception';
+  const EXCEPTION = 'civi.api.exception';
 
   /**
    * Weight - Early
@@ -101,4 +104,5 @@ class Events {
       self::RESPOND,
     );
   }
+
 }

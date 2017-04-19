@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,50 +23,41 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
-
-
 abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
 
   protected $_fileName;
 
-  /**#@+
-   * @access protected
-   * @var integer
-   */
-
   /**
-   * imported file size
+   * Imported file size.
    */
   protected $_fileSize;
 
   /**
-   * seperator being used
+   * Separator being used.
    */
   protected $_seperator;
 
   /**
-   * total number of lines in file
+   * Total number of lines in file.
    */
   protected $_lineCount;
 
   /**
-   * whether the file has a column header or not
+   * Whether the file has a column header or not.
    *
    * @var boolean
    */
   protected $_haveColumnHeader;
 
   /**
-   * @param $fileName
+   * @param string $fileName
    * @param string $seperator
    * @param $mapper
    * @param bool $skipColumnHeader
@@ -76,7 +67,8 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
    * @return mixed
    * @throws Exception
    */
-  function run($fileName,
+  public function run(
+    $fileName,
     $seperator = ',',
     &$mapper,
     $skipColumnHeader = FALSE,
@@ -132,7 +124,7 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
         continue;
       }
 
-      /* trim whitespace around the values */
+      // Trim whitespace around the values.
 
       $empty = TRUE;
       foreach ($values as $k => $v) {
@@ -201,8 +193,8 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
 
       if ($returnCode & self::DUPLICATE) {
         if ($returnCode & self::MULTIPLE_DUPE) {
-          /* TODO: multi-dupes should be counted apart from singles
-                     * on non-skip action */
+          // TODO: multi-dupes should be counted apart from singles
+          // on non-skip action.
         }
         $this->_duplicateCount++;
         $recordNumber = $this->_lineCount;
@@ -230,7 +222,6 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
 
     fclose($fd);
 
-
     if ($mode == self::MODE_PREVIEW || $mode == self::MODE_IMPORT) {
       $customHeaders = $mapper;
 
@@ -242,7 +233,8 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
       }
       if ($this->_invalidRowCount) {
         // removed view url for invlaid contacts
-        $headers = array_merge(array(ts('Line Number'),
+        $headers = array_merge(array(
+            ts('Line Number'),
             ts('Reason'),
           ),
           $customHeaders
@@ -251,7 +243,8 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
         self::exportCSV($this->_errorFileName, $headers, $this->_errors);
       }
       if ($this->_conflictCount) {
-        $headers = array_merge(array(ts('Line Number'),
+        $headers = array_merge(array(
+            ts('Line Number'),
             ts('Reason'),
           ),
           $customHeaders
@@ -260,7 +253,8 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
         self::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
       }
       if ($this->_duplicateCount) {
-        $headers = array_merge(array(ts('Line Number'),
+        $headers = array_merge(array(
+            ts('Line Number'),
             ts('View Activity History URL'),
           ),
           $customHeaders
@@ -270,20 +264,15 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
         self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
       }
     }
-    //echo "$this->_totalCount,$this->_invalidRowCount,$this->_conflictCount,$this->_duplicateCount";
     return $this->fini();
   }
 
   /**
-   * Given a list of the importable field keys that the user has selected
-   * set the active fields array to this list
+   * Given a list of the importable field keys that the user has selected set the active fields array to this list.
    *
-   * @param array mapped array of values
-   *
-   * @return void
-   * @access public
+   * @param array $fieldKeys
    */
-  function setActiveFields($fieldKeys) {
+  public function setActiveFields($fieldKeys) {
     $this->_activeFieldCount = count($fieldKeys);
     foreach ($fieldKeys as $key) {
       if (empty($this->_fields[$key])) {
@@ -296,12 +285,12 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * function to format the field values for input to the api
+   * Format the field values for input to the api.
    *
-   * @return array (reference ) associative array of name/value pairs
-   * @access public
+   * @return array
+   *   (reference ) associative array of name/value pairs
    */
-  function &getActiveFieldParams() {
+  public function &getActiveFieldParams() {
     $params = array();
     for ($i = 0; $i < $this->_activeFieldCount; $i++) {
       if (isset($this->_activeFields[$i]->_value)
@@ -316,13 +305,13 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $title
    * @param int $type
    * @param string $headerPattern
    * @param string $dataPattern
    */
-  function addField($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
+  public function addField($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
     if (empty($name)) {
       $this->_fields['doNotImport'] = new CRM_Activity_Import_Field($name, $title, $type, $headerPattern, $dataPattern);
     }
@@ -339,16 +328,13 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Store parser values
+   * Store parser values.
    *
    * @param CRM_Core_Session $store
    *
    * @param int $mode
-   *
-   * @return void
-   * @access public
    */
-  function set($store, $mode = self::MODE_SUMMARY) {
+  public function set($store, $mode = self::MODE_SUMMARY) {
     $store->set('fileSize', $this->_fileSize);
     $store->set('lineCount', $this->_lineCount);
     $store->set('seperator', $this->_seperator);
@@ -380,21 +366,16 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
         $store->set('duplicatesFileName', $this->_duplicateFileName);
       }
     }
-    //echo "$this->_totalCount,$this->_invalidRowCount,$this->_conflictCount,$this->_duplicateCount";
   }
 
   /**
-   * Export data to a CSV file
+   * Export data to a CSV file.
    *
-   * @param $fileName
+   * @param string $fileName
    * @param array $header
-   * @param data $data
-   *
-   * @internal param string $filename
-   * @return void
-   * @access public
+   * @param array $data
    */
-  static function exportCSV($fileName, $header, $data) {
+  public static function exportCSV($fileName, $header, $data) {
     $output = array();
     $fd = fopen($fileName, 'w');
 
@@ -415,4 +396,3 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
   }
 
 }
-

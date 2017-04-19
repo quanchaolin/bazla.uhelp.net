@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,40 +23,33 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class generates form components for processing a pledge payment
- *
+ * This class generates form components for processing a pledge payment.
  */
 class CRM_Pledge_Form_Payment extends CRM_Core_Form {
 
   /**
-   * the id of the pledge payment that we are proceessing
+   * The id of the pledge payment that we are proceessing.
    *
    * @var int
-   * @public
    */
   public $_id;
 
   /**
-   * Function to set variables up before form is built
-   *
-   * @return void
-   * @access public
+   * Set variables up before form is built.
    */
   public function preProcess() {
     // check for edit permission
     if (!CRM_Core_Permission::check('edit pledges')) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
 
     $this->_id = CRM_Utils_Request::retrieve('ppId', 'Positive', $this);
@@ -65,14 +58,10 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form.
-   * the default values are retrieved from the database
-   *
-   * @access public
-   *
-   * @return void
+   * Set default values for the form.
+   * the default values are retrieved from the database.
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     if ($this->_id) {
       $params['id'] = $this->_id;
@@ -81,7 +70,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
       if (isset($defaults['contribution_id'])) {
         $this->assign('pledgePayment', TRUE);
       }
-      $status = CRM_Contribute_PseudoConstant::contributionStatus($defaults['status_id']);
+      $status = CRM_Core_PseudoConstant::getName('CRM_Pledge_BAO_Pledge', 'status_id', $defaults['status_id']);
       $this->assign('status', $status);
     }
     $defaults['option_type'] = 1;
@@ -89,13 +78,10 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
-    //add various dates
+    // add various dates
     $this->addDate('scheduled_date', ts('Scheduled Date'), TRUE);
 
     $this->addMoney('scheduled_amount',
@@ -107,14 +93,14 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
       TRUE
     );
 
-    $optionTypes = array('1' => ts('Adjust Pledge Payment Schedule?'),
+    $optionTypes = array(
+      '1' => ts('Adjust Pledge Payment Schedule?'),
       '2' => ts('Adjust Total Pledge Amount?'),
     );
     $element = $this->addRadio('option_type',
       NULL,
       $optionTypes,
-      array(
-        ), '<br/>'
+      array(), '<br/>'
     );
 
     $this->addButtons(array(
@@ -133,27 +119,22 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
-    //get the submitted form values.
+    // get the submitted form values.
     $formValues = $this->controller->exportValues($this->_name);
     $params = array();
     $formValues['scheduled_date'] = CRM_Utils_Date::processDate($formValues['scheduled_date']);
     $params['scheduled_date'] = CRM_Utils_Date::format($formValues['scheduled_date']);
     $params['currency'] = CRM_Utils_Array::value('currency', $formValues);
     $now = date('Ymd');
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
     if (CRM_Utils_Date::overdue(CRM_Utils_Date::customFormat($params['scheduled_date'], '%Y%m%d'), $now)) {
-      $params['status_id'] = array_search('Overdue', $contributionStatus);
+      $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Overdue');
     }
     else {
-      $params['status_id'] = array_search('Pending', $contributionStatus);
+      $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Pending');
     }
 
     $params['id'] = $this->_id;
@@ -164,7 +145,6 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
     if (CRM_Utils_Array::value('option_type', $formValues) == 2) {
       $adjustTotalAmount = TRUE;
     }
-
 
     $pledgeScheduledAmount = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
       $params['id'],
@@ -179,7 +159,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
     if (($formValues['scheduled_amount'] - $pledgeScheduledAmount) >= $oldestPaymentAmount['amount']) {
       $adjustTotalAmount = TRUE;
     }
-    //update pledge status
+    // update pledge status
     CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeId,
       array($params['id']),
       $params['status_id'],
@@ -191,5 +171,5 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
     $statusMsg = ts('Pledge Payment Schedule has been updated.');
     CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
   }
-}
 
+}

@@ -1,10 +1,9 @@
 <?php
-
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.5                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2014                                |
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -24,33 +23,40 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
  * This class generates form components for Financial Type
- *
  */
 class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
 
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Set variables up before form is built.
+   */
+  public function preProcess() {
+    // Check permission for Financial Type when ACL-FT is enabled
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
+      && !CRM_Core_Permission::check('administer CiviCRM Financial Types')
+    ) {
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+    }
+    parent::preProcess();
+  }
+
+  /**
+   * Build the form object.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
     $this->setPageTitle(ts('Financial Type'));
 
-    $this->_id = CRM_Utils_Request::retrieve('id' , 'Positive', $this);
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     if ($this->_id) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_id, 'name');
     }
@@ -68,20 +74,17 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $this->assign('aid', $this->_id);
     }
-    if ($this->_action == CRM_Core_Action::UPDATE && CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_id, 'is_reserved','vid')) {
+    if ($this->_action == CRM_Core_Action::UPDATE && CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_id, 'is_reserved', 'vid')) {
       $this->freeze(array('is_active'));
     }
-    
-    $this->addRule('name', ts('A financial type with this name already exists. Please select another name.'),'objectExists',
+
+    $this->addRule('name', ts('A financial type with this name already exists. Please select another name.'), 'objectExists',
       array('CRM_Financial_DAO_FinancialType', $this->_id)
     );
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -92,7 +95,7 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
       CRM_Core_Session::setStatus(ts('Selected financial type has been deleted.'), ts('Record Deleted'), 'success');
     }
     else {
-      $params = $ids = array( );
+      $params = $ids = array();
       // store the submitted values in an array
       $params = $this->exportValues();
 
@@ -103,7 +106,7 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
       $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $url = CRM_Utils_System::url('civicrm/admin/financial/financialType', 'reset=1&action=browse');
-        CRM_Core_Session::setStatus(ts('The financial type "%1" has been updated.', array( 1 => $financialType->name)), ts('Saved'), 'success');
+        CRM_Core_Session::setStatus(ts('The financial type "%1" has been updated.', array(1 => $financialType->name)), ts('Saved'), 'success');
       }
       else {
         $url = CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts', 'reset=1&action=browse&aid=' . $financialType->id);

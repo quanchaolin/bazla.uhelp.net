@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -107,7 +107,7 @@
         <div class="form-layout-compressed">
         {/if}
         {if $field.help_pre && $action neq 4 && $form.$n.html}
-          <div class="crm-section helprow-{$n}-section" id="helprow-{$n}">
+          <div class="crm-section helprow-{$n}-section helprow-pre" id="helprow-{$n}">
             <div class="content description">{$field.help_pre}</div>
           </div>
         {/if}
@@ -150,9 +150,6 @@
               {if $n|substr:0:3 eq 'im-'}
                 {assign var="provider" value=$n|cat:"-provider_id"}
                 {$form.$provider.html}&nbsp;
-                {elseif $n|substr:0:4 eq 'url-'}
-                {assign var="websiteType" value=$n|cat:"-website_type_id"}
-                {$form.$websiteType.html}&nbsp;
               {/if}
               {if $n eq 'email_greeting' or  $n eq 'postal_greeting' or $n eq 'addressee'}
                 {include file="CRM/Profile/Form/GreetingType.tpl"}
@@ -174,12 +171,7 @@
                 &nbsp;{$form.$phone_ext_field.html}
                 {/if}
               {else}
-                {if ( $field.data_type eq 'Date' or
-                ( ( ( $n eq 'birth_date' ) or ( $n eq 'deceased_date' ) or ( $n eq 'activity_date_time' ) ) ) ) and $field.is_view neq 1 }
-                {include file="CRM/common/jcalendar.tpl" elementName=$n}
-                {else}
-                  {$form.$n.html}
-                {/if}
+                {$form.$n.html}
                 {if $field.html_type eq 'Autocomplete-Select'}
                   {if $field.data_type eq 'ContactReference'}
                     {include file="CRM/Custom/Form/ContactReference.tpl" element_name = $n}
@@ -198,13 +190,13 @@
 
       {* Show explanatory text for field if not in 'view' mode *}
         {if $field.help_post && $action neq 4 && $form.$n.html}
-          <div class="crm-section helprow-{$n}-section" id="helprow-{$n}">
+          <div class="crm-section helprow-{$n}-section helprow-post" id="helprow-{$n}">
             <div class="content description">{$field.help_post}</div>
           </div>
         {/if}
       {/if}{* end of main if field name if *}
     {/foreach}
-   
+
     {if $isCaptcha && ( $mode eq 8 || $mode eq 4 || $mode eq 1 ) }
       {include file='CRM/common/ReCAPTCHA.tpl'}
       <script type="text/javascript">cj('.recaptcha_label').attr('width', '140px');</script>
@@ -226,7 +218,12 @@
       {/if}
       <div class="crm-submit-buttons" style='{$floatStyle}'>
         {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}<span class="crm-button">{$form._qf_Edit_upload_duplicate.html}</span>{/if}
-        <a class="button cancel" href="{$cancelURL}">{ts}Cancel{/ts}</a>
+        <a class="button cancel" href="{$cancelURL}">
+          <span>
+            <i class="crm-i fa-times"></i>
+            {ts}Cancel{/ts}
+          </span>
+        </a>
       </div>
     {/if}
     {if $help_post && $action neq 4}<br /><div class="messages help">{$help_post}</div>{/if}

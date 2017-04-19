@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,15 +23,18 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Metadata for an extension (e.g. the extension's "info.xml" file)
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Extension_Info {
 
   /**
-   * Extension info file name
+   * Extension info file name.
    */
   const FILENAME = 'info.xml';
 
@@ -42,12 +45,18 @@ class CRM_Extension_Info {
   public $file = NULL;
 
   /**
-   * Load extension info an XML file
+   * @var array
+   *   Each item is a specification like:
+   *   array('type'=>'psr4', 'namespace'=>'Foo\Bar', 'path'=>'/foo/bar').
+   */
+  public $classloader = array();
+
+  /**
+   * Load extension info an XML file.
    *
    * @param $file
    *
    * @throws CRM_Extension_Exception_ParseException
-   * @internal param string $string XML content
    * @return CRM_Extension_Info
    */
   public static function loadFromFile($file) {
@@ -62,9 +71,10 @@ class CRM_Extension_Info {
   }
 
   /**
-   * Load extension info a string
+   * Load extension info a string.
    *
-   * @param string $string XML content
+   * @param string $string
+   *   XML content.
    *
    * @throws CRM_Extension_Exception_ParseException
    * @return CRM_Extension_Info
@@ -87,24 +97,23 @@ class CRM_Extension_Info {
    * @param null $label
    * @param null $file
    */
-  function __construct($key = NULL, $type = NULL, $name = NULL, $label = NULL, $file = NULL) {
-    $this->key       = $key;
-    $this->type      = $type;
-    $this->name      = $name;
-    $this->label     = $label;
-    $this->file      = $file;
+  public function __construct($key = NULL, $type = NULL, $name = NULL, $label = NULL, $file = NULL) {
+    $this->key = $key;
+    $this->type = $type;
+    $this->name = $name;
+    $this->label = $label;
+    $this->file = $file;
   }
 
   /**
    * Copy attributes from an XML document to $this
    *
    * @param SimpleXMLElement $info
-   * @return void
    */
   public function parse($info) {
-    $this->key   = (string) $info->attributes()->key;
-    $this->type  = (string) $info->attributes()->type;
-    $this->file  = (string) $info->file;
+    $this->key = (string) $info->attributes()->key;
+    $this->type = (string) $info->attributes()->type;
+    $this->file = (string) $info->file;
     $this->label = (string) $info->name;
 
     // Convert first level variables to CRM_Core_Extension properties
@@ -121,6 +130,16 @@ class CRM_Extension_Info {
           $this->urls[$urlAttr] = (string) $url;
         }
         ksort($this->urls);
+      }
+      elseif ($attr === 'classloader') {
+        $this->classloader = array();
+        foreach ($val->psr4 as $psr4) {
+          $this->classloader[] = array(
+            'type' => 'psr4',
+            'prefix' => (string) $psr4->attributes()->prefix,
+            'path' => (string) $psr4->attributes()->path,
+          );
+        }
       }
       else {
         $this->$attr = CRM_Utils_XML::xmlObjToArray($val);

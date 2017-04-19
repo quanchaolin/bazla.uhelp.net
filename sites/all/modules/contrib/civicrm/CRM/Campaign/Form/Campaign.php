@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,62 +23,57 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class generates form components for processing a campaign
- *
+ * This class generates form components for processing a campaign.
  */
 class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
 
   /**
-   * action
+   * Action
    *
    * @var int
    */
-  protected $_action;
+  public $_action;
 
   /**
-   * context
+   * Context
    *
    * @var string
    */
   protected $_context;
 
   /**
-   * object values.
+   * Object values.
    *
    * @var array
    */
   protected $_values;
 
   /**
-   * the id of the campaign we are proceessing
+   * The id of the campaign we are proceessing
    *
    * @var int
-   * @protected
    */
   protected $_campaignId;
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Campaign';
+  }
 
   public function preProcess() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
       CRM_Utils_System::permissionDenied();
-    }
-
-    //check for custom data type.
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      return CRM_Custom_Form_CustomData::preProcess($this);
     }
 
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
@@ -120,51 +115,39 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
 
     // when custom data is included in form.
     if (!empty($_POST['hidden_custom'])) {
+      $campaignTypeId = empty($_POST['campaign_type_id']) ? NULL : $_POST['campaign_type_id'];
       $this->set('type', 'Campaign');
-      $this->set('subType', CRM_Utils_Array::value('campaign_type_id', $_POST));
+      $this->set('subType', $campaignTypeId);
       $this->set('entityId', $this->_campaignId);
 
-      CRM_Custom_Form_CustomData::preProcess($this);
+      CRM_Custom_Form_CustomData::preProcess($this, NULL, $campaignTypeId, 1, 'Campaign', $this->_campaignId);
       CRM_Custom_Form_CustomData::buildQuickForm($this);
       CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = $this->_values;
 
-    //load only custom data defaults.
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
-
     if (isset($defaults['start_date'])) {
-      list($defaults['start_date'],
-        $defaults['start_date_time']
-      ) = CRM_Utils_Date::setDateDefaults($defaults['start_date'],
-        'activityDateTime'
-      );
+      list($defaults['start_date'], $defaults['start_date_time'])
+        = CRM_Utils_Date::setDateDefaults($defaults['start_date'], 'activityDateTime');
     }
     else {
-      list($defaults['start_date'],
-        $defaults['start_date_time']
-      ) = CRM_Utils_Date::setDateDefaults();
+      list($defaults['start_date'], $defaults['start_date_time'])
+        = CRM_Utils_Date::setDateDefaults();
     }
 
     if (isset($defaults['end_date'])) {
-      list($defaults['end_date'],
-        $defaults['end_date_time']
-      ) = CRM_Utils_Date::setDateDefaults($defaults['end_date'],
-        'activityDateTime'
-      );
+      list($defaults['end_date'], $defaults['end_date_time'])
+        = CRM_Utils_Date::setDateDefaults($defaults['end_date'], 'activityDateTime');
     }
 
     if (!isset($defaults['is_active'])) {
@@ -210,10 +193,6 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
 
     $this->applyFilter('__ALL__', 'trim');
-
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::buildQuickForm($this);
-    }
 
     //lets assign custom data type and subtype.
     $this->assign('customDataType', 'Campaign');
@@ -266,11 +245,11 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       )
     );
 
-    $this->addWysiwyg('goal_general', ts('Campaign Goals'), array('rows' => 2, 'cols' => 40));
+    $this->add('wysiwyg', 'goal_general', ts('Campaign Goals'), array('rows' => 2, 'cols' => 40));
     $this->add('text', 'goal_revenue', ts('Revenue Goal'), array('size' => 8, 'maxlength' => 12));
     $this->addRule('goal_revenue', ts('Please enter a valid money value (e.g. %1).',
-        array(1 => CRM_Utils_Money::format('99.99', ' '))
-      ), 'money');
+      array(1 => CRM_Utils_Money::format('99.99', ' '))
+    ), 'money');
 
     // is this Campaign active
     $this->addElement('checkbox', 'is_active', ts('Is Active?'));
@@ -295,7 +274,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   }
 
   /**
-   * This function is used to add the rules (mainly global rules) for form.
+   * add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
    * @param $fields
@@ -303,10 +282,9 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
    * @param $errors
    *
    * @return bool|array
-   * @access public
    * @see valid_date
    */
-  static function formRule($fields, $files, $errors) {
+  public static function formRule($fields, $files, $errors) {
     $errors = array();
 
     return empty($errors) ? TRUE : $errors;
@@ -314,10 +292,6 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
 
   /**
    * Form submission of new/edit campaign is processed.
-   *
-   * @access public
-   *
-   * @return void
    */
   public function postProcess() {
     // store the submitted values in an array
@@ -355,9 +329,9 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $params['groups'] = $groups;
 
     // delete previous includes/excludes, if campaign already existed
-    $groupTableName    = CRM_Contact_BAO_Group::getTableName();
-    $dao               = new CRM_Campaign_DAO_CampaignGroup();
-    $dao->campaign_id  = $this->_campaignId;
+    $groupTableName = CRM_Contact_BAO_Group::getTableName();
+    $dao = new CRM_Campaign_DAO_CampaignGroup();
+    $dao->campaign_id = $this->_campaignId;
     $dao->entity_table = $groupTableName;
     $dao->find();
     while ($dao->fetch()) {
@@ -369,7 +343,6 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       CRM_Utils_Array::value('campaign_type_id', $params)
     );
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
       $this->_campaignId,
       'Campaign'
     );
@@ -390,7 +363,5 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=campaign'));
     }
   }
+
 }
-
-
-

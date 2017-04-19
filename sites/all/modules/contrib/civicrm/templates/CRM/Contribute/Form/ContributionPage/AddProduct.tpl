@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,10 +23,11 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="contribute-form-contributionpage-addproduct-main"}
 {capture assign=managePremiumsURL}{crmURL p='civicrm/admin/contribute/managePremiums' q="reset=1"}{/capture}
 <h3>{if $action eq 2 }{ts}Add Products to This Page{/ts} {elseif $action eq 1024}{ts}Preview{/ts}{else} {ts}Remove Products from this Page{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-contribution-add_product-form-block">
-  <div id="help">
+  <div class="help">
     {if $action eq 1024}
       {ts}This is a preview of this product as it will appear on your Contributions page(s).{/ts}
     {else}
@@ -89,12 +90,11 @@
           data = eval(data);//get json array
           if ( data != null ) {
             $("#financial_type_id").val(data);
-  
           }
-  
+
         }
       });
-  
+
     }
     getFinancialType();
 
@@ -102,3 +102,6 @@
 });
 {/literal}
 </script>
+{/crmRegion}
+{crmRegion name="contribute-form-contributionpage-addproduct-post"}
+{/crmRegion}

@@ -56,7 +56,7 @@
   </item>
   <item>
      <path>civicrm/case/addToCase</path>
-     <title>Build Activity To Case</title>
+     <title>File on Case</title>
      <page_callback>CRM_Case_Form_ActivityToCase</page_callback>
   </item>
   <item>
@@ -111,10 +111,6 @@
      <access_arguments>access all cases and activities</access_arguments>
   </item>
   <item>
-     <path>civicrm/case/ajax/unclosed</path>
-     <page_callback>CRM_Case_Page_AJAX::unclosedCases</page_callback>
-  </item>
-  <item>
      <path>civicrm/case/ajax/addclient</path>
      <page_callback>CRM_Case_Page_AJAX::addClient</page_callback>
   </item>
@@ -131,10 +127,5 @@
   <item>
     <path>civicrm/ajax/delcaserole</path>
     <page_callback>CRM_Case_Page_AJAX::deleteCaseRoles</page_callback>
-  </item>
-  <item>
-    <path>civicrm/case/changeactivitystatus</path>
-    <title>Change Activity Status</title>
-    <page_callback>CRM_Case_Form_ActivityChangeStatus</page_callback>
   </item>
 </menu>

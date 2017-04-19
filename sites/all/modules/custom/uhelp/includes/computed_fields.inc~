@@ -1,0 +1,13 @@
+/**
+ *  This is for the computed field on the Recruitment Event 
+ *  content type (Machine name: recruitment_event)
+ *  that calculates the total number of students that 
+ *  showed up to the event
+ */
+
+function computed_field_field_recruitment_total_students_compute(&$entity_field, $entity_type, $entity, $field, $instance, $langcode, $items) {
+
+
+  $entity_field[0]['value'] = $student_total;
+  return $available_beds;
+}

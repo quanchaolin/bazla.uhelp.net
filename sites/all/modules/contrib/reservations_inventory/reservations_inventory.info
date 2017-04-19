@@ -1,0 +1,19 @@
+name = Reservations Inventory
+package = Reservations
+description = "Adds an Inventory Taxonomy to Content Type and Nodes in that type.  Can limit Reservable Items to specific items in UI."
+
+core = 7.x
+
+dependencies[] = reservations
+
+files[] = reservations_inventory.module
+
+configure = admin/config/reservations/inventory
+
+
+; Information added by drupal.org packaging script on 2013-10-01
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "reservations_inventory"
+datestamp = "1380625689"
+

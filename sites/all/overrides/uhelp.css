@@ -1,0 +1,43 @@
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 750px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  font-size: 82%;
+  font-family:  arial, verdana, sans-serif;
+  line-height: 130%;
+  color: #000;
+  background-color: #000;
+}
+
+#suckerfishmenu {
+    background: none repeat scroll 0 0 #009872;
+}
+
+#suckerfishmenu a {
+    background: url("../images/green/MenuDiv.png") repeat-y scroll 100% 0 #009872;
+}
+
+#header {
+    background: #009872;
+    margin-bottom: 12px;
+}
+
+.site-name a:link, #site-name a:link {
+    color: #000;
+}
+.site-name a:visited, #site-name a:visited {
+    color: #000;
+}
+
+
+#crm-container div.crm-summary-display_name {
+    font-size: 19px;
+    padding-bottom: 10px;
+    padding-top: 28px;
+}
+
+tr.view-subfooter-number{ 
+     display: none; 
+}

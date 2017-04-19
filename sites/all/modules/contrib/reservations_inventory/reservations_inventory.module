@@ -1,0 +1,319 @@
+<?php
+
+/**
+ * @file
+ * reservations_inventory functions
+ */
+
+/**
+ * Implements hook_permission().
+ */
+function reservations_inventory_permission() {
+  return array(
+   'administer reservations inventory' => array(
+      'title' => '<em class="placeholder">Reservations</em>: Administer Inventory',
+      'description' => t('Configure Invetnory Settings')),
+    'manage reservations inventory' => array(
+      'title' => '<em class="placeholder">Reservations</em>: Manage Inventory',
+      'description' => t('Without this permission, the inventory field is disabled and updated programatically.'))
+  );
+}
+
+
+/**
+ * Implements hook_menu().
+ */
+function reservations_inventory_menu() {
+  $i = 0;
+  // Standard Administration settings.
+  $items['admin/config/reservations/inventory'] = array(
+    'title' => 'Inventory',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('reservations_inventory_admin_settings'),
+    'access callback' => 'user_access',
+    'access arguments' => array('administer reservations'),
+    'description' => 'Configure settings for Reservations Inventory.',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  
+  // FOR EACH INVENTORY TERM, ADD THESE LINKS
+  // REQUIRES MANUALY REBUILDING MENU
+  
+  $vid = variable_get('reservations_inventory_vid', 0); 
+  $tree = taxonomy_get_tree($vid);
+  $half = round(count($tree)/2);
+  
+  foreach ($tree as $term) {
+    $i++;
+    $position = ($i < $half) ? 'left' : 'right';
+    // Adds Block of Menu Options for Each Active Inventory
+    $items['admin/reservations/' . $term->tid] = array(
+      'title' => $term->name . ' Inventory',
+      'description' => 'Block of Inventory Related Menu Options',
+      'position' => $position,
+      'page callback' => 'system_admin_menu_block_page',
+      'access arguments' => array('manage reservations'),
+      'file' => 'system.admin.inc',
+      'file path' => drupal_get_path('module', 'system'),
+      'weight' => $term->weight,
+    );
+  
+    // MAKE
+    $items['admin/reservations/' . $term->tid . '/add'] = array(
+      'title' => 'Make ' . $term->name . ' Reservation',
+      'page callback' => 'reservations_inventory_add_redirect',
+      'page arguments' => array(2),
+      'access arguments' => array('manage reservations'),
+      'type' => MENU_NORMAL_ITEM,
+      'weight' => -50,
+    );
+  
+    // CHECK IN/OUT
+    $items['admin/reservations/' . $term->tid . '/check-in-out'] = array(
+      'title' => 'Check In/Out ' . $term->name . ' Reservations',
+      'page callback' => 'reservations_inventory_check_in_out_redirect',
+      'page arguments' => array(2),
+      'access arguments' => array('manage reservations'),
+      'type' => MENU_NORMAL_ITEM,
+      'weight' => -45,
+    );
+  
+    // CURRENT INVENTORY
+    $items['admin/reservations/' . $term->tid . '/current-inventory'] = array(
+      'title' => 'Current Inventory of ' . $term->name . ' Items',
+      'page callback' => 'reservations_inventory_current_inventory_redirect',
+      'page arguments' => array(2),
+      'access arguments' => array('manage reservations'),
+      'type' => MENU_NORMAL_ITEM,
+      'weight' => -40,
+    );
+  
+    // PERMISSIONS 
+    $items['admin/reservations/' . $term->tid . '/permissions'] = array(
+      'title' => 'Manage Permissions for ' . $term->name . ' Inventory',
+      'page callback' => 'reservations_inventory_permissions_redirect',
+      'page arguments' => array(2),
+      'access arguments' => array('manage reservations'),
+      'type' => MENU_NORMAL_ITEM,
+      'weight' => -35,
+    );  
+  }
+    
+  return $items;
+}
+
+/**
+ * These functions are required because the menu needs to follow the patten above.
+ */
+function reservations_inventory_add_redirect($tid) {
+  drupal_goto('node/add/reservations-reservation/inventory/' . $tid);
+}
+
+function reservations_inventory_permissions_redirect($tid) {
+  drupal_goto('admin/reservations/manage/permissions/inventory/' . $tid);
+}
+
+function reservations_inventory_current_inventory_redirect($tid) {
+  drupal_goto('admin/reservations/manage/current_inventory/inventory/' . $tid);
+}
+
+function reservations_inventory_check_in_out_redirect($tid) {
+  drupal_goto('admin/reservations/manage/list/inventory/' . $tid);
+}
+
+
+/**
+ * Builds the admininstration settings form.
+ */
+function reservations_inventory_admin_settings($form, &$form_state) {
+
+  $vid = variable_get('reservations_inventory_vid', 0);   
+  $tid = variable_get('reservations_inventory_default_reservation_inventory', '');
+      
+   // weighted -9
+   $grouping_array = reservations_taxonomy_term_select(t('Default Inventory'), NULL, $tid, $vid, t('If configured, when creating a reservation the reservable items will be filtered to this inventory by default.'), 0, '<' . t('Select') . '>');
+
+  $form['reservations_inventory_default_reservation_inventory'] = $grouping_array;
+
+  return system_settings_form($form);
+}
+
+
+function reservations_inventory_get_inventory_tids($type) {
+  $tids = db_query("SELECT tids FROM {reservations_inventory_node_type} WHERE type = :type", array(':type' => $type))->fetchField();
+  return ($tids) ? explode(',', $tids) : NULL;
+}
+
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function reservations_inventory_form_reservations_reservation_node_form_alter(&$form, &$form_state) {
+  
+  $language = $form['language']['#value'];
+  // node/add/reservations-reservation/inventory/$tid
+  // check to see if inventory is being passed
+  
+  if(!$form['field_reservations_inventory'][$language]['#default_value']) {
+
+    $inventory = reservations_inventory_set_inventory();
+    
+    $form['field_reservations_inventory']['#type'] = 'hidden';
+    $form['field_reservations_inventory'][$language]['#default_value'] = $inventory;
+  } else {
+    if (user_access('manage reservations')) {
+      //can see but no longer edit?
+      $form['field_reservations_inventory']['#disabled'] = 'TRUE';
+    } else {
+      $form['field_reservations_inventory']['#type'] = 'hidden';
+    }
+  }
+   
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function reservations_inventory_form_node_type_form_alter(&$form, &$form_state) {
+  
+  // Reservation content type can't used for other Reservations functionality.
+  if (isset($form['#node_type']->type) && $form['#node_type']->type == 'reservations_reservation') {
+    return;
+  }
+  
+  $type = $form['old_type']['#value'];
+
+  if ($type) {
+    $nodes = reservations_nodes_for_type_count($type);
+    $settings = reservations_load_item_settings($type);
+  }
+     
+  $vid = variable_get('reservations_inventory_vid', 0);   
+  $tid = db_query("SELECT tids FROM {reservations_inventory_node_type} WHERE type = :type", array(':type' => $type))->fetchField();
+   
+  $inventory_array = reservations_taxonomy_term_select(t('Inventory'), NULL, $tid, $vid, t('When added to several reservations inferences, inventory will filter the content types displayed to this term.  Terms added to the Reservations Inventory vocabulary will appear here.'), 0, '<' . t('Select') . '>');
+
+  $form['reservations']['reservations_inventory'] = $inventory_array;
+  $form['#validate'][] = 'reservations_inventory_node_type_save_validate';
+
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function reservations_inventory_form_node_type_delete_confirm_alter(&$form, &$form_state) {
+  $type = str_replace('-', '_', arg(3));
+  reservations_inventory_node_type_delete_validate($form);      
+}
+
+/**
+ * Validates saving of Inventory settings for Reservations content types.
+ */
+function reservations_inventory_node_type_save_validate($form, &$form_state) {
+  $values = $form_state['values'];
+
+  if ($values['old_type']) {
+  
+    //update only if the type already exists
+    $inventory = db_query("SELECT tids FROM {reservations_inventory_node_type} WHERE type = :type", array(':type' => $values['old_type']))->fetchField();
+    
+    if ($inventory) {
+      $num_updated = db_update('reservations_inventory_node_type') 
+      ->fields(array(
+      'type' => $values['old_type'],
+      'tids' => $values['reservations_inventory'],
+      ))
+      ->condition('type', $values['old_type'], '=')
+      ->execute();
+    } else {
+	  $result = db_insert('reservations_inventory_node_type') 
+      ->fields(array(
+      'type' => $values['old_type'],
+      'tids' => $values['reservations_inventory'],
+       ))
+       ->execute(); 
+    }
+    
+  } else {
+    $result = db_insert('reservations_inventory_node_type') 
+    ->fields(array(
+    'type' => $values['type'],
+    'tids' => $values['reservations_inventory'],
+     ))
+     ->execute();
+  }
+  
+  // UPDATE EXISTING NODES OF THE TYPE
+  // DO WE NEED BATCH?
+    
+  //get the resources
+  $nids = db_query("SELECT node.nid FROM {node} LEFT JOIN {reservations_resource_node} ON node.nid = reservations_resource_node.nid WHERE reservations_sub_type = 1 AND type = :type", array(':type' => $values['type']));
+   
+  foreach($nids as $nid) {
+    $node = node_load($nid->nid);
+    $node->field_reservations_inventory[LANGUAGE_NONE][0]['tid'] = $values['reservations_inventory'];
+    node_save($node);
+  }
+  
+  // get the buckets
+  $nids = db_query("SELECT node.nid FROM {node} LEFT JOIN {reservations_bucket_node } ON node.nid = reservations_bucket_node .nid WHERE reservations_sub_type = 1 AND type = :type", array(':type' => $values['type']));
+   
+  foreach($nids as $nid) {
+    $node = node_load($nid->nid);
+    $node->field_reservations_inventory[LANGUAGE_NONE][0]['tid'] = $values['reservations_inventory'];
+    node_save($node);
+  }
+  
+}
+
+/**
+ * Validates deleting of Inventory settings for Reservable content types.
+ */
+function reservations_inventory_node_type_delete_validate($form, &$form_state) {
+  
+  $type = $form['type']['#value'];
+  // Only validate active Reservations node types.
+  if (reservations_is_reservations_type($type)) {
+    $num_deleted = db_delete('reservations_inventory_node_type')
+    ->condition('type', $type)
+    ->execute();
+  }
+}
+
+/**
+ * Synchronizes reservations_inventory_node_type table with node_type
+ * Removes types deleted while module was disabled
+ */
+function reservations_inventory_node_type_sync() {
+  //$types = db_query("SELECT node_type.type, reservations_inventory_node_type.type AS inventory_type FROM {node_type} LEFT JOIN {reservations_inventory_node_type} ON node_type.type = reservations_inventory_node_type.type");
+  
+  $types = db_query("SELECT node_type.type, reservations_inventory_node_type.type AS inventory_type FROM {reservations_inventory_node_type} LEFT JOIN {node_type} ON node_type.type = reservations_inventory_node_type.type");
+  
+  foreach ($types as $type) {
+    if (!$type->type) {
+      //REMOVE 
+      $num_deleted = db_delete('reservations_inventory_node_type')
+      ->condition('type', $type->inventory_type)
+      ->execute();
+    }
+  }
+}
+
+
+/**
+ * Sets Inventory value
+ */
+function reservations_inventory_set_inventory($node = NULL) {
+   
+  $inventory = (arg(3) == 'inventory') ? arg(4) : NULL;
+  // if inventory isn't passed, check default
+  if (!$inventory) {
+    $inventory = variable_get('reservations_inventory_default_reservation_inventory', '');
+  }
+  
+  //finally check the node, if the value is already set use that
+
+  return $inventory;
+}
+

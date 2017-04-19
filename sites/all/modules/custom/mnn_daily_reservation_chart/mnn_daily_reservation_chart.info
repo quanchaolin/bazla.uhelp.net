@@ -1,0 +1,9 @@
+name = MNN Reservation Daily Chart
+package = MNN Custom
+description = "Will use a view to display a chart of daily reservations"
+
+core = 7.x
+files[] = mnn_daily_reservation_chart.module
+
+
+

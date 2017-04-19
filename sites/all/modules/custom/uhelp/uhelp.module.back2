@@ -1,0 +1,787 @@
+<?php
+/**
+ * @file
+ * This module will provide custom functionality for the UHELP project
+ */
+
+define('HELP_DEPARTMENT_FACULTY_RELATIONSHIP_TYPE', 18);
+define('HELP_FACULTY_UNIVERSITY_RELATIONSHIP_TYPE', 31);
+define('HELP_DEPARTMENT_FIELD_OF_STUDY_RELATIONSHIP_TYPE', 27);
+
+
+function uhelp_menu() {
+  $items['moodle-import/classes'] = array(
+    'title' => 'Import Classes from Moodle',
+    'page callback' => 'uhelp_get_moodle_courses_and_teachers',
+    'access arguments' => array('access content'),
+    'menu_name' => 'main-menu',
+    'type' => MENU_SUGGESTED_ITEM,
+  );
+  $items['moodle-import/students'] = array(
+    'title' => 'Import Registered Students from Moodle',
+    'page callback' => 'uhelp_get_moodle_enrollments',
+    'access arguments' => array('access content'),
+    'menu_name' => 'main-menu',  
+    'type' => MENU_SUGGESTED_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * This function is called by the internship_viewfields field on the 
+ * internship content type
+ */
+function uhelp_get_internship_contact_info($field_name='field_internship_org'){
+  if (arg(0) == 'node' && is_numeric(arg(1))){
+    $internship = node_load(arg(1));
+    if ($internship->{$field_name}) {
+      $contact_id = $internship->{$field_name}[LANGUAGE_NONE][0]['contact_id'];
+    }
+  }
+  return $contact_id;
+}
+
+/**
+ *  This is for the available beds computed field on the Dorm Room content 
+ *  type (machine name = dorm-bed
+ */
+function computed_field_field_cmptd_available_beds_compute(&$entity_field, $entity_type, $entity, $field, $instance, $langcode, $items) {
+
+  $capacity = $entity->field_dorm_room_capacity[LANGUAGE_NONE][0]['value'];
+  $number_of_occupants = 
+    count($entity->field_dorm_room_students[LANGUAGE_NONE]);
+  $available_beds = $capacity - $number_of_occupants;
+  $entity_field[0]['value'] = $available_beds;
+  return $available_beds;
+}
+
+function computed_field_field_dorm_student_display_name_compute(&$entity_field, $entity_type, $entity, $field, $instance, $langcode, $items){
+//  dsm($entity->field_dorm_students_student);
+  $uid_of_student=$entity->field_dorm_students_student['und'][0]['target_id'];
+  civicrm_initialize( );
+  $cidtouse = CRM_Core_BAO_UFMatch::getContactID($uid_of_student);
+  $params = array(
+  'contact_id' => $cidtouse,
+  'version' => 3,
+  );
+
+// Get Contact details for the user.
+  $contact = civicrm_api( 'contact','get',$params );
+  
+  dsm($contact['values'][$cidtouse]['display_name']);
+  $entity_field[0]['value'] =$contact['values'][$cidtouse]['display_name'];
+  return $contact['values'][$cidtouse]['display_name'];
+}
+
+function uhelp_form_alter(&$form, &$form_state, $form_id) { 
+  if (isset($form['#node_edit_form']) && $form['#node_edit_form'] && 
+      $form['type']['#value'] == 'university_class') {
+    $form['title'] = array(
+			   '#type' => 'hidden',
+			   '#value' => 'University Class',
+			   );
+  }
+  if (isset($form['#node_edit_form']) && $form['#node_edit_form'] && 
+      $form['type']['#value'] == 'university_course') {
+    $form['title'] = array(
+			   '#type' => 'hidden',
+			   '#value' => 'University Course',
+			   );
+
+    //ALTER THE NAMES OF THE FIELDS OF STUDY TO INCLUDE ALL DEPARTMENT,
+    //FACULTY, AND UNIVERSITY INFO
+    if (is_array($form['field_uc_field_of_study'][LANGUAGE_NONE]['#options'])) {
+      foreach ($form['field_uc_field_of_study'][LANGUAGE_NONE]['#options'] as
+	       $cid => $label) {
+	if (is_int($cid)) {
+	  $form['field_uc_field_of_study'][LANGUAGE_NONE]['#options'][$cid] =
+	    uhelp_get_chained_contact_name($cid);
+	}
+	asort($form['field_uc_field_of_study'][LANGUAGE_NONE]['#options']);
+      }
+    }
+  }
+}
+
+function uhelp_node_presave($node) {
+  $auto_title = "";
+
+  if ($node->type == 'university_class') { 
+    $course_nid = $node->field_uclass_course[LANGUAGE_NONE][0]['nid'];
+    if ($course_nid) {
+      $course = node_load($course_nid);
+      $auto_title = $course->title.": ";
+
+      if ($node->field_academic_period[LANGUAGE_NONE]) {
+	$period = taxonomy_term_load($node->field_academic_period
+				     [LANGUAGE_NONE][0]['tid']);
+	
+	$auto_title .=  $period->name.": ";
+      }
+
+
+      $field_of_study_cid = 
+	$course->field_uc_field_of_study[LANGUAGE_NONE][0]['contact_id'];
+      if ($field_of_study_cid) {
+	$department_cid =
+	  uhelp_get_department_for_field_of_study($field_of_study_cid);
+	$faculty_cid = uhelp_get_faculty_for_department($department_cid);
+	$university_cid = uhelp_get_university_for_faculty($faculty_cid);
+	if ($university_cid) {
+	  $university = uhelp_get_contact($university_cid);
+	  if ($university) {
+	    $auto_title .= $university['display_name'];
+	  }
+	}
+      }
+      
+    }
+    if ($auto_title) {
+      $node->title = $auto_title;
+    }
+  }
+
+  if ($node->type == 'university_course') { 
+    if ($node->field_uc_course_name[LANGUAGE_NONE]) {
+      $auto_title = $node->field_uc_course_name[LANGUAGE_NONE][0]['value'].
+	" - ";
+    }
+    
+    $field_of_study_cid = 
+      $node->field_uc_field_of_study[LANGUAGE_NONE][0]['contact_id'];
+    if ($field_of_study_cid) {
+      $department_cid =
+	uhelp_get_department_for_field_of_study($field_of_study_cid);
+      $faculty_cid = uhelp_get_faculty_for_department($department_cid);
+      $university_cid = uhelp_get_university_for_faculty($faculty_cid);
+      if ($university_cid) {
+	$university = uhelp_get_contact($university_cid);
+	if ($university && $university['nick_name']) {
+	  $auto_title .= $university['nick_name'];
+	}
+	else if ($university) {
+	  $auto_title .= $university['display_name'];
+	}
+      }
+      //NO LONGER USING FACULTY IN COURSE TITLE
+      /*
+      if ($faculty_cid) {
+	$faculty = uhelp_get_contact($faculty_cid);
+	if ($faculty && $faculty['nick_name']) {
+	  $auto_title .= ' - '.$faculty['nick_name'];
+	}
+	else if ($faculty) {
+	  $auto_title .= ' - '.$faculty['display_name'];
+	}
+      }
+      */
+    }
+    
+    if ($auto_title) {
+      $node->title = $auto_title;
+    }
+  }
+}
+
+function uhelp_get_contact($contact_id) {
+  civicrm_initialize( );
+  $params = array(
+		  'version' => 3,
+		  'sequential' => 1,
+		  'contact_id' => $contact_id,
+		  );
+
+  $result = civicrm_api('Contact', 'get', $params);
+  if (!$result['is_error'] && $result['values']) {
+    return $result['values'][0];
+  }
+  return NULL;
+}
+function uhelp_get_university_for_faculty($faculty_cid) {
+  $university_cid = 0;
+  civicrm_initialize( );
+  $params = array(
+		  'version' => 3,
+		  'sequential' => 1,
+		  'relationship_type_id' =>
+		  HELP_FACULTY_UNIVERSITY_RELATIONSHIP_TYPE,
+		  'contact_id_a' => $faculty_cid,
+		  );
+  $result = civicrm_api('Relationship', 'get', $params);
+
+  if (!$result['is_error']) {
+    $university_cid = $result['values'][0]['contact_id_b'];
+  }
+  return $university_cid;
+
+}
+
+function uhelp_get_faculty_for_department($department_cid) {
+  $faculty_cid = 0;
+  civicrm_initialize( );
+  $params = array(
+		  'version' => 3,
+		  'sequential' => 1,
+		  'relationship_type_id' =>
+		  HELP_DEPARTMENT_FACULTY_RELATIONSHIP_TYPE,
+		  'contact_id_a' => $department_cid,
+		  );
+  $result = civicrm_api('Relationship', 'get', $params);
+  if (!$result['is_error']) {
+    $faculty_cid = $result['values'][0]['contact_id_b'];
+  }
+  return $faculty_cid;
+}
+
+function uhelp_get_department_for_field_of_study($field_of_study_cid) {
+  $department_cid = 0;
+  civicrm_initialize( );
+  $params = array(
+		  'version' => 3,
+		  'sequential' => 1,
+		  'relationship_type_id' =>
+		  HELP_DEPARTMENT_FIELD_OF_STUDY_RELATIONSHIP_TYPE,
+		  'contact_id_a' => $field_of_study_cid,
+		  );
+  $result = civicrm_api('Relationship', 'get', $params);
+  if (!$result['is_error']) {
+    $department_cid = $result['values'][0]['contact_id_b'];
+  }
+  return $department_cid;
+}
+function uhelp_modify_relationship_contact_names($contact_id,
+						 &$currentRelationships,
+						 &$inactiveRelationships) {
+  foreach ($currentRelationships as &$relationship) {
+
+    $related_contact_id = ($contact_id == $relationship['contact_id_a']) ?
+      $relationship['contact_id_b'] : $relationship['contact_id_a'];
+
+    $relationship['name'] =uhelp_get_chained_contact_name($related_contact_id);
+  }
+  foreach ($inactiveRelationships as &$relationship) {
+    $related_contact_id = ($contact_id == $relationship['contact_id_a']) ?
+      $relationship['contact_id_b'] : $relationship['contact_id_a'];
+  
+    $relationship['name'] =uhelp_get_chained_contact_name($related_contact_id);
+  }
+  
+}
+
+function uhelp_get_chained_contact_name($contact_id) {
+
+  $contact = uhelp_get_contact($contact_id);
+  $sub_type = $contact['contact_sub_type'][0];
+
+  switch ($sub_type) {
+  case 'Field_of_Study':
+    $department_cid = uhelp_get_department_for_field_of_study($contact_id);
+    $department = uhelp_get_contact($department_cid);
+    if ($department_cid) {
+      $faculty_cid = uhelp_get_faculty_for_department($department_cid);
+      if ($faculty_cid) {
+	$faculty = uhelp_get_contact($faculty_cid);
+	$university_cid = uhelp_get_university_for_faculty($faculty_cid);
+	if ($university_cid) {
+	  $university = uhelp_get_contact($university_cid);
+	}
+      }
+    }
+    break;  
+  case 'University_Department':
+    $faculty_cid = uhelp_get_faculty_for_department($contact_id);
+    if ($faculty_cid) {
+      $faculty = uhelp_get_contact($faculty_cid);
+      $university_cid = uhelp_get_university_for_faculty($faculty_cid);
+      if ($university_cid) {
+	$university = uhelp_get_contact($university_cid);
+      }
+    }
+    break;  
+  case 'Facult_':
+    $university_cid = uhelp_get_university_for_faculty($contact_id);
+    if ($university_cid) {
+      $university = uhelp_get_contact($university_cid);
+    }
+    break;  
+  }
+  
+  $chained_name = "";
+  if ($university) {
+    $chained_name .= $university['display_name'] . ' - '; 
+  }
+  if ($faculty) {
+    $chained_name .= $faculty['display_name'] . ' - '; 
+  }
+  if ($department) {
+    $chained_name .= $department['display_name'] . ' - '; 
+  }
+
+  $chained_name .= $contact['display_name']; 
+  return $chained_name;
+}
+
+function uhelp_get_student_uid() {
+  global $help_student_uid;
+  global $user;
+
+  if (!$help_student_uid) {
+    if (arg(0) == 'node' && is_numeric(arg(1)) &&  is_numeric(arg(2))){
+      $help_student_uid = arg(2);
+      $student = user_load($help_student_uid);
+      if (!$student) {
+	unset($help_student_uid);
+      }
+    }  
+  }
+
+  if (!$help_student_uid) {
+    $help_student_uid = filter_input(INPUT_GET, 'student_uid');
+  }
+ 
+  if (!$help_student_uid) {
+    if (arg(0) == 'node' && is_numeric(arg(1))) {
+      $help_student_uid = $user->uid;
+    }  
+  }
+
+  if (!$help_student_uid) {
+    $help_student_uid = $_SESSION['UHELP_STUDENT_UID'];
+  }
+  else {
+    $_SESSION['UHELP_STUDENT_UID'] = $help_student_uid;
+  }
+
+  return $help_student_uid;
+}
+
+function uhelp_student_integrated_class_schedule_filter(&$view,
+							&$row) {
+  $help_student_uid = uhelp_get_student_uid();
+
+  $row_node = node_load($row->nid);
+
+  if ($row_node->type == 'class_session_time') {
+    $class_nid = 
+      $row_node->field_class_session_class[LANGUAGE_NONE][0]['target_id'];
+    $class_node = node_load($class_nid);
+    if (!$class_node) {
+      drupal_set_message("Error Code 34323: Missing class!", "error");
+      return TRUE;
+    }
+  } 
+  else {
+    $class_node = $row_node;
+  }
+
+  if (!$class_node->field_enrolled_students) {
+    return TRUE;
+  }
+
+  $students = $class_node->field_enrolled_students[LANGUAGE_NONE];
+  foreach($students as $data) {
+    if ($data['target_id'] == $help_student_uid) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+
+function uhelp_student_class_list_filter(&$view,&$row) {
+
+  $help_student_uid = uhelp_get_student_uid();
+
+  $class_node = node_load($row->nid);
+  
+  if (!$class_node->field_enrolled_students) {
+    return TRUE;
+  }
+
+  $students = $class_node->field_enrolled_students[LANGUAGE_NONE];
+  foreach($students as $data) {
+    if ($data['target_id'] == $help_student_uid) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+
+}
+
+function uhelp_get_advisor_email_for_meeting_request(&$meeting_request) {
+  civicrm_initialize();
+  $params = array(
+		  'version' => 3,
+		  'sequential' => 1,
+		  'uf_id' => $meeting_request->uid,
+		  );
+  $result = civicrm_api('UFMatch', 'get', $params);
+  if ($result['values']) {
+    $params = array(
+		    'version' => 3,
+		    'sequential' => 1,
+		    'relationship_type_id' => 22,
+		    'contact_id_b' => $result['values'][0]['contact_id'],
+		    );
+    $result = civicrm_api('Relationship', 'get', $params);
+    if ($result['values']) {
+      $params = array(
+		      'version' => 3,
+		      'sequential' => 1,
+		      'contact_id' => $result['values'][0]['contact_id_a'],
+		      );
+      $result = civicrm_api('Contact', 'get', $params);
+      if ($result['values']) {
+	$email = $result['values'][0]['email']; 
+	return $email;
+      }
+    }
+  }
+  return "noemail@example.org";
+}
+
+/**
+ * Function is called from the Header of the Class Calendar Per Student view
+ */
+function uhelp_student_calendar_header() {
+  global $user;
+
+  $check = array_intersect(array('administrator', 'HELP Teacher',
+				 'HELP Adviser', 'HELP Administrator'
+				 ), 
+			   array_values($user->roles));
+
+
+  $is_admin = empty($check) ? FALSE : TRUE;
+
+  $help_student_uid = uhelp_get_student_uid();
+
+  $bad_user = FALSE;
+  if (!$is_admin &&
+      ($user->uid != $help_student_uid)) {
+    drupal_set_message("Sorry, can't do that for you.", 'error');
+    drupal_goto('dashboard/student');
+    return "";
+  }
+
+  $student = user_load($help_student_uid);
+  if ($student) {
+    $out .= "<h1>Class Calendar for: $student->name</h1>";
+  }
+
+  if ($is_admin) {
+    $out .= l("Return to Student Profile", "node/38/".$help_student_uid);
+  }
+  else {
+    $out .= l("Return to my Dashboard", "dashboard/student");
+  }
+
+  return $out;
+}
+
+function uhelp_get_moodle_courses_and_teachers() {
+  $to_return= "begin moodle courses";
+  $view = views_get_view('clone_of_moodle_courses');
+  $view->set_display('page_1');
+  $view->execute(); 
+  $courses_and_teachers= $view->result;
+//    dsm($courses_and_teachers);
+  foreach ($courses_and_teachers as $item) {
+//        dsm($item);
+    if ($item->course_categories_name) {
+      //check to see if a node with this moodle course id exists     
+      $class_query = new EntityFieldQuery();
+      $class_query->entityCondition('entity_type', 'node')
+       ->entityCondition('bundle', 'help_class')
+       ->propertyCondition('status', 1)
+       ->fieldCondition('field_hc_moodle_course_id', 'value', $item->id, '=')
+       ->addMetaData('account', user_load(1)); // Run the query as user 1.
+      $class_result = $class_query->execute();
+      
+//      dsm($item);
+      if (!isset($class_result['node'])) {
+      $classes_notadded .= "HELP Class <strong>".$item->course_fullname."</strong> not added because no HELP Course exists with the appropriate course code<br><br>";
+      }
+      if (isset($class_result['node'])) {
+//load class node
+         $class_node_nid = array_keys($class_result['node']);
+         $class_node = entity_load('node', $class_node_nid);
+//        dsm($class_node);
+
+// check to see if this teacher is already linked to the node
+         foreach ($class_node as $class_node_for_teacher) {
+//dsm($class_node_for_teacher);
+           foreach ($class_node_for_teacher->field_hc_teacher as $teacher_item) {
+//dsm($teacher_item);
+$teacher_match = FALSE;
+             foreach ($teacher_item as $teacher) {
+//dsm($teacher);
+               $teacher_cid = $teacher['contact_id'];
+               $teacher_user = user_load_by_mail($item->author_email);
+//               dsm ($teacher_user);
+               civicrm_initialize( );
+                $cid = CRM_Core_BAO_UFMatch::getContactID($teacher_user->uid);
+//                print $cid;
+//                print "-----".$teacher_cid."<br>";
+                if ($cid == $teacher_cid){
+                $teacher_match=TRUE;
+//                print "<br>teacher matched. skip <br>";
+            
+                }
+                }
+             if ($teacher_match == FALSE){
+             foreach ($teacher_item as $teacher) {
+//dsm($teacher);
+               $teacher_cid = $teacher['contact_id'];
+               $teacher_user = user_load_by_mail($item->author_email);
+//               dsm ($teacher_user);
+               civicrm_initialize( );
+                $cid = CRM_Core_BAO_UFMatch::getContactID($teacher_user->uid);
+//                print $cid;
+//                print "-----".$teacher_cid."<br>";
+                
+                if ($cid && $cid != $teacher_cid){
+                 $displayName = CRM_Core_DAO::getFieldValue( 'CRM_Contact_DAO_Contact', $cid, 'display_name', 'id' );
+
+                  //add teacher to class 
+                   $teachers_added.= "new teacher <strong>". $displayName." (". $item->author_email.")</strong> added to existing class ". $class_node_for_teacher->title;
+                  $class_node_for_teacher->field_hc_teacher['und'][]['contact_id']= $cid;
+                  if($class_node_for_teacher = node_submit($class_node_for_teacher)) { // Prepare node for saving
+ //                   dsm($class_node_for_teacher);
+                  node_save($class_node_for_teacher);
+                  }
+       
+                  
+               }
+             }
+             }
+           }
+         }
+
+// insert additional teacher into existing node
+
+// break out of function? 
+
+//print "node exists";
+     }else {
+        //here we create our node to be saved
+        $node = new stdClass();
+        $node->type = 'help_class';
+        node_object_prepare($node);
+        $node->language = LANGUAGE_NONE;
+        $node->title = $item->course_fullname;
+
+        //get the nid of the course for reference
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'node')
+	      ->entityCondition('bundle', 'help_course')
+          ->propertyCondition('status', 1)
+          ->fieldCondition('field_hc_code', 'value', $item->course_fullname, '=')
+          ->addMetaData('account', user_load(1)); // Run the query as user 1.
+        $result = $query->execute();
+//        print $item->course_fullname.":<br>";
+        if (isset($result['node'])) {
+      	  $course_items_nids = array_keys($result['node']);
+	      $course_node = entity_load('node', $course_items_nids);
+	//        dsm($course_items_nids);
+		  $node->field_hc_course[$node->language][] = array(
+                   'target_id' => $course_items_nids[0],
+                   'target_type' => 'node',
+                );
+      
+  // set the moodle id
+          $moodleid=$item->id;
+          settype($moodleid, "integer");   
+          $node->field_hc_moodle_course_id['und'][0]['value'] = $moodleid;
+          $node->field_hc_moodle_course_id['und'][0]['value'] = $moodleid;
+          $teacher_user = user_load_by_mail($item->author_email);
+          //     dsm ($teacher_user);
+          civicrm_initialize( );
+          $cid = CRM_Core_BAO_UFMatch::getContactID($teacher_user->uid);
+          if ($cid){
+            $node->field_hc_teacher['und'][]['contact_id']=$cid;
+          } 
+          $node->uid = "1";
+          $node->status   = 1;
+          $node->promote  = 0;
+          $node->sticky   = 0;
+          $node->created  = time() - (rand( 1,240) * 60);
+ //        dsm($node);
+          node_submit($node); // Prepare node for saving
+          node_save($node);
+//          drupal_set_message( "Node with nid " . $node->nid . " saved!\n");
+          $classes_added .= "New HELP Class ". $node->title. " added.<br>Please <a href='/node/".$node->nid."/edit' target='_newtab'>click here</a> to edit and add class sessions and academic period<hr>"; 
+
+        }
+      }
+    }
+  }
+  $to_return.= $teachers_added."<hr>";
+  $to_return.= $classes_added;
+$to_return.= "<hr>";
+$to_return.= $classes_notadded;
+  $to_return.= "<br><strong>Moodle to Baz la sync of classes and teachers complete</strong>";
+return $to_return;
+}
+
+function uhelp_get_moodle_enrollments() {
+  $return_enrollments = "<br>";
+  $return_enrollments.= "begin moodle user enrollments<br>";
+
+  $view = views_get_view('clone_of_moodle_users');
+  $view->execute();
+  $enrollments = $view->result;
+//  dsm($enrollments);
+  foreach ($enrollments as $enrollment) {
+  $class_node ="";
+//dsm($enrollment->course_id);
+    if ($enrollment->course_id) {
+       $enrollment_query = new EntityFieldQuery();
+       $enrollment_query->entityCondition('entity_type', 'node')
+         ->entityCondition('bundle', 'help_class')
+         ->propertyCondition('status', 1)
+         ->fieldCondition('field_hc_moodle_course_id', 'value', $enrollment->course_id, '=')
+         ->addMetaData('account', user_load(1)); // Run the query as user 1.
+      $enrollment_result = $enrollment_query->execute();
+//dsm($enrollment->course_id);
+      if (isset($enrollment_result['node'])) {
+//load class node
+//      dsm($enrollment_result);
+         $class_node_nid = array_keys($enrollment_result['node']);
+         $class_node = entity_load('node', $class_node_nid);
+//   dsm($class_node); //field_enrolled_students
+//   $node = node_load(array_shift(array_keys($entities['node'])));
+$class_node_nid =array_keys($class_node);
+//dsm($class_node_nid);
+//dsm($class_node[$class_node_nid[0]]);
+
+             $student_match = FALSE;
+$class_node_for_student = $class_node[$class_node_nid[0]];
+//dsm($class_node_for_student);
+
+//dsm($enrollment);
+            foreach ($class_node_for_student->field_enrolled_students as $items) {
+//              dsm($items);
+//              $student_match = FALSE;
+                foreach ($items as $item) {
+ //                 dsm($item);
+//                  dsm($enrollment->user_email);
+                  $student_user = user_load_by_mail($enrollment->user_email);
+//                 dsm($student_user);
+                  if ($student_user->uid == $item['target_id']) {
+                  $student_match = TRUE;
+//                  break;
+                  }
+                                
+                }
+                }
+              if ($student_match == FALSE) {
+  //                foreach ($items as $item) {
+//                    dsm($class_node_for_student);
+//                    dsm($enrollment);
+//                  dsm($enrollment->user_email);
+                    $student_user = user_load_by_mail($enrollment->user_email);
+//                    dsm($class_node_for_student);
+                    if ($student_user && in_array('HELP Student', $student_user->roles)){
+                      $class_node_for_student->field_enrolled_students['und'][]['target_id']= $student_user->uid;
+                      if($class_node_for_student = node_submit($class_node_for_student)) { // Prepare node for saving
+//                      dsm($class_node_for_student);
+                      $return_enrollments.= "<br>".$enrollment->user_firstname." ".$enrollment->user_lastname." (".$enrollment->user_email.") added to class ".$class_node_for_student->title."<br>";
+                    node_save($class_node_for_student);
+                      }
+                    }
+          
+ //             }
+//                    $class_node_for_student="";
+            }
+          }
+
+          
+      }   
+   }
+   return $return_enrollments;
+}   
+
+function uhelp_get_moodle_grades() {
+  print "<br>";
+  print "begin moodle grades";
+
+  $view = views_get_view('moodlegrades');
+  $view->execute();
+  $grades = $view->result;
+  print "Test";
+dsm($grades);
+  foreach ($grades as $grade) {
+    //    dsm($grade);  
+    //   print "test1";
+    //   print $grade->user_email;
+    $student = user_load_by_mail($grade->user_email);
+     
+    // get drupal nid for class from moodle course id
+    $class_grade_query = new EntityFieldQuery();
+    $class_grade_query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'help_class')
+      ->propertyCondition('status', 1)
+      ->fieldCondition('field_hc_moodle_course_id', 'value', $grade->course_id, '=')
+      ->addMetaData('account', user_load(1)); // Run the query as user 1.
+    $class_grade_result = $class_grade_query->execute();
+//dsm($enrollment->course_id);
+    if (isset($class_grade_result['node'])) {
+//load class node
+
+      $class_node_nid = array_keys($class_grade_result['node']);
+//we don't need to load the node if we have the nid
+//      $class_node = entity_load('node', $class_node_nid);
+//   dsm($class_node); //field_enrolled_students
+//   $node = node_load(array_shift(array_keys($entities['node'])));
+
+//      $class_node_for_student = $class_node[$class_node_nid[0]];
+//dsm($class_node_nid);
+      $student_user = user_load_by_mail($grade->user_email);
+      $student_user_uid = $student_user->uid;
+if ($student_user){      
+      //check for existing grade with this id
+      $existing_grade_query = new EntityFieldQuery();
+      $existing_grade_query->entityCondition('entity_type', 'node')
+        ->entityCondition('bundle', 'course_grade_or_evaluation')
+        ->propertyCondition('status', 1)
+        ->fieldCondition('field_eval_moodle_grade_id', 'value', $grade->id, '=')
+        ->addMetaData('account', user_load(1)); // Run the query as user 1.
+      $existing_grade_result = $existing_grade_query->execute();
+//dsm($enrollment->course_id);
+      if (isset($existing_grade_result['node'])) {
+      //here we will update the existing grade if it exists
+      //but for now we're just skipping and moving to the next item
+      }else{
+      //create our grade node 
+        $node = new stdClass();
+        $node->type = 'course_grade_or_evaluation';
+        node_object_prepare($node);
+        $node->language = LANGUAGE_NONE;
+        $node->title = $item->course_fullname;
+	    $node->field_eval_class[$node->language][] = array(
+                   'target_id' => $class_node_nid[0],
+                   'target_type' => 'node',
+                );
+	    $node->field_eval_student[$node->language][] = array(
+                   'target_id' => $student_user_uid,
+                   'target_type' => 'user',
+                );
+        $node->field_eval_grade['und'][0]['value'] = $grade->grade_grades_finalgrade;
+        $node->field_eval_moodle_grade_id['und'][0]['value'] = $grade->id;        
+//        dsm($node);
+
+        node_submit($node); // Prepare node for saving
+        node_save($node);
+drupal_set_message( "Node with nid " . $node->nid . " saved!\n");
+ }
+ 
+        }       
+     }  
+  }
+  print "<br>";
+}
+

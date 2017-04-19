@@ -1,0 +1,1366 @@
+"UNIQ","FSAE","Agro-Economie",1,1,"Biologie générale","BIO 100"
+"UNIQ","FSAE","Agro-Economie",1,1,"Chimie générale et inorganique","CHM 100"
+"UNIQ","FSAE","Agro-Economie",1,1,"Introduction à l'Agriculture","PTC 100"
+"UNIQ","FSAE","Agro-Economie",1,1,"Introduction aux sciences de l'environement","ENV 101"
+"UNIQ","FSAE","Agro-Economie",1,1,"Mathématiques pour gestionnaires","MAT 110"
+"UNIQ","FSAE","Agro-Economie",1,1,"Techniques d'expression francaise","FGB 102"
+"UNIQ","FSAE","Agro-Economie",1,1,"Zoologie générale","BIO 101"
+"UNIQ","FSAE","Agro-Economie",1,2,"Anglais intermédiaire","LAN 101"
+"UNIQ","FSAE","Agro-Economie",1,2,"Biophysique","PHY 112"
+"UNIQ","FSAE","Agro-Economie",1,2,"Botanique générale","BIO 102"
+"UNIQ","FSAE","Agro-Economie",1,2,"Chimie organique","CHM 110"
+"UNIQ","FSAE","Agro-Economie",1,2,"Géologie I","GTC 101"
+"UNIQ","FSAE","Agro-Economie",1,2,"Statistisques I","MAT 141"
+"UNIQ","FSAE","Agro-Economie",1,2,"Travaux pratiques agricoles I","PTC 150"
+"UNIQ","FSAE","Agro-Economie",2,1,"Cartographie générale","TOP 211"
+"UNIQ","FSAE","Agro-Economie",2,1,"Micro-Economie I","ECO 110"
+"UNIQ","FSAE","Agro-Economie",2,1,"Principe d'Ecologie","BIO 110"
+"UNIQ","FSAE","Agro-Economie",2,1,"Probabilités et Inférences Statistiques","MAT 244"
+"UNIQ","FSAE","Agro-Economie",2,1,"Sciences du sol I","SSL 100"
+"UNIQ","FSAE","Agro-Economie",2,1,"Sociologie générale","FGB 110"
+"UNIQ","FSAE","Agro-Economie",2,1,"Travaux pratiques agricoles II","PTC 151"
+"UNIQ","FSAE","Agro-Economie",2,2,"Biochimie Générale","CHM 119"
+"UNIQ","FSAE","Agro-Economie",2,2,"Economie Rurale","DER 120"
+"UNIQ","FSAE","Agro-Economie",2,2,"Entomologie générale ","BIO 140"
+"UNIQ","FSAE","Agro-Economie",2,2,"Fertilite et Fertilisation des Sols","SSL 110"
+"UNIQ","FSAE","Agro-Economie",2,2,"Introduction à l'Informatique","INF 101"
+"UNIQ","FSAE","Agro-Economie",2,2,"Microbiologie Générale","BIO 130"
+"UNIQ","FSAE","Agro-Economie",3,1,"Agroclimatologie","PTC 110"
+"UNIQ","FSAE","Agro-Economie",3,1,"Introduction à la Génétique","BIO 123"
+"UNIQ","FSAE","Agro-Economie",3,1,"Méthodologie Générale","FGB 103"
+"UNIQ","FSAE","Agro-Economie",3,1,"Principes d'Anatomie et de Physiologie Animales","ZOO 121"
+"UNIQ","FSAE","Agro-Economie",3,1,"Principes de Zootechnie","ZOO 140"
+"UNIQ","FSAE","Agro-Economie",3,1,"Techniques d'expression créole","FGB 101"
+"UNIQ","FSAE","Agro-Economie",3,2,"Fonctions des Exploitations Agricoles","PTC 154"
+"UNIQ","FSAE","Agro-Economie",3,2,"Géographie Economique","ECO 103"
+"UNIQ","FSAE","Agro-Economie",3,2,"Hydrologie Générale","HYD 201"
+"UNIQ","FSAE","Agro-Economie",3,2,"Physiologie Végétale","PTC 130"
+"UNIQ","FSAE","Agro-Economie",3,2,"Principes d'Agronomie","PTC 140"
+"UNIQ","FSAE","Agro-Economie",3,2,"Principes de Gestion","ADM 111"
+"UNIQ","FSAE","Agro-Economie",3,2,"Sociologie Rurale","DER 110"
+"UNIQ","FSAE","Agro-Economie",4,1,"Algèbre Linéaire","MAT 101"
+"UNIQ","FSAE","Agro-Economie",4,1,"Commercialisation des Produits Agricoles","DER 230"
+"UNIQ","FSAE","Agro-Economie",4,1,"Comptabilité Générale I","COM 110"
+"UNIQ","FSAE","Agro-Economie",4,1,"Economie des Ressources Naturelles","ENV 244"
+"UNIQ","FSAE","Agro-Economie",4,1,"Gestion des Exploitations Agricoles","DER 221"
+"UNIQ","FSAE","Agro-Economie",4,1,"Macro-économie","ECO 111"
+"UNIQ","FSAE","Agro-Economie",4,2,"Droit de l'Environnement","ENV 222"
+"UNIQ","FSAE","Agro-Economie",4,2,"Econométrie I","ECO 226"
+"UNIQ","FSAE","Agro-Economie",4,2,"Introduction à la Finance","ADM 115"
+"UNIQ","FSAE","Agro-Economie",4,2,"Micro-économie II","ECO 120"
+"UNIQ","FSAE","Agro-Economie",4,2,"Séminaire Plan et Projet","PAE 291"
+"UNIQ","FSAE","Agro-Economie",5,1,"Agriculture de Montagne","PTC 200"
+"UNIQ","FSAE","Agro-Economie",5,1,"Agriculture et Développement Economique","DER 240"
+"UNIQ","FSAE","Agro-Economie",5,1,"Crédit Rural","DER 252"
+"UNIQ","FSAE","Agro-Economie",5,1,"Gestion de Projet","ADM 236"
+"UNIQ","FSAE","Agro-Economie",5,1,"Politique Agricole","DER 241"
+"UNIQ","FSAE","Agro-Economie",5,1,"Séminaire Transfert Technologies","DER 231"
+"UNIQ","FSAE","Agro-Economie",5,2,"Analyse Economique de Projet","ECO 240"
+"UNIQ","FSAE","Agro-Economie",5,2,"Economie de l'Entreprise Coopérative","ECO 254"
+"UNIQ","FSAE","Agro-Economie",5,2,"Economie du Développement","ECO 232"
+"UNIQ","FSAE","Agro-Economie",5,2,"Projet de Fin d'Etudes","SAE 299"
+"UNIQ","FSAE","Agro-Environnement",1,1,"Biologie Générale","BIO 100"
+"UNIQ","FSAE","Agro-Environnement",1,1,"Calcul pour Gestionnaires","MAT 110"
+"UNIQ","FSAE","Agro-Environnement",1,1,"Chimie Générale et Inorganique","CHM 100"
+"UNIQ","FSAE","Agro-Environnement",1,1,"Introduction à l'Agriculture","PTC 100"
+"UNIQ","FSAE","Agro-Environnement",1,1,"Introduction aux Sciences de l'Environnement","ENV 101"
+"UNIQ","FSAE","Agro-Environnement",1,1,"Techniques d' Expression Française","FGB 102"
+"UNIQ","FSAE","Agro-Environnement",1,1,"Zoologie Générale","BIO 101"
+"UNIQ","FSAE","Agro-Environnement",1,2,"Algèbre générale","MAT 100"
+"UNIQ","FSAE","Agro-Environnement",1,2,"Anglais Intermédiaire","LAN 101"
+"UNIQ","FSAE","Agro-Environnement",1,2,"Biophysique","PHY 112"
+"UNIQ","FSAE","Agro-Environnement",1,2,"Botanique Générale","BIO 102"
+"UNIQ","FSAE","Agro-Environnement",1,2,"Chimie organique","CHM 110"
+"UNIQ","FSAE","Agro-Environnement",1,2,"Géologie I","GTC 101"
+"UNIQ","FSAE","Agro-Environnement",1,2,"Travaux pratiques agricoles I","PTC 150"
+"UNIQ","FSAE","Agro-Environnement",2,1,"Cartographie Générale","TOP 211"
+"UNIQ","FSAE","Agro-Environnement",2,1,"Micro-economie I","ECO 110"
+"UNIQ","FSAE","Agro-Environnement",2,1,"Principes d'Ecologie","BIO 110"
+"UNIQ","FSAE","Agro-Environnement",2,1,"Sciences du Sol I","SSL 100"
+"UNIQ","FSAE","Agro-Environnement",2,1,"Sociologie Générale","FGB 110"
+"UNIQ","FSAE","Agro-Environnement",2,1,"Statistique I","MAT 140"
+"UNIQ","FSAE","Agro-Environnement",2,1,"Travaux pratiques agricoles II","PTC 151"
+"UNIQ","FSAE","Agro-Environnement",2,2,"Biochimie Générale","CHM 119"
+"UNIQ","FSAE","Agro-Environnement",2,2,"Economie Rurale","DER 120"
+"UNIQ","FSAE","Agro-Environnement",2,2,"Entomologie Générale","BIO 140"
+"UNIQ","FSAE","Agro-Environnement",2,2,"Fertilité et Fertilisation des Sols","SSL 110"
+"UNIQ","FSAE","Agro-Environnement",2,2,"Introduction à l'Informatique","INF 101"
+"UNIQ","FSAE","Agro-Environnement",2,2,"Microbiologie Générale","BIO 130"
+"UNIQ","FSAE","Agro-Environnement",2,2,"Probabilite et Inference Statistique","MAT 244"
+"UNIQ","FSAE","Agro-Environnement",3,1,"Agroclimatologie","PTC 110"
+"UNIQ","FSAE","Agro-Environnement",3,1,"Introduction à la Génétique","BIO 123"
+"UNIQ","FSAE","Agro-Environnement",3,1,"Méthodologie Générale","FGB 103"
+"UNIQ","FSAE","Agro-Environnement",3,1,"Principes d'Anatomie et de Physiologie Animales","ZOO 121"
+"UNIQ","FSAE","Agro-Environnement",3,1,"Principes de Zootechnie","ZOO 140"
+"UNIQ","FSAE","Agro-Environnement",3,1,"Techniques d'expression créole","FGB 101"
+"UNIQ","FSAE","Agro-Environnement",3,2,"Fonctions des Exploitations Agricoles","PTC 154"
+"UNIQ","FSAE","Agro-Environnement",3,2,"Géographie Economique","ECO 103"
+"UNIQ","FSAE","Agro-Environnement",3,2,"Hydrologie Générale","HYD 201"
+"UNIQ","FSAE","Agro-Environnement",3,2,"Physiologie Végétale","PTC 130"
+"UNIQ","FSAE","Agro-Environnement",3,2,"Principes d'Agronomie","PTC 140"
+"UNIQ","FSAE","Agro-Environnement",3,2,"Principes de Gestion","ADM 111"
+"UNIQ","FSAE","Agro-Environnement",3,2,"Sociologie Rurale","DER 110"
+"UNIQ","FSAE","Agro-Environnement",4,1,"Controle Intégré des Animaux Ravageurs","PTC 231"
+"UNIQ","FSAE","Agro-Environnement",4,1,"Droit de l'Environnement","ENV 223"
+"UNIQ","FSAE","Agro-Environnement",4,1,"Ecologie appliquée","ENV 213"
+"UNIQ","FSAE","Agro-Environnement",4,1,"Eléments de Télédétection","ENV 211"
+"UNIQ","FSAE","Agro-Environnement",4,1,"Gestion de Projet","ADM 236"
+"UNIQ","FSAE","Agro-Environnement",4,1,"Introduction au Systeme d'Information Geographique","ENV 260"
+"UNIQ","FSAE","Agro-Environnement",4,1,"Irrigation et Drainage","GNR 200"
+"UNIQ","FSAE","Agro-Environnement",4,2,"Amélioration et Conservations de Sols","SSL 210"
+"UNIQ","FSAE","Agro-Environnement",4,2,"Culture Société et Environnement","ENV 221"
+"UNIQ","FSAE","Agro-Environnement",4,2,"Economie de l'Environnement et des Ressources Naturelles","ENV 244"
+"UNIQ","FSAE","Agro-Environnement",4,2,"Elements d'Aménagement du Territoire","ENV 232"
+"UNIQ","FSAE","Agro-Environnement",4,2,"Ressources Halieutiques","ENV 245"
+"UNIQ","FSAE","Agro-Environnement",4,2,"Sylviculture","ENV 240"
+"UNIQ","FSAE","Agro-Environnement",5,1,"Agriculture de Montagne","PTC 200"
+"UNIQ","FSAE","Agro-Environnement",5,1,"Aménagement des Bassin Versants","ENV 231"
+"UNIQ","FSAE","Agro-Environnement",5,1,"Aménagement et Gestion de Forêt","ENV 230"
+"UNIQ","FSAE","Agro-Environnement",5,1,"Enquête et Expérimentation","PTC 221"
+"UNIQ","FSAE","Agro-Environnement",5,1,"Sciences du Sol II","SSL 200"
+"UNIQ","FSAE","Agro-Environnement",5,2,"Projet de Fin d'Etudes","SAE 299"
+"UNIQ","FSAE","Production agricole",1,1,"Biologie générale","BIO 100"
+"UNIQ","FSAE","Production agricole",1,1,"Chimie générale et inorganique","CHM 100"
+"UNIQ","FSAE","Production agricole",1,1,"Introduction à l'Agriculture","PTC 100"
+"UNIQ","FSAE","Production agricole",1,1,"Introduction aux sciences de l'environement","ENV 101"
+"UNIQ","FSAE","Production agricole",1,1,"Mathématiques pour gestionnaires","MAT 110"
+"UNIQ","FSAE","Production agricole",1,1,"Techniques d'expression francaise","FGB 102"
+"UNIQ","FSAE","Production agricole",1,1,"Zoologie générale","BIO 101"
+"UNIQ","FSAE","Production agricole",1,2,"Anglais intermédiaire","LAN 101"
+"UNIQ","FSAE","Production agricole",1,2,"Biophysique","PHY 112"
+"UNIQ","FSAE","Production agricole",1,2,"Botanique générale","BIO 102"
+"UNIQ","FSAE","Production agricole",1,2,"Chimie organique","CHM 110"
+"UNIQ","FSAE","Production agricole",1,2,"Statistique I","MAT 141"
+"UNIQ","FSAE","Production agricole",1,2,"Travaux pratiques agricoles I","PTC 150"
+"UNIQ","FSAE","Production agricole",2,1,"Cartographie générale","TOP 211"
+"UNIQ","FSAE","Production agricole",2,1,"Micro-Economie I","ECO 110"
+"UNIQ","FSAE","Production agricole",2,1,"Principe d'Ecologie","BIO 110"
+"UNIQ","FSAE","Production agricole",2,1,"Probabilités et Inférences Statistiques","MAT 244"
+"UNIQ","FSAE","Production agricole",2,1,"Sciences du sol I","SSL 100"
+"UNIQ","FSAE","Production agricole",2,1,"Sociologie générale","FGB 110"
+"UNIQ","FSAE","Production agricole",2,1,"Travaux pratiques agricoles II","PTC 151"
+"UNIQ","FSAE","Production agricole",2,2,"Biochimie Générale","CHM 119"
+"UNIQ","FSAE","Production agricole",2,2,"Economie Rurale","DER 120"
+"UNIQ","FSAE","Production agricole",2,2,"Entomologie générale ","BIO 140"
+"UNIQ","FSAE","Production agricole",2,2,"Fertilite et Fertilisation des Sols","SSL 110"
+"UNIQ","FSAE","Production agricole",2,2,"Introduction à l'Informatique","INF 101"
+"UNIQ","FSAE","Production agricole",3,1,"Agroclimatologie","PTC 110"
+"UNIQ","FSAE","Production agricole",3,1,"Introduction à la Génétique","BIO 123"
+"UNIQ","FSAE","Production agricole",3,1,"Méthodologie Générale","FGB 103"
+"UNIQ","FSAE","Production agricole",3,1,"Principes d'Anatomie et de Physiologie Animales","ZOO 121"
+"UNIQ","FSAE","Production agricole",3,1,"Principes de Zootechnie","ZOO 140"
+"UNIQ","FSAE","Production agricole",3,1,"Techniques d'expression créole","FGB 101"
+"UNIQ","FSAE","Production agricole",3,2,"Fonctions des Exploitations Agricoles","PTC 154"
+"UNIQ","FSAE","Production agricole",3,2,"Géographie Economique","ECO 103"
+"UNIQ","FSAE","Production agricole",3,2,"Hydrologie Générale","HYD 201"
+"UNIQ","FSAE","Production agricole",3,2,"Physiologie Végétale","PTC 130"
+"UNIQ","FSAE","Production agricole",3,2,"Principes d'Agronomie","PTC 140"
+"UNIQ","FSAE","Production agricole",3,2,"Principes de Gestion","ADM 111"
+"UNIQ","FSAE","Production agricole",3,2,"Sociologie Rurale","DER 110"
+"UNIQ","FSAE","Production agricole",4,1,"Agronomie Avancée","PTC 240"
+"UNIQ","FSAE","Production agricole",4,1,"Amélioration des Especes Végétales et Animales","PTC 220"
+"UNIQ","FSAE","Production agricole",4,1,"Controle Intégré des Animaux Ravageurs","PTC 231"
+"UNIQ","FSAE","Production agricole",4,1,"Cultures vivrières","PTC 250"
+"UNIQ","FSAE","Production agricole",4,1,"Gestion de Projet","ADM 236"
+"UNIQ","FSAE","Production agricole",4,1,"Irrigation et Drainage","GNR 200"
+"UNIQ","FSAE","Production agricole",4,1,"Nutrition et Alimentation animales","ZOO 230"
+"UNIQ","FSAE","Production agricole",4,2,"Amélioration et Conservations de Sols","SSL 210"
+"UNIQ","FSAE","Production agricole",4,2,"Eléments de comptabilité et de finance","ADM 122"
+"UNIQ","FSAE","Production agricole",4,2,"Elevage des Monogastriques","ZOO 240"
+"UNIQ","FSAE","Production agricole",4,2,"Elevage des Ruminants","ZOO 241"
+"UNIQ","FSAE","Production agricole",4,2,"Hygiene et Pathologie Animale","ZOO 220"
+"UNIQ","FSAE","Production agricole",4,2,"Phytopathologie","PTC 230"
+"UNIQ","FSAE","Production agricole",4,2,"Séminaire Plan et Projet","PAE 291"
+"UNIQ","FSAE","Production agricole",5,1,"Agriculture de Montagne","PTC 200"
+"UNIQ","FSAE","Production agricole",5,1,"Commercialisation des Produits Agricoles","DER 230"
+"UNIQ","FSAE","Production agricole",5,1,"Conservation et Technologie Post-récolte","PTC 260"
+"UNIQ","FSAE","Production agricole",5,1,"Enquête et Expérimentation","PTC 221"
+"UNIQ","FSAE","Production agricole",5,1,"Gestion des Exploitations Agricoles","DER 221"
+"UNIQ","FSAE","Production agricole",5,1,"Plantes Industrielles","PRC 253"
+"UNIQ","FSAE","Production agricole",5,2,"Projet de Fin d'Etudes","SAE 299"
+"UNIQ","FSEA","Gestion des Institutions financières",1,1,"Calcul pour gestionnaires","MAT 110"
+"UNIQ","FSEA","Gestion des Institutions financières",1,1,"Comptabilité générale I","COM 110"
+"UNIQ","FSEA","Gestion des Institutions financières",1,1,"Introduction à l'économie","ECO 101"
+"UNIQ","FSEA","Gestion des Institutions financières",1,1,"Introduction au travail intellectuel","ADM 103"
+"UNIQ","FSEA","Gestion des Institutions financières",1,1,"Sociologie générale","FGB 113"
+"UNIQ","FSEA","Gestion des Institutions financières",1,1,"Technique d'Expression francaise","FGB 002"
+"UNIQ","FSEA","Gestion des Institutions financières",1,2,"Anglais ou Espagnol","LAN 101 ou LES 101"
+"UNIQ","FSEA","Gestion des Institutions financières",1,2,"Comptabilité générale II","COM 111"
+"UNIQ","FSEA","Gestion des Institutions financières",1,2,"Géographie économique ou Introduction aux sciences de l'environnement","ECO 103 ou ENV 101"
+"UNIQ","FSEA","Gestion des Institutions financières",1,2,"Microéconomie I","ECO 110"
+"UNIQ","FSEA","Gestion des Institutions financières",1,2,"Principes de gestion","ADM 111"
+"UNIQ","FSEA","Gestion des Institutions financières",1,2,"Statistique I","MAT 141"
+"UNIQ","FSEA","Gestion des Institutions financières",2,1,"Comptabilité financière I","COM 220"
+"UNIQ","FSEA","Gestion des Institutions financières",2,1,"Gestion des ressources humaines","ADM 116"
+"UNIQ","FSEA","Gestion des Institutions financières",2,1,"Introduction aux Systèmes d'information","ADM 112"
+"UNIQ","FSEA","Gestion des Institutions financières",2,1,"Macroéconomie I","ECO 111"
+"UNIQ","FSEA","Gestion des Institutions financières",2,1,"Marketing  ","ADM 114"
+"UNIQ","FSEA","Gestion des Institutions financières",2,1,"Mathématiques Financières","ADM 225"
+"UNIQ","FSEA","Gestion des Institutions financières",2,2,"Anglais des affaires","LAN 203"
+"UNIQ","FSEA","Gestion des Institutions financières",2,2,"Fiscalité I","COM 223"
+"UNIQ","FSEA","Gestion des Institutions financières",2,2,"Fondamentaux de la finance","FIN 101"
+"UNIQ","FSEA","Gestion des Institutions financières",2,2,"Gestion des opérations de la production","ADM 117"
+"UNIQ","FSEA","Gestion des Institutions financières",2,2,"Marketing bancaire","BAN 254"
+"UNIQ","FSEA","Gestion des Institutions financières",2,2,"Principes de probabilité","ADM 250"
+"UNIQ","FSEA","Gestion des Institutions financières",3,1,"Analyse financière","FIN 110"
+"UNIQ","FSEA","Gestion des Institutions financières",3,1,"Comptabilité financière II","COM 221"
+"UNIQ","FSEA","Gestion des Institutions financières",3,1,"Droit des sociétés","ADM 220"
+"UNIQ","FSEA","Gestion des Institutions financières",3,1,"Economie managériale","ECO 130"
+"UNIQ","FSEA","Gestion des Institutions financières",3,1,"Inférence statistique","ADM 255"
+"UNIQ","FSEA","Gestion des Institutions financières",3,1,"Initiation aux assurances","FIN 105"
+"UNIQ","FSEA","Gestion des Institutions financières",3,1,"Monnaie et Banque","ECO 222"
+"UNIQ","FSEA","Gestion des Institutions financières",3,2,"Comportement organisationnel","ADM 110"
+"UNIQ","FSEA","Gestion des Institutions financières",3,2,"Comptabilité analytique I","COM 225"
+"UNIQ","FSEA","Gestion des Institutions financières",3,2,"Comptabilité de l'assurance","COM 239"
+"UNIQ","FSEA","Gestion des Institutions financières",3,2,"Controle interne","BAN 220"
+"UNIQ","FSEA","Gestion des Institutions financières",3,2,"Finance de marché","FIN 125"
+"UNIQ","FSEA","Gestion des Institutions financières",3,2,"Gestion de Trésorerie","FIN 120"
+"UNIQ","FSEA","Gestion des Institutions financières",3,2,"Gestion des opérations des institutions financières","BAN 250"
+"UNIQ","FSEA","Gestion des Institutions financières",3,2,"Théorie des organisations","ADM 221"
+"UNIQ","FSEA","Gestion des Institutions financières",4,1,"Gestion de porte-feuille","FIN 135"
+"UNIQ","FSEA","Gestion des Institutions financières",4,1,"Gestion du crédit","BAN 255"
+"UNIQ","FSEA","Gestion des Institutions financières",4,1,"Méthodes de recherche en Sciences administratives ","ADM 298"
+"UNIQ","FSEA","Gestion des Institutions financières",4,1,"Organisation d'une banque et Technologie de l'informatique","BAN 257"
+"UNIQ","FSEA","Gestion des Institutions financières",4,1,"Stratégie et politique générale d'entreprise","ADM 294"
+"UNIQ","FSEA","Gestion des Institutions financières",4,1,"Techniques bancaires internationales","BAN 256"
+"UNIQ","FSEA","Gestion des Institutions financières",4,1,"Théorie des organisations","ADM 221"
+"UNIQ","FSEA","Gestion des Institutions financières",4,2,"Projet de Fin d'Etudes","SEA 299"
+"UNIQ","FSEA","Gestion des Institutions financières",4,2,"Séminaire Ethique des affaires","ADM 109"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",1,1,"Calcul pour gestionnaires","MAT 110"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",1,1,"Comptabilité générale I","COM 110"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",1,1,"Introduction à l'économie","ECO 101"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",1,1,"Introduction au travail intellectuel","ADM 103"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",1,1,"Sociologie générale","FGB 113"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",1,1,"Technique d'Expression francaise","FGB 002"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",1,2,"Anglais ou Espagnol","LAN 101 ou LES 101"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",1,2,"Comptabilité générale II","COM 111"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",1,2,"Géographie économique ou Introduction aux sciences de l'environnement","ECO 103 ou ENV 101"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",1,2,"Microéconomie I","ECO 110"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",1,2,"Principes de gestion","ADM 111"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",1,2,"Statistique I","MAT 141"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",2,1,"Comptabilité financière I","COM 220"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",2,1,"Introduction à l'administration publique","ADM 113"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",2,1,"Introduction aux Systèmes d'information","ADM 112"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",2,1,"Macroéconomie I","ECO 111"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",2,1,"Marketing  ","ADM 114"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",2,1,"Mathématiques Financières","ADM 225"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",2,2,"Anglais des affaires","LAN 203"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",2,2,"Gestion des opérations de la production","ADM 117"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",2,2,"Gestion des ressources humaines","ADM 116"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",2,2,"Informatique pour Gestionnaires","INF 107"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",2,2,"Méthodes quantitatives pour gestionnaires","ADM 118"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",2,2,"Monnaie et Banque","ECO 222"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",2,2,"Principes de probabilité","ADM 250"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",3,1,"Comportement organisationnel","ADM 110"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",3,1,"Comptabilité analytique I","COM 225"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",3,1,"Droit des sociétés","ADM 220"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",3,1,"Economie managériale","ECO 130"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",3,1,"Fondamentaux de la finance","FIN 101"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",3,1,"Inférence statistique","ADM 255"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",3,1,"Introduction aux assurances","FIN 105"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",3,2,"Analyse financière","FIN 110"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",3,2,"Fiscalité I","COM 223"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",3,2,"Gestion de projet","ADM 236"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",3,2,"La PME en Haiti","ADM 254"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",3,2,"Leadership et supervision","ADM 224"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",3,2,"Planification et controle de la production et des stocks","ADM 235"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",3,2,"Théorie des organisations","ADM 221"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",4,1,"Controle de gestion","ADM 249"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",4,1,"Création et administration d'une PME","ADM 231"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",4,1,"Développement de l'entrepreneurship","ADM 253"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",4,1,"Méthodes de recherches en sciences administratives","ADM 298"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",4,1,"Problèmes financiers et financement PME","ADM 284"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",4,1,"Stratégie et politique générale d'entreprise","ADM 294"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",4,2,"Projet de Fin d'Etudes","SEA 299"
+"UNIQ","FSEA","Gestion des Petites et Moyennes Entreprises",4,2,"Séminaire Ethique des affaires","ADM 109"
+"UNIQ","FSEA","Sciences comptables",1,1,"Calcul pour gestionnaires","MAT 110"
+"UNIQ","FSEA","Sciences comptables",1,1,"Comportement organisationnel","ADM 110"
+"UNIQ","FSEA","Sciences comptables",1,1,"Comptabilité générale I","COM 110"
+"UNIQ","FSEA","Sciences comptables",1,1,"Eléments de Droit des affaires","DRA 110"
+"UNIQ","FSEA","Sciences comptables",1,1,"Introduction au travail intellectuel","ADM 103"
+"UNIQ","FSEA","Sciences comptables",1,1,"Technique d'Expression francaise","FGB 002"
+"UNIQ","FSEA","Sciences comptables",1,2,"Anglais ou Espagnol","LAN 101 ou LES 101"
+"UNIQ","FSEA","Sciences comptables",1,2,"Comptabilité générale II","COM 111"
+"UNIQ","FSEA","Sciences comptables",1,2,"Géographie économique ou Introduction aux sciences de l'environnement","ECO 103 ou ENV 101"
+"UNIQ","FSEA","Sciences comptables",1,2,"Microéconomie I","ECO 110"
+"UNIQ","FSEA","Sciences comptables",1,2,"Principes de gestion","ADM 111"
+"UNIQ","FSEA","Sciences comptables",1,2,"Statistique I","MAT 141"
+"UNIQ","FSEA","Sciences comptables",2,1,"Comptabilité financière I","COM 220"
+"UNIQ","FSEA","Sciences comptables",2,1,"Introduction aux Systèmes d'information","ADM 112"
+"UNIQ","FSEA","Sciences comptables",2,1,"Macroéconomie I","ECO 111"
+"UNIQ","FSEA","Sciences comptables",2,1,"Marketing  ","ADM 114"
+"UNIQ","FSEA","Sciences comptables",2,1,"Mathématiques Financières","ADM 225"
+"UNIQ","FSEA","Sciences comptables",2,1,"Sociologie générale","FGB 110"
+"UNIQ","FSEA","Sciences comptables",2,2,"Fiscalité I","COM 223"
+"UNIQ","FSEA","Sciences comptables",2,2,"Gestion des opérations et de la production","ADM 117"
+"UNIQ","FSEA","Sciences comptables",2,2,"Gestion des ressources humaines","ADM 116"
+"UNIQ","FSEA","Sciences comptables",2,2,"Introduction à la finance","ADM 115"
+"UNIQ","FSEA","Sciences comptables",2,2,"Méthodes quantitatives pour gestionnaires","ADM 118"
+"UNIQ","FSEA","Sciences comptables",2,2,"Probabilité et Inférence statistique","MAT 244"
+"UNIQ","FSEA","Sciences comptables",3,1,"Comptabilité analytique I","COM 225"
+"UNIQ","FSEA","Sciences comptables",3,1,"Comptabilité financière II","COM 221"
+"UNIQ","FSEA","Sciences comptables",3,1,"Economie managériale","ECO 130"
+"UNIQ","FSEA","Sciences comptables",3,1,"Gestion financière","ADM 226"
+"UNIQ","FSEA","Sciences comptables",3,1,"Introduction à l'administration publique","ADM 113"
+"UNIQ","FSEA","Sciences comptables",3,1,"Théorie des organisations","ADM 221"
+"UNIQ","FSEA","Sciences comptables",3,2,"Vérification I","COM 226"
+"UNIQ","FSEA","Sciences comptables",3,2,"Comptabilité analytique II","COM 235"
+"UNIQ","FSEA","Sciences comptables",3,2,"Comptabilité financière III","COM 230"
+"UNIQ","FSEA","Sciences comptables",3,2,"Méthodes de recherches en sciences économiques et administratives","ADM 298"
+"UNIQ","FSEA","Sciences comptables",3,2,"Informatique pour Sciences comptables ","INF 109"
+"UNIQ","FSEA","Sciences comptables",4,1,"Comptabilité financière IV","COM 241"
+"UNIQ","FSEA","Sciences comptables",4,1,"Fiscalité II","COM 253"
+"UNIQ","FSEA","Sciences comptables",4,1,"Planification et Controle budgétaire","COM 245"
+"UNIQ","FSEA","Sciences comptables",4,1,"Théorie comptable","COM 240"
+"UNIQ","FSEA","Sciences comptables",4,1,"Vérification II","COM 246"
+"UNIQ","FSEA","Sciences comptables",4,2,"Projet de fin d'études","SEA 299"
+"UNIQ","FSEA","Sciences comptables",4,2,"Séminaire Ethique des affaires","AD 109"
+"UNIQ","FSEA","Sciences économiques",1,1,"Comptabilite Generale I","COM 110"
+"UNIQ","FSEA","Sciences économiques",1,1,"Introduction a l' Economie","ECO 101"
+"UNIQ","FSEA","Sciences économiques",1,1,"Introduction au Travail Intellectuel","ADM 103"
+"UNIQ","FSEA","Sciences économiques",1,1,"Principe de Gestion","ADM 111"
+"UNIQ","FSEA","Sciences économiques",1,1,"Sociologie générale","FGB 113"
+"UNIQ","FSEA","Sciences économiques",1,1,"Techniques d' Expression Francaise","FGB 102"
+"UNIQ","FSEA","Sciences économiques",1,2,"Algorithmique","INF 214"
+"UNIQ","FSEA","Sciences économiques",1,2,"Analyse mathématique pour Economistes","ECO 105"
+"UNIQ","FSEA","Sciences économiques",1,2,"Anglais","LAN 101"
+"UNIQ","FSEA","Sciences économiques",1,2,"Comptabilite Generale II","COM 111"
+"UNIQ","FSEA","Sciences économiques",1,2,"Macroéconomie I","ECO 111"
+"UNIQ","FSEA","Sciences économiques",1,2,"Mathematiques Financieres","ADM 225"
+"UNIQ","FSEA","Sciences économiques",1,2,"Microeconomie I","ECO 110"
+"UNIQ","FSEA","Sciences économiques",2,1,"Algèbre pour économistes","ECO 106"
+"UNIQ","FSEA","Sciences économiques",2,1,"Calcul des probabilités","MAT 242"
+"UNIQ","FSEA","Sciences économiques",2,1,"Comptabilité nationale","ECO 224"
+"UNIQ","FSEA","Sciences économiques",2,1,"Démographie économique","DEM 101"
+"UNIQ","FSEA","Sciences économiques",2,1,"Histoire des faits et théories économiques","ECO 225"
+"UNIQ","FSEA","Sciences économiques",2,1,"Monnaie, crédit et Banque","ECO 222"
+"UNIQ","FSEA","Sciences économiques",2,2,"Anglais des affaires ou Espagnol des affaires","LAN 203 ou LES 203"
+"UNIQ","FSEA","Sciences économiques",2,2,"Fondamentaux de la finance","FIN 101"
+"UNIQ","FSEA","Sciences économiques",2,2,"Macroéconomie II","ECO 121"
+"UNIQ","FSEA","Sciences économiques",2,2,"Méthodes quantitatives et Recherche opérationnelle","ECO 107"
+"UNIQ","FSEA","Sciences économiques",2,2,"Programmation en C","INF 220"
+"UNIQ","FSEA","Sciences économiques",2,2,"Statistique II","MAT 243"
+"UNIQ","FSEA","Sciences économiques",3,1,"Econometrie I ","ECO 226"
+"UNIQ","FSEA","Sciences économiques",3,1,"Economie de la Caraibe","ECO 255"
+"UNIQ","FSEA","Sciences économiques",3,1,"Economie Financiere","ECO 256"
+"UNIQ","FSEA","Sciences économiques",3,1,"Relations Economiques Internationales","ECO 233"
+"UNIQ","FSEA","Sciences économiques",3,1,"Techniques d'analyse de la conjoncture","ECO 131"
+"UNIQ","FSEA","Sciences économiques",3,1,"Théorie et politique monétaire","ECO 235"
+"UNIQ","FSEA","Sciences économiques",3,2,"Cycle, crises et théories de la croissance","ECO 234"
+"UNIQ","FSEA","Sciences économiques",3,2,"Econometrie II","ECO 244"
+"UNIQ","FSEA","Sciences économiques",3,2,"Economie industrielle","ECO 250"
+"UNIQ","FSEA","Sciences économiques",3,2,"Finances publiques","ECO 223"
+"UNIQ","FSEA","Sciences économiques",3,2,"Informatique pour Sciences sociales","INF 105"
+"UNIQ","FSEA","Sciences économiques",3,2,"Théories Macro-économiques","ECO 231"
+"UNIQ","FSEA","Sciences économiques",4,1,"Analyse Economique de Projet","ECO 240"
+"UNIQ","FSEA","Sciences économiques",4,1,"Analyse économique de projet","ECO 240"
+"UNIQ","FSEA","Sciences économiques",4,1,"Economie du développement","ECO 232"
+"UNIQ","FSEA","Sciences économiques",4,1,"Economie haitienne","ECO 246"
+"UNIQ","FSEA","Sciences économiques",4,1,"Economie rurale","DER 120"
+"UNIQ","FSEA","Sciences économiques",4,1,"Méthodes de Recherche en Sciences sociales","ECO 298"
+"UNIQ","FSEA","Sciences économiques",4,2,"Projet de Fin d'Etudes","SEA 299"
+"UNIQ","FSEA","Sciences économiques",4,2,"Séminaire Ethique des affaires","ADM 109"
+"UNIQ","FSED","Langues Vivantes",1,1,"Anglais des Affaires","LAN202"
+"UNIQ","FSED","Langues Vivantes",1,1,"Elements de Linguistique","LIN110"
+"UNIQ","FSED","Sciences de l'education: Administration Scolaire",3,1,"Stage 1","SED-288"
+"UNIQ","FSED","Sciences de l'education: Administration Scolaire",3,2,"Différences Individuelles a l'Ecole","PSY-104"
+"UNIQ","FSED","Sciences de l'education: Administration Scolaire",3,2,"Introduction a la planification scolaire","EDU-108"
+"UNIQ","FSED","Sciences de l'education: Administration Scolaire",4,1,"Introduction a l'Analyse Quantitative ","MET-110"
+"UNIQ","FSED","Sciences de l'education: Administration Scolaire",4,1,"Les Courants Pedagogiques Contemporains","LIH-209"
+"UNIQ","FSED","Sciences de l'education: Administration Scolaire",4,1,"Méthode de Recherche en Education","MET-130"
+"UNIQ","FSED","Sciences de l'education: Administration Scolaire",4,1,"Micro-Enseignement","STP-100"
+"UNIQ","FSED","Sciences de l'education: Administration Scolaire",4,1,"Objectif pedagogiques cognitif ","ENS-104"
+"UNIQ","FSED","Sciences de l'education: Administration Scolaire",4,1,"Stage II","SED-289"
+"UNIQ","FSED","Sciences de l'education: Chimie Biologie ",3,1,"Biologie Generale","BIO-100"
+"UNIQ","FSED","Sciences de l'education: Chimie Biologie ",3,1,"Chimie generale et inorganique","CHM-100"
+"UNIQ","FSED","Sciences de l'education: Chimie Biologie ",3,1,"Histologie I","ANA-104"
+"UNIQ","FSED","Sciences de l'education: Chimie Biologie ",3,1,"Introduction a la chimie ","CHM-001"
+"UNIQ","FSED","Sciences de l'education: Chimie Biologie ",3,1,"Microbiologie General ","BIO-130"
+"UNIQ","FSED","Sciences de l'education: Chimie Biologie ",4,1,"Biochimie generale","CHM-119"
+"UNIQ","FSED","Sciences de l'education: Chimie Biologie ",4,1,"Biologie moleculaire","BIO-130"
+"UNIQ","FSED","Sciences de l'education: Chimie Biologie ",4,1,"Chimie organique","CHM-110"
+"UNIQ","FSED","Sciences de l'education: Chimie Biologie ",4,1,"Genetique","bio-123"
+"UNIQ","FSED","Sciences de l'education: Chimie Biologie ",4,1,"Socio-linguistique","LIN-101"
+"UNIQ","FSED","Sciences de l'education: license specialise",3,1,"Anglais intermediare","LAN-101"
+"UNIQ","FSED","Sciences de l'education: License specialise",3,1,"Introduction au travail intellectuel ","FGB-000"
+"UNIQ","FSED","Sciences de l'education: License specialise",3,1,"Production de materiel pedagogiques ou fabrication de materiel pedagogique ","DID-110"
+"UNIQ","FSED","Sciences de l'education: License specialise",3,1,"Sociologie Generale ","FGB-110 "
+"UNIQ","FSED","Sciences de l'education: License specialise",3,1,"Stage Administratif","SED-291"
+"UNIQ","FSED","Sciences de l'education: License specialise",3,2,"Epistemologie des sciences de l'education ","MET-140"
+"UNIQ","FSED","Sciences de l'education: License specialise",3,2,"Gestion de la Salle de Classe","ENS-209"
+"UNIQ","FSGA","Génie civil : Infrastructures",1,1,"Algèbre générale","MAT 100"
+"UNIQ","FSGA","Génie civil : Infrastructures",1,1,"Calcul I","MAT 111"
+"UNIQ","FSGA","Génie civil : Infrastructures",1,1,"Chimie générale et Inorganique","CHM 100"
+"UNIQ","FSGA","Génie civil : Infrastructures",1,1,"Dessin Technique I","ATD 131"
+"UNIQ","FSGA","Génie civil : Infrastructures",1,1,"Géologie I","GTC 101"
+"UNIQ","FSGA","Génie civil : Infrastructures",1,1,"Géométrie plane","MAT 119"
+"UNIQ","FSGA","Génie civil : Infrastructures",1,1,"Techniques d' Expression Francaise","FGB 102"
+"UNIQ","FSGA","Génie civil : Infrastructures",1,2,"Algèbre Linéaire","MAT 101"
+"UNIQ","FSGA","Génie civil : Infrastructures",1,2,"Calcul II","MAT 112"
+"UNIQ","FSGA","Génie civil : Infrastructures",1,2,"Dessin du Batiment I","ATD 101"
+"UNIQ","FSGA","Génie civil : Infrastructures",1,2,"Géologie II","GTC 102"
+"UNIQ","FSGA","Génie civil : Infrastructures",1,2,"Géométrie Analytique","MAT 120"
+"UNIQ","FSGA","Génie civil : Infrastructures",1,2,"Physique Conceptuelle","PHY 110"
+"UNIQ","FSGA","Génie civil : Infrastructures",2,1,"Analyse numérique","MAT 261"
+"UNIQ","FSGA","Génie civil : Infrastructures",2,1,"Calcul III","MAT 113"
+"UNIQ","FSGA","Génie civil : Infrastructures",2,1,"Cartographie","TOP 211"
+"UNIQ","FSGA","Génie civil : Infrastructures",2,1,"Introduction à l'Environnement","ENV 101"
+"UNIQ","FSGA","Génie civil : Infrastructures",2,1,"Introduction à l'ingénierie informatique","INF 115"
+"UNIQ","FSGA","Génie civil : Infrastructures",2,1,"Mécanique des Solides I","PHY 141"
+"UNIQ","FSGA","Génie civil : Infrastructures",2,1,"Thermodynamique","PHY 191"
+"UNIQ","FSGA","Génie civil : Infrastructures",2,2,"Algorithmique","INF 120"
+"UNIQ","FSGA","Génie civil : Infrastructures",2,2,"Calcul IV","MAT 114"
+"UNIQ","FSGA","Génie civil : Infrastructures",2,2,"Chimie organique","CHM 110"
+"UNIQ","FSGA","Génie civil : Infrastructures",2,2,"Mécanique des solides II","PHY 142"
+"UNIQ","FSGA","Génie civil : Infrastructures",2,2,"Photo-Interprétation","TOP 212"
+"UNIQ","FSGA","Génie civil : Infrastructures",2,2,"Statistiques et Probabilités I","MAT 140"
+"UNIQ","FSGA","Génie civil : Infrastructures",2,2,"Topographie I","TOP 201"
+"UNIQ","FSGA","Génie civil : Infrastructures",3,1,"Circulation Routière","TRO 201"
+"UNIQ","FSGA","Génie civil : Infrastructures",3,1,"Electricité et Magnétisme","PHY 121"
+"UNIQ","FSGA","Génie civil : Infrastructures",3,1,"Hydrologie","HYD 201"
+"UNIQ","FSGA","Génie civil : Infrastructures",3,1,"Programmation en C","INF 220"
+"UNIQ","FSGA","Génie civil : Infrastructures",3,1,"Résistance des Matériaux I","RDM 101"
+"UNIQ","FSGA","Génie civil : Infrastructures",3,1,"Topographie II","TOP 202"
+"UNIQ","FSGA","Génie civil : Infrastructures",3,2,"Anglais Intermédiaire","LAN 101"
+"UNIQ","FSGA","Génie civil : Infrastructures",3,2,"Géométrie Routière","TRO 202"
+"UNIQ","FSGA","Génie civil : Infrastructures",3,2,"Hydraulique Générale","HYD 211"
+"UNIQ","FSGA","Génie civil : Infrastructures",3,2,"Matériaux de construction ","GTC 221"
+"UNIQ","FSGA","Génie civil : Infrastructures",3,2,"Mécanique des Fluides","PHY 261"
+"UNIQ","FSGA","Génie civil : Infrastructures",3,2,"Mécanique des sols I ","GTC 211"
+"UNIQ","FSGA","Génie civil : Infrastructures",3,2,"Résistance des Matériaux II","RDM 202"
+"UNIQ","FSGA","Génie civil : Infrastructures",4,1,"Graphiques","ATD 212"
+"UNIQ","FSGA","Génie civil : Infrastructures",4,1,"Introduction à l'économie","ECO 101"
+"UNIQ","FSGA","Génie civil : Infrastructures",4,1,"Mécanique des sols II","GTC 212"
+"UNIQ","FSGA","Génie civil : Infrastructures",4,1,"Principes de Gestion","ADM 111"
+"UNIQ","FSGA","Génie civil : Infrastructures",4,1,"Structures I","RDM 211"
+"UNIQ","FSGA","Génie civil : Infrastructures",4,1,"Transport","TRO 221"
+"UNIQ","FSGA","Génie civil : Infrastructures",4,2,"Béton Armé I","BAP 201"
+"UNIQ","FSGA","Génie civil : Infrastructures",4,2,"Chaussées et Pistes","TRO 203"
+"UNIQ","FSGA","Génie civil : Infrastructures",4,2,"Digues et Barrages","TRO 231"
+"UNIQ","FSGA","Génie civil : Infrastructures",4,2,"Drainage Routier","TRO 204"
+"UNIQ","FSGA","Génie civil : Infrastructures",4,2,"Gestion de projets pour ingénieurs","GIN 254"
+"UNIQ","FSGA","Génie civil : Infrastructures",4,2,"Structures II","RDM 212"
+"UNIQ","FSGA","Génie civil : Infrastructures",5,1,"Béton Armé II","BAP 202"
+"UNIQ","FSGA","Génie civil : Infrastructures",5,1,"Constructions Métalliques","CON 201"
+"UNIQ","FSGA","Génie civil : Infrastructures",5,1,"Entretien Routier","TRO 205"
+"UNIQ","FSGA","Génie civil : Infrastructures",5,1,"Fondations d'ouvrages","GTC 241"
+"UNIQ","FSGA","Génie civil : Infrastructures",5,1,"Ouvrages d'Art","TRO 211"
+"UNIQ","FSGA","Génie civil : Infrastructures",5,2,"Exécution de Travaux","CON 211"
+"UNIQ","FSGA","Génie civil : Infrastructures",5,2,"Marché des Travaux Publics","CON 224"
+"UNIQ","FSGA","Génie civil : Infrastructures",5,2,"Projet de fin d'études","SGA 299"
+"UNIQ","FSGA","Génie électrique: Energie électrique",1,1,"Algèbre générale","MAT 100"
+"UNIQ","FSGA","Génie électrique: Energie électrique",1,1,"Calcul I","MAT 111"
+"UNIQ","FSGA","Génie électrique: Energie électrique",1,1,"Chimie Générale et Inorganique","CHM 100"
+"UNIQ","FSGA","Génie électrique: Energie électrique",1,1,"Dessin Technique I","ATD 131"
+"UNIQ","FSGA","Génie électrique: Energie électrique",1,1,"Géométrie plane","MAT 119"
+"UNIQ","FSGA","Génie électrique: Energie électrique",1,1,"Techniques d' Expression Francaise","FGB 102"
+"UNIQ","FSGA","Génie électrique: Energie électrique",1,2,"Algèbre Linéaire","MAT 101"
+"UNIQ","FSGA","Génie électrique: Energie électrique",1,2,"Anglais Intermédiaire","LAN 101"
+"UNIQ","FSGA","Génie électrique: Energie électrique",1,2,"Calcul II","MAT 112"
+"UNIQ","FSGA","Génie électrique: Energie électrique",1,2,"Géométrie Analytique","MAT 120"
+"UNIQ","FSGA","Génie électrique: Energie électrique",1,2,"Introduction a l' Economie","ECO 101"
+"UNIQ","FSGA","Génie électrique: Energie électrique",1,2,"Physique Conceptuelle","PHY 110"
+"UNIQ","FSGA","Génie électrique: Energie électrique",2,1,"Analyse Numérique","MAT 261"
+"UNIQ","FSGA","Génie électrique: Energie électrique",2,1,"Calcul III","MAT 113"
+"UNIQ","FSGA","Génie électrique: Energie électrique",2,1,"Introduction à l'ingénierie informatique","INF 115"
+"UNIQ","FSGA","Génie électrique: Energie électrique",2,1,"Mécanique des Solides I","PHY 141"
+"UNIQ","FSGA","Génie électrique: Energie électrique",2,1,"Thermodynamique","PHY 191"
+"UNIQ","FSGA","Génie électrique: Energie électrique",2,2,"Algorithmique","INF 120"
+"UNIQ","FSGA","Génie électrique: Energie électrique",2,2,"Calcul IV","MAT 114"
+"UNIQ","FSGA","Génie électrique: Energie électrique",2,2,"Electricité et Magnétisme","PHY 121"
+"UNIQ","FSGA","Génie électrique: Energie électrique",2,2,"Physique ondulatoire","PHY 131"
+"UNIQ","FSGA","Génie électrique: Energie électrique",2,2,"Resistance des Matériaux","RDM 101"
+"UNIQ","FSGA","Génie électrique: Energie électrique",2,2,"Statistiques et Probabilités I","MAT 140"
+"UNIQ","FSGA","Génie électrique: Energie électrique",3,1,"Champs et Ondes","ELE 574"
+"UNIQ","FSGA","Génie électrique: Energie électrique",3,1,"Circuits électriques I","ELE 201"
+"UNIQ","FSGA","Génie électrique: Energie électrique",3,1,"Economie de l'Ingénieur","GIN 214"
+"UNIQ","FSGA","Génie électrique: Energie électrique",3,1,"Principes de Gestion","ADM 111"
+"UNIQ","FSGA","Génie électrique: Energie électrique",3,1,"Programmation en C","INF 220"
+"UNIQ","FSGA","Génie électrique: Energie électrique",3,1,"Recherches opérationnelles I","GIN 201"
+"UNIQ","FSGA","Génie électrique: Energie électrique",3,2,"Analyse des signaux","ELE 241"
+"UNIQ","FSGA","Génie électrique: Energie électrique",3,2,"Antennes","ELE 275"
+"UNIQ","FSGA","Génie électrique: Energie électrique",3,2,"Circuits électriques II","ELE 202"
+"UNIQ","FSGA","Génie électrique: Energie électrique",3,2,"Eclairage et installations électriques","ELE 225"
+"UNIQ","FSGA","Génie électrique: Energie électrique",3,2,"Electronique I","ELE 211"
+"UNIQ","FSGA","Génie électrique: Energie électrique",3,2,"Gestion de projets pour ingénieurs","GIN 254"
+"UNIQ","FSGA","Génie électrique: Energie électrique",4,1,"Asservissements linéaires","ELE 252"
+"UNIQ","FSGA","Génie électrique: Energie électrique",4,1,"Electrification","ELE 222"
+"UNIQ","FSGA","Génie électrique: Energie électrique",4,1,"Electronique II","ELE 212"
+"UNIQ","FSGA","Génie électrique: Energie électrique",4,1,"Electrotechnique","ELE 290"
+"UNIQ","FSGA","Génie électrique: Energie électrique",4,1,"Laboratoire électrique I","ELE 281"
+"UNIQ","FSGA","Génie électrique: Energie électrique",4,1,"Systèmes digitaux et logiques I","ELE 242"
+"UNIQ","FSGA","Génie électrique: Energie électrique",4,2,"Electronique de puissance","ELE 213"
+"UNIQ","FSGA","Génie électrique: Energie électrique",4,2,"Introduction aux communications","ELE 231"
+"UNIQ","FSGA","Génie électrique: Energie électrique",4,2,"Laboratoire électrique II","ELE 282"
+"UNIQ","FSGA","Génie électrique: Energie électrique",4,2,"Machines électriques I","ELE 261"
+"UNIQ","FSGA","Génie électrique: Energie électrique",4,2,"Réseaux électriques","ELE 223"
+"UNIQ","FSGA","Génie électrique: Energie électrique",4,2,"Systèmes digitaux et logiques II","ELE 243"
+"UNIQ","FSGA","Génie électrique: Energie électrique",5,1,"Base de données I","INF 321"
+"UNIQ","FSGA","Génie électrique: Energie électrique",5,1,"Energies renouvelables","ELE 913"
+"UNIQ","FSGA","Génie électrique: Energie électrique",5,1,"Introduction à la réseautique","INF 222"
+"UNIQ","FSGA","Génie électrique: Energie électrique",5,1,"Protection des systèmes électriques","ELE 224"
+"UNIQ","FSGA","Génie électrique: Energie électrique",5,1,"Systèmes de communications","ELE 232"
+"UNIQ","FSGA","Génie électrique: Energie électrique",5,2,"Ingénierie des communications","ELE 233"
+"UNIQ","FSGA","Génie électrique: Energie électrique",5,2,"Projet de fin d'études","SGA 299"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",1,1,"Algèbre générale","MAT 100"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",1,1,"Calcul I","MAT 111"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",1,1,"Chimie Générale et Inorganique","CHM 100"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",1,1,"Dessin Technique I","ATD 131"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",1,1,"Géométrie plane","MAT 119"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",1,1,"Techniques d' Expression Francaise","FGB 102"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",1,2,"Algèbre Linéaire","MAT 101"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",1,2,"Anglais Intermédiaire","LAN 101"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",1,2,"Calcul II","MAT 112"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",1,2,"Géométrie Analytique","MAT 120"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",1,2,"Introduction a l' Economie","ECO 101"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",1,2,"Physique Conceptuelle","PHY 110"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",2,1,"Analyse Numérique","MAT 261"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",2,1,"Calcul III","MAT 113"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",2,1,"Introduction à l'ingénierie informatique","INF 115"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",2,1,"Mécanique des Solides I","PHY 141"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",2,1,"Thermodynamique","PHY 191"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",2,2,"Algorithmique","INF 120"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",2,2,"Calcul IV","MAT 114"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",2,2,"Electricité et Magnétisme","PHY 121"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",2,2,"Physique ondulatoire","PHY 131"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",2,2,"Resistance des Matériaux","RDM 101"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",2,2,"Statistiques et Probabilités I","MAT 140"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",3,1,"Champs et Ondes","ELE 574"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",3,1,"Circuits électriques I","ELE 201"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",3,1,"Economie de l'Ingénieur","GIN 214"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",3,1,"Principes de Gestion","ADM 111"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",3,1,"Programmation en C","INF 220"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",3,1,"Recherches opérationnelles I","GIN 201"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",3,2,"Asservissements linéaires","ELE 252"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",3,2,"Circuits électriques II","ELE 202"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",3,2,"Eclairage et installations électriques","ELE 225"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",3,2,"Electronique I","ELE 211"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",3,2,"Gestion de projets pour ingénieurs","GIN 254"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",3,2,"Systèmes digitaux et logiques I","ELE 242"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",4,1,"Antennes","ELE 275"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",4,1,"Electronique II","ELE 212"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",4,1,"Electrotechnique","ELE 290"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",4,1,"Introduction aux communications","ELE 231"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",4,1,"Laboratoire électrique I","ELE 281"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",4,1,"Systèmes digitaux et logiques II","ELE 243"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",4,2,"Hyperfréquences","ELE 420"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",4,2,"Introduction à la réseautique","INF 222"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",4,2,"Laboratoire électrique II","ELE 282"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",4,2,"Optoélectronique","ELE 422"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",4,2,"Réseaux de transmission de données","ELE 421"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",4,2,"Systèmes de communications","ELE 232"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",5,1,"Communications numériques","ELE 510"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",5,1,"Ingénierie des communications","ELE 233"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",5,1,"Introduction aux systèmes spatiaux","ELE 513"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",5,1,"Télécommucations mobiles","ELE 511"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",5,1,"Téléinformatique","ELE 512"
+"UNIQ","FSGA","Génie électrique: Télécommunications ",5,2,"Projet de fin d'études","SGA 299"
+"UNIQ","FSGA","Génie industriel",1,1,"Algèbre générale","MAT 100"
+"UNIQ","FSGA","Génie industriel",1,1,"Calcul I","MAT 111"
+"UNIQ","FSGA","Génie industriel",1,1,"Chimie générale et inorganique","CHM 100"
+"UNIQ","FSGA","Génie industriel",1,1,"Dessin Technique I","ATD 131"
+"UNIQ","FSGA","Génie industriel",1,1,"Géométrie plane","MAT 119"
+"UNIQ","FSGA","Génie industriel",1,1,"Principes de Gestion","ADM 111"
+"UNIQ","FSGA","Génie industriel",1,2,"Algèbre Linéaire","MAT 101"
+"UNIQ","FSGA","Génie industriel",1,2,"Calcul II","MAT 112"
+"UNIQ","FSGA","Génie industriel",1,2,"Chimie organique","CHM 110"
+"UNIQ","FSGA","Génie industriel",1,2,"Géométrie Analytique","MAT 120"
+"UNIQ","FSGA","Génie industriel",1,2,"Introduction au Génie Industriel","GIN 219"
+"UNIQ","FSGA","Génie industriel",1,2,"Physique Conceptuelle","PHY 110"
+"UNIQ","FSGA","Génie industriel",2,1,"Calcul III","MAT 113"
+"UNIQ","FSGA","Génie industriel",2,1,"Comptabilité générale I","COM 110"
+"UNIQ","FSGA","Génie industriel",2,1,"Gestion des Ressources Humaines","ADM 116"
+"UNIQ","FSGA","Génie industriel",2,1,"Introduction à l'ingénierie informatique","INF 115"
+"UNIQ","FSGA","Génie industriel",2,1,"Marketing","ADM 114"
+"UNIQ","FSGA","Génie industriel",2,1,"Mécanique des solides I","PHY 141"
+"UNIQ","FSGA","Génie industriel",2,2,"Algorithmique","INF 120"
+"UNIQ","FSGA","Génie industriel",2,2,"Calcul IV","MAT 114"
+"UNIQ","FSGA","Génie industriel",2,2,"Electricité et Magnétisme","PHY 121"
+"UNIQ","FSGA","Génie industriel",2,2,"Statistiques et Probabilités","MAT 140"
+"UNIQ","FSGA","Génie industriel",2,2,"Théorie des organisations","ADM 121"
+"UNIQ","FSGA","Génie industriel",2,2,"Thermodynamique","PHY 191"
+"UNIQ","FSGA","Génie industriel",3,1,"Circuits électriques I","ELE 201"
+"UNIQ","FSGA","Génie industriel",3,1,"Introduction à l'économie","ECO 101"
+"UNIQ","FSGA","Génie industriel",3,1,"Programmation en C","INF 220"
+"UNIQ","FSGA","Génie industriel",3,1,"Recherches opérationnelles I","GIN 201"
+"UNIQ","FSGA","Génie industriel",3,1,"Résistance des matériaux I","RDM 101"
+"UNIQ","FSGA","Génie industriel",3,1,"Statistiques et Probabilités II","MAT 240"
+"UNIQ","FSGA","Génie industriel",3,2,"Ergonomie","GIN 212"
+"UNIQ","FSGA","Génie industriel",3,2,"Gestion de projets pour ingénieurs","GIN 254"
+"UNIQ","FSGA","Génie industriel",3,2,"Gestion des opérations de la production","GIN 231"
+"UNIQ","FSGA","Génie industriel",3,2,"Mesure et analyse du travail","GIN 213"
+"UNIQ","FSGA","Génie industriel",3,2,"Physique ondulatoire","PHY 131"
+"UNIQ","FSGA","Génie industriel",3,2,"Recherches opérationnelles II","GIN 202"
+"UNIQ","FSGA","Génie industriel",4,1,"Aménagement des espaces industriels","GIN 311"
+"UNIQ","FSGA","Génie industriel",4,1,"Développement industriel","GIN 264"
+"UNIQ","FSGA","Génie industriel",4,1,"Economie de l'Ingénieur","GIN 214"
+"UNIQ","FSGA","Génie industriel",4,1,"Infographie","INF 311"
+"UNIQ","FSGA","Génie industriel",4,1,"Matériaux","GIN 215"
+"UNIQ","FSGA","Génie industriel",4,1,"Psychologie industrielle","GIN 312"
+"UNIQ","FSGA","Génie industriel",4,2,"BPR (Business Process Re-Engineering)","GIN 218"
+"UNIQ","FSGA","Génie industriel",4,2,"Comptabilité avancée","GIN 291"
+"UNIQ","FSGA","Génie industriel",4,2,"Etude de faisabilité","GIN 281"
+"UNIQ","FSGA","Génie industriel",4,2,"Manufacture industrielle","GIN 262"
+"UNIQ","FSGA","Génie industriel",4,2,"MIS (Management, Information et Système)","GIN 253"
+"UNIQ","FSGA","Génie industriel",4,2,"Techniques d' Expression Francaise","FGB 102"
+"UNIQ","FSGA","Génie industriel",5,1,"Anglais Intermédiaire","LAN 101"
+"UNIQ","FSGA","Génie industriel",5,1,"Gestion de la qualité","GIN 221"
+"UNIQ","FSGA","Génie industriel",5,1,"Projet de fin d'études","SGA 299"
+"UNIQ","FSGA","Génie industriel",5,1,"Théorie des contraintes (TOC)","GIN 261"
+"UNIQ","FSGA","Génie: Architecture",1,1,"Algèbre générale","MAT 100"
+"UNIQ","FSGA","Génie: Architecture",1,1,"Calcul I","MAT 111"
+"UNIQ","FSGA","Génie: Architecture",1,1,"Dessin Batiment I","ATD 101"
+"UNIQ","FSGA","Génie: Architecture",1,1,"Dessin Technique I","ATD 131"
+"UNIQ","FSGA","Génie: Architecture",1,1,"Géométrie plane","MAT 119"
+"UNIQ","FSGA","Génie: Architecture",1,1,"Techniques d' Expression Francaise","FGB 102"
+"UNIQ","FSGA","Génie: Architecture",1,2,"Algèbre Linéaire","MAT 101"
+"UNIQ","FSGA","Génie: Architecture",1,2,"Comp. Arc. I",
+"UNIQ","FSGA","Génie: Architecture",1,2,"Dessin Batiment II","ATD 102"
+"UNIQ","FSGA","Génie: Architecture",1,2,"Dessin technique II","ATD 132"
+"UNIQ","FSGA","Génie: Architecture",1,2,"Histoire Arts et Civilisation","ARC 200"
+"UNIQ","FSGA","Génie: Architecture",1,2,"Physique Conceptuelle","PHY 110"
+"UNIQ","FSGA","Génie: Architecture",2,1,"Comp. Arc. II","ARC 222"
+"UNIQ","FSGA","Génie: Architecture",2,1,"Culture et Architecture","FGB 111"
+"UNIQ","FSGA","Génie: Architecture",2,1,"Introduction à l'ingénierie informatique","INF 115"
+"UNIQ","FSGA","Génie: Architecture",2,1,"Lab Rotation Artist I","ATD 121"
+"UNIQ","FSGA","Génie: Architecture",2,1,"Psychologie générale ","PSY 101"
+"UNIQ","FSGA","Génie: Architecture",2,1,"Sociologie générale","FGB 113"
+"UNIQ","FSGA","Génie: Architecture",2,2,"Comp. Arc. III","ARC 223"
+"UNIQ","FSGA","Génie: Architecture",2,2,"Graphiques (Autocad)","ATD 212"
+"UNIQ","FSGA","Génie: Architecture",2,2,"Histoire de l'Architecture I","ARC 201"
+"UNIQ","FSGA","Génie: Architecture",2,2,"Lab Rotation Artist II","ATD 122"
+"UNIQ","FSGA","Génie: Architecture",2,2,"Sciences Environnement","ENV 101"
+"UNIQ","FSGA","Génie: Architecture",2,2,"Topographie","TOP 201"
+"UNIQ","FSGA","Génie: Architecture",3,1,"Aménagement des sites","ARC 210"
+"UNIQ","FSGA","Génie: Architecture",3,1,"Comp. Arc. IV","ARC 224"
+"UNIQ","FSGA","Génie: Architecture",3,1,"Histoire de l'Architecture II","ARC 202"
+"UNIQ","FSGA","Génie: Architecture",3,1,"Introduction à l'économie","ECO 101"
+"UNIQ","FSGA","Génie: Architecture",3,1,"Matériaux de construction ","GTC 221"
+"UNIQ","FSGA","Génie: Architecture",3,1,"Théorie de l'Architecture I","ARC 211"
+"UNIQ","FSGA","Génie: Architecture",3,2,"Analyse structurale I","RDM 131"
+"UNIQ","FSGA","Génie: Architecture",3,2,"Approche bioclimatique I","ARC 281"
+"UNIQ","FSGA","Génie: Architecture",3,2,"Comp. Arc. V","ARC 225"
+"UNIQ","FSGA","Génie: Architecture",3,2,"Construction I","ARC 231"
+"UNIQ","FSGA","Génie: Architecture",3,2,"Histoire de l'Architecture III","ARC 203"
+"UNIQ","FSGA","Génie: Architecture",3,2,"Théorie de l'Architecture II","ARC 212"
+"UNIQ","FSGA","Génie: Architecture",4,1,"Analyse structurale II","RDM 132"
+"UNIQ","FSGA","Génie: Architecture",4,1,"Approche bioclimatique II","ARC 282"
+"UNIQ","FSGA","Génie: Architecture",4,1,"Comp. Arc. VI","ARC 226"
+"UNIQ","FSGA","Génie: Architecture",4,1,"Construction II","ARC 232"
+"UNIQ","FSGA","Génie: Architecture",4,1,"Théorie de l'Architecture","ARC 213"
+"UNIQ","FSGA","Génie: Architecture",4,1,"Urbanisme et Aménagement I","ARC 251"
+"UNIQ","FSGA","Génie: Architecture",4,2,"Atelier expérimental","GTC 225"
+"UNIQ","FSGA","Génie: Architecture",4,2,"Comp. Arc. VII","ARC 227"
+"UNIQ","FSGA","Génie: Architecture",4,2,"Conserv. Patrimoine","ARC 204"
+"UNIQ","FSGA","Génie: Architecture",4,2,"Construction III","ARC 233"
+"UNIQ","FSGA","Génie: Architecture",4,2,"Principes de Gestion","ADM 111"
+"UNIQ","FSGA","Génie: Architecture",4,2,"Urbanisme et Aménagement II","ARC 252"
+"UNIQ","FSGA","Génie: Architecture",5,1,"Anglais","LAN 101"
+"UNIQ","FSGA","Génie: Architecture",5,1,"Architecture intérieure","ARC 241"
+"UNIQ","FSGA","Génie: Architecture",5,1,"Comp. Arc. VIII","ARC 228"
+"UNIQ","FSGA","Génie: Architecture",5,1,"Gestion de projets pour ingénieurs","GIN 254"
+"UNIQ","FSGA","Génie: Architecture",5,1,"Stage d'initiation","ARC 261"
+"UNIQ","FSGA","Génie: Architecture",5,1,"Urbanisme et aménagement III","ARC 253"
+"UNIQ","FSGA","Génie: Architecture",5,2,"Aménagement paysager","ARC 243"
+"UNIQ","FSGA","Génie: Architecture",5,2,"Gestion des constructions","ARC 270"
+"UNIQ","FSGA","Génie: Architecture",5,2,"Mécanique du batiment","ARC 242"
+"UNIQ","FSGA","Génie: Architecture",5,2,"Projet de fin d'études","SGA 299"
+"UNIQ","FSGA","Génie: Architecture",5,2,"Stage professionnel","ARC 262"
+"UNIQ","FSJP","Sciences Juridiques",1,1,"Droit Constitutionnel I","PUB 171"
+"UNIQ","FSJP","Sciences Juridiques",1,1,"Droit des Personnes","CIV 101"
+"UNIQ","FSJP","Sciences Juridiques",1,1,"Histoire des idées politiques","HIS 131"
+"UNIQ","FSJP","Sciences Juridiques",1,1,"Institutions juridictionnelles","PRO 161"
+"UNIQ","FSJP","Sciences Juridiques",1,1,"Introduction au Travail Intellectuel",
+"UNIQ","FSJP","Sciences Juridiques",1,1,"Introduction générale au Droit","DRT 120"
+"UNIQ","FSJP","Sciences Juridiques",1,2,"Droit Constitutionnel II","PUB 172"
+"UNIQ","FSJP","Sciences Juridiques",1,2,"Droit de la Famille","CIV 102"
+"UNIQ","FSJP","Sciences Juridiques",1,2,"Drooit pénal général","PEN 151"
+"UNIQ","FSJP","Sciences Juridiques",1,2,"Histoire des Relations Internationales (1945 à nos jours)","HIS 132"
+"UNIQ","FSJP","Sciences Juridiques",1,2,"Introduction à l'économie ou Introduction à la sociologie",
+"UNIQ","FSJP","Sciences Juridiques",2,1,"Droit administratif I","PUB 173"
+"UNIQ","FSJP","Sciences Juridiques",2,1,"Droit Pénal spécial","PEN 152"
+"UNIQ","FSJP","Sciences Juridiques",2,1,"Droits des affaires I ","DRA 111"
+"UNIQ","FSJP","Sciences Juridiques",2,1,"Droits des biens","CIV 103"
+"UNIQ","FSJP","Sciences Juridiques",2,1,"Méthodologie Juridique I","DRT 122"
+"UNIQ","FSJP","Sciences Juridiques",2,1,"Procédure civile I ","PRO 162"
+"UNIQ","FSJP","Sciences Juridiques",2,2,"Procédure civile II","PRO 163"
+"UNIQ","FSJP","Sciences Juridiques",2,2,"Droit administratif II","PUB 174"
+"UNIQ","FSJP","Sciences Juridiques",2,2,"Droit des obligations I ","CIV 104"
+"UNIQ","FSJP","Sciences Juridiques",2,2,"Droits des affaires II","DRA 112"
+"UNIQ","FSJP","Sciences Juridiques",2,2,"Methodologie juridique II","DRT 123"
+"UNIQ","FSJP","Sciences Juridiques",2,2,"Procédure pénale","PEN 153"
+"UNIQ","FSJP","Sciences Juridiques",3,1,"Droit administratif III","PUB 175"
+"UNIQ","FSJP","Sciences Juridiques",3,1,"Droit des Affaires III","DRA 113"
+"UNIQ","FSJP","Sciences Juridiques",3,1,"Droit des obligations II","CIV 105"
+"UNIQ","FSJP","Sciences Juridiques",3,1,"Droit du Travail ","TRA 191"
+"UNIQ","FSJP","Sciences Juridiques",3,1,"Droit international public I","INT 141"
+"UNIQ","FSJP","Sciences Juridiques",3,2,"Contrats Spéciaux","CIV 106"
+"UNIQ","FSJP","Sciences Juridiques",3,2,"Droit administratif IV","PUB 176"
+"UNIQ","FSJP","Sciences Juridiques",3,2,"Droit comparé","INT 145"
+"UNIQ","FSJP","Sciences Juridiques",3,2,"Droit des affaires IV","DRA 114"
+"UNIQ","FSJP","Sciences Juridiques",3,2,"Droit international public II","INT 142"
+"UNIQ","FSJP","Sciences Juridiques",4,1,"Droit de la Sécurité Sociale","TRA 193"
+"UNIQ","FSJP","Sciences Juridiques",4,1,"Voies d'Exécution","PRO 164"
+"UNIQ","FSJP","Sciences Juridiques",4,1,"Droit Financier et Fiscal","PUB 177"
+"UNIQ","FSJP","Sciences Juridiques",4,1,"Droit international privé I","INT 143"
+"UNIQ","FSJP","Sciences Juridiques",4,1,"Régimes matrimoniaux","CIV 110"
+"UNIQ","FSJP","Sciences Juridiques",4,1,"Succession et Libéralités","CIV 108"
+"UNIQ","FSJP","Sciences Juridiques",4,2,"Déontologie du Juriste","SJU 201"
+"UNIQ","FSJP","Sciences Juridiques",4,2,"Droit des suretés","CIV 107"
+"UNIQ","FSJP","Sciences Juridiques",4,2,"Droit fondamentaux de l'homme","DRH 180"
+"UNIQ","FSJP","Sciences Juridiques",4,2,"Droit international privé II","INT 144"
+"UNIQ","FSJP","Sciences Juridiques",4,2,"Projet de fin d'études Sciences juridiques",
+"UEH","FAMV","Ressources naturelles et environnement",4,1,"Biologie aquatique",
+"UEH","FAMV","Ressources naturelles et environnement",4,1,"Biometrie",
+"UEH","FAMV","Ressources naturelles et environnement",4,1,"Chimie de l'environnement",
+"UEH","FAMV","Ressources naturelles et environnement",4,1,"Complement d'hydrologie",
+"UEH","FAMV","Ressources naturelles et environnement",4,1,"Gestion de l'Environnement",
+"UEH","FAMV","Ressources naturelles et environnement",4,1,"Gestion des dechets",
+"UEH","FAMV","Ressources naturelles et environnement",4,1,"Hydrologie forestaire",
+"UEH","FAMV","Ressources naturelles et environnement",4,1,"Hydrostatique et Hydrodinamique",
+"UEH","FAMV","Ressources naturelles et environnement",4,1,"Informatique II ",
+"UEH","FAMV","Ressources naturelles et environnement",4,1,"Pepinaire et plantation",
+"UEH","FAMV","Ressources naturelles et environnement",4,1,"Physique du sol",
+"UEH","FAMV","Ressources naturelles et environnement",4,1,"Programmation ",
+"UEH","FAMV","Ressources naturelles et environnement",4,1,"Ressources halieutiques et cotieres",
+"UEH","FAMV","Ressources naturelles et environnement",4,1,"Sylviculture et amenagement de bassin versant",
+"UEH","FAMV","Sciences et technologie des aliments",4,1,"Analyse des produits alimentaires",
+"UEH","FAMV","Sciences et technologie des aliments",4,1,"Bibliotheque",
+"UEH","FAMV","Sciences et technologie des aliments",4,1,"Biometrie I ",
+"UEH","FAMV","Sciences et technologie des aliments",4,1,"Chimie alimentaire",
+"UEH","FAMV","Sciences et technologie des aliments",4,1,"Chimie physique des aliments",
+"UEH","FAMV","Sciences et technologie des aliments",4,1,"Marche des produits agricoles I ",
+"UEH","FAMV","Sciences et technologie des aliments",4,1,"Methodologie et technique de la recherche II",
+"UEH","FAMV","Sciences et technologie des aliments",4,1,"Microbiologie alimentaire",
+"UEH","FAMV","Sciences et technologie des aliments",4,1,"Nutrition appliquees",
+"UEH","FAMV","Sciences et technologie des aliments",4,1,"Ressources des Déchets et Traitement des Eaux Usées",
+"UEH","FAMV","Sciences et technologie des aliments",4,1,"TP de biometrie",
+"UEH","FAMV","Sciences et technologie des aliments",4,1,"Travaux pratiques en sciences et technologie des aliments",
+"UEH","FDS","Genie Civil",2,2,"Adduction d'Eau Potable",
+"UEH","FDS","Genie Civil",2,2,"Beton Armé",
+"UEH","FDS","Genie Civil",2,2,"Climatisation",
+"UEH","FDS","Genie Civil",2,2,"Drainage",
+"UEH","FDS","Genie Civil",2,2,"Electrification",
+"UEH","FDS","Genie Civil",2,2,"Materiaux de Constructions",
+"UEH","FDS","Genie Civil",2,2,"Métallurgie",
+"UEH","FDS","Genie Civil",2,3,"Electronique de Puissance",
+"UEH","FDS","Genie Civil",2,"1,2,3","Electrotechnique 3",
+"UEH","FDS","Genie Civil",3,1,"Gestion de l'Environnement",
+"UEH","FDS","Genie Civil",3,1,"Hydraulique Appliquée",
+"UEH","FDS","Genie Civil",3,2,"Installations Electriques",
+"UEH","FDS","Genie Civil",3,2,"Irrigation",
+"UEH","FDS","Genie Civil",3,2,"Macroeconomie",
+"UEH","FDS","Genie Civil",3,2,"Mécanique des Pistons",
+"UEH","FDS","Genie Civil",3,2,"Mécanique des Structures",
+"UEH","FDS","Genie Civil",3,2,"Microeconomie",
+"UEH","FDS","Genie Civil",3,2,"Réseaux Electriques 2",
+"UEH","FDS","Genie Civil",3,2,"Routes",
+"UEH","FDS","Genie Civil",3,2,"Systeme Asservissement",
+"UEH","FDS","Genie Civil",4,1,"Asservissement",
+"UEH","FDS","Genie Civil ",4,2,"Antenne",
+"UEH","FDS","Genie Electromecanique",1,,"Algebre",
+"UEH","FDS","Genie Electromecanique",1,,"Analyse",
+"UEH","FDS","Genie Electromecanique",1,,"Chimie generale",
+"UEH","FDS","Genie Electromecanique",1,,"Dessin technique",
+"uEH","FDS","Genie Electromecanique",1,,"Francais II",
+"UEH","FDS","Genie Electromecanique",1,,"Geometrie",
+"UEH","FDS","Genie Electromecanique",1,,"Physique conceptuel",
+"UEH","FDS","Genie Electromecanique",2,,"Geometrie affinee",
+"UEH","FDS","Genie Electromecanique",3,,"Analyse numerique",
+"UEH","FDS","Genie Electromecanique",3,,"Canique des fluides",
+"UEH","FDS","Genie Electromecanique",3,,"Circuit electrique",
+"UEH","FDS","Genie Electromecanique",3,,"Circuit logique",
+"UEH","FDS","Genie Electromecanique",3,,"Electronique Analogique",
+"UEH","FDS","Genie Electromecanique",3,,"Materiaux",
+"UEH","FDS","Genie Electromecanique",3,,"Mathematique",
+"UEH","FDS","Genie Electromecanique",3,,"Mecanique des materiaux",
+"UEH","FDS","Genie Electromecanique",3,,"Structures des donnees",
+"UEH","FDS","Genie Electromecanique",3,,"TP electronique analogique",
+"UEH","FDS","Genie Electromecanique",4,,"Analyse des signaux",
+"UEH","FDS","Genie Electromecanique",4,,"Automate",
+"UEH","FDS","Genie Electromecanique",4,,"Base de donnees",
+"UEH","FDS","Genie Electromecanique",4,,"Economie",
+"UEH","FDS","Genie Electromecanique",4,,"Electronique de puissance",
+"UEH","FDS","Genie Electromecanique",4,,"Electronique de puissant",
+"UEH","FDS","Genie Electromecanique",4,,"Electrotech",
+"UEH","FDS","Genie Electromecanique",4,,"Hydraulique generale",
+"UEH","FDS","Genie Electromecanique",4,,"Installation electrique ",
+"UEH","FDS","Genie Electromecanique",4,,"Mecanique appliquees",
+"UEH","FDS","Genie Electronique",4,2,"Circuits Logiques ",
+"UEH","FDS","Genie Electronique",4,2,"Electronique",
+"UEH","FDS","Genie Electronique",4,2,"Electronique Analogique",
+"UEH","FDS","Genie Electronique",4,2,"Electronique non lineaire",
+"UEH","FDS","Genie Electronique",4,2,"Lignes de Transmission",
+"UEH","FDS","Genie electronique",4,2,"Telecom 1",
+"UEH","FDS","Genie Electronique",4,2,"Television",
+"UEH","FDS","Genie Electronique",4,2,"Theorie information",
+"UEH","FDS","Genie Electronique",4,2,"TpEL.A",
+"UEH","FDS","Genie Electronique",4,,"Analyse des signaux",
+"UEH","FDS","Genie Electronique",4,,"Csharp",
+"UEH","FDS","Genie Electronique",4,,"Economie",
+"UEH","FDS","Genie Electronique",4,,"Electronique de Puissance",
+"UEH","FDS","Genie Electronique",4,,"Electrotechnique",
+"UEH","FDS","Genie electronique",4,,"Installations Electriques",
+"UEH","FDS","Genie Electronique",4,,"Lignes de Transmission",
+"UEH","FDS","Genie Electronique",4,,"Microprocesseur",
+"UEH","FMP","Medecine",1,1,"Biologie cellulaire et genetique",
+"UEH","FMP","Medecine",1,1,"Botanique et Biologie vegetale",
+"UEH","FMP","Medecine",1,1,"Calcul pharmaceutiques",
+"UEH","FMP","Medecine",1,1,"Chimie Analytique",
+"UEH","FMP","Medecine",1,1,"Chimie organique",
+"UEH","FMP","Medecine",1,1,"chimie physique generale",
+"UEH","FMP","Medecine",1,1,"Connaissance des medicaments",
+"UEH","FMP","Medecine",1,1,"Ecologie",
+"UEH","FMP","Medecine",1,1,"Francais",
+"UEH","FMP","Medecine",1,1,"Mathematiques",
+"UEH","FMP","Medecine",1,1,"Physiques",
+"UEH","FMP","Medecine",1,2,"Anatomie II",
+"UEH","FMP","Medecine",1,2,"Biologie Cellulaire et moleculaire",
+"UEH","FMP","Medecine",1,2,"Calcul pharmaceutiques 2",
+"UEH","FMP","Medecine",2,1,"Medicaments essentiel ",
+"UEH","FMP","Medecine",2,2,"Chimie Organique ",
+"UEH","FMP","Medecine",2,2,"Chimie physique pharmaceutique",
+"UEH","FMP","Medecine",2,2,"Medicaments essentiel ",
+"UEH","FMP","Medecine",2,2,"Pharmacie chimique organique",
+"UEH","FMP","Medecine",2,2,"Pharmacie Galenique ",
+"UEH","FMP","Medecine",2,2,"Taxonomie Vegetale",
+"UEH","FMP","Medecine",3,1,"Endocrinologie",
+"UEH","FMP","Medecine",3,1,"Pathologie chirurgicale(Ophtalmologie",
+"UEH","FMP","Medecine",3,1,"Pathologie medicale(Cardiologie)",
+"UEH","FMP","Medecine",3,1,"Psychiatrie",
+"UEH","FMP","Medecine",3,1,"Radiologie",
+"UEH","FMP","Medecine",3,1,"Rumatologie",
+"UEH","FMP","Medecine",3,1,"Therapeutique CV",
+"UEH","FMP","Medecine",3,2,"Ethique",
+"UEH","FMP","Medecine",3,2,"Hematologie",
+"UEH","FMP","Medecine",3,2,"Medecine familiale",
+"UEH","FMP","Medecine",3,2,"Nephrologie",
+"UEH","FMP","Medecine",3,2,"Pathologie (urologie)",
+"UEH","FMP","Medecine",3,2,"Pediatrie",
+"UEH","FMP","Medecine",3,2,"Toxicologie",
+"UEH","FMP","Medecine",4,1,"Anesthesiologie",
+"UEH","FMP","Medecine",4,1,"Cardiologie",
+"UEH","FMP","Medecine",4,1,"Chirurgie Générale",
+"UEH","FMP","Medecine",4,1,"Epidémiologie Générale",
+"UEH","FMP","Medecine",4,1,"Immunologie",
+"UEH","FMP","Medecine",4,1,"Medecine Interne",
+"UEH","FMP","Medecine",4,1,"Neurologie",
+"UEH","FMP","Medecine",4,1,"Orthopedie (Stage)",
+"UEH","FMP","Medecine",4,1,"Parasitologie",
+"UEH","FMP","Medecine",4,1,"Pédiatrie",
+"UEH","FMP","Medecine",4,1,"Physiopathologie",
+"UEH","FMP","Medecine",4,1,"Pneumologie",
+"UEH","FMP","Medecine",4,1,"Psychologie Medicale",
+"UEH","FMP","Medecine",4,1,"Radiologie",
+"UEH","FMP","Medecine",4,1,"Sémiologie Chirurgicale",
+"UEH","FMP","Medecine",4,1,"Sémiologie Rénale",
+"UEH","FMP","Medecine",4,1,"Therapeutique",
+"UEH","FMP","Medecine",4,2,"Administration de Systeme de Sante",
+"UEH","FMP","Medecine",4,2,"Anatomie Pathologique",
+"UEH","FMP","Medecine",4,2,"Medecine Communautaire Preventive et Sociale",
+"UEH","FMP","Medecine",4,2,"Ophtalmologie (Stage)",
+"UEH","FMP","Medecine",4,2,"Oto-Rhino-Laryngologie (Stage) ",
+"UEH","FMP","Medecine",4,2,"Pneumologie",
+"UEH","FMP","Medecine",4,2,"Semiologie Medicale",
+"UEH","FMP","Medecine",4,2,"Sémiologie Réspiratoire",
+"UEH","FMP","Medecine",4,2,"Traumatologie",
+"UEH","FMP","Medecine",4,"7 et 8","Anatomie / Pathologie",
+"UEH","FMP","Medecine",4,"7 et 8","Cardiologie",
+"UEH","FMP","Medecine",4,"7 et 8","Gastro-enterologie",
+"UEH","FMP","Medecine",4,"7 et 8","Obstetrique-Gynecologique",
+"UEH","FMP","Medecine",4,"7 et 8","Pédiatrie",
+"UEH","FMP","Medecine",4,"7 et 8","Psychologie Medicale",
+"UEH","FMP","Medecine",4,"7 et 8","Traumatologie",
+"UEH","FMP","Medecine",4,"7 et 8 ","Chirurgie Générale",
+"UEH","FMP","Medecine",5,1,"Cardiologie",
+"UEH","FMP","Medecine",5,1,"Medecine Legale",
+"UEH","FMP","Medecine",5,1,"Nephrologie",
+"UEH","FMP","Medecine",5,1,"Neurologie",
+"UEH","FMP","Medecine",5,1,"Ophtalmologie",
+"UEH","FMP","Medecine",5,1,"Psychiatrie",
+"UEH","FMP","Medecine",5,2,"Chirurgie",
+"UEH","FMP","Medecine",5,2,"Hématologie",
+"UEH","FMP","Medecine",5,2,"Obstetrique-Gynecologique",
+"UEH","FMP","Medecine",5,2,"Pédiatrie",
+"UEH","FMP","Medecine",5,2,"Radiologie",
+"UEH","FMP","Medecine",5,2,"Urologie",
+"UEH","FMP","Medecine",,,"Physiologie",
+"UEH","FMP","Medecine/Pharmacie",1,2,"Chimie Analytique 2",
+"UEH","FMP","Medecine/Pharmacie",1,2,"Chimie Minerale",
+"UEH","FMP","Medecine/Pharmacie",1,2,"Chimie Organique 2",
+"UEH","FMP","Medecine/Pharmacie",1,2,"Embriologie general",
+"UEH","FMP","Medecine/Pharmacie",1,2,"Francais II",
+"UEH","FMP","Medecine/Pharmacie",1,2,"Histologie",
+"UEH","FMP","Medecine/Pharmacie",1,2,"Statistiques",
+"UEH","FMP","Medecine/Pharmacie",2,1,"Chimie Organique ",
+"UEH","FMP","Medecine/Pharmacie",2,1,"Chimie physique",
+"UEH","FMP","Medecine/Pharmacie",2,1,"Pharmacie chimique minerale",
+"UEH","FMP","Medecine/Pharmacie",2,1,"Pharmacie Galenique",
+"UEH","FMP","Medecine/Pharmacie",2,1,"Pharmacologie",
+"UEH","FMP","Medecine/Pharmacie",2,1,"Physiologie",
+"UEH","FMP","Medecine/Pharmacie",2,1,"Taxonomie Vegetale",
+"UEH","FMP","Medecine/Pharmacie",1,2,"Physiques 2",
+"UEH","FMP","Pharmacie",1,2,"Chimie Minerale",
+"UEH","FMP","Pharmacie",2,1,"Biochimie Métabolique",
+"UEH","FMP","Pharmacie",2,2,"Biologie Cellulaire",
+"UEH","FMP","Pharmacie",3,1,"Ginecologie 1",
+"UEH","FMP","Pharmacie",3,1,"Ginecologie Obstretique(pratique)",
+"UEH","FMP","Pharmacie",3,1,"Medecine CPS",
+"UEH","FMP","Pharmacie",3,1,"Obstetrique",
+"UEH","FMP","Pharmacie",3,1,"Pathologie chirurgicale(Chirurgie generale)",
+"UEH","FMP","Pharmacie",3,2,"Dermatologie ",
+"UEH","FMP","Pharmacie",3,2,"Ginecologie 2",
+"UEH","FMP","Pharmacie",3,2,"Medecine CPS",
+"UEH","FMP","Pharmacie",3,2,"Neurologie",
+"UEH","FMP","Pharmacie",4,1,"Pharmacologie Fondamentale",
+"UEH","FMP","Pharmacie",4,2,"Biochimie Clinique",
+"UEH","FMP","Pharmacie",4,2,"Pharmacologie",
+"UEH","FMP","Pharmacie",4,7,"Pharmacologie ",
+"UEH","FMP","Pharmacie",5,2,"Bioethique et Deontologie",
+"UEH","FMP","Pharmacie",5,2,"Dermatologie",
+"UEH","FMP","Pharmacie",5,2,"Toxicologie",
+"UEH","FMP","Pharmacie",,,"Chimie Analytique",
+"UEH","FO","Médecine dentaire",1,"n/a","Anatomie dentaire",
+"UEH","FO","Médecine dentaire",1,"n/a","Anatomie generale",
+"UEH","FO","Médecine dentaire",1,"n/a","Biologie cellulaire",
+"UEH","FO","Médecine dentaire",1,"n/a","Biologie generale",
+"UEH","FO","Médecine dentaire",1,"n/a","Biologie moleculaire",
+"UEH","FO","Médecine dentaire",1,"n/a","Chimie generale",
+"UEH","FO","Médecine dentaire",1,"n/a","Chimie organique",
+"UEH","FO","Médecine dentaire",1,"n/a","Genetique",
+"UEH","FO","Médecine dentaire",1,"n/a","Histologie generale",
+"UEH","FO","Médecine dentaire",1,"n/a","Hygiene dentaire",
+"UEH","FO","Médecine dentaire",1,"n/a","Mathematiques",
+"UEH","FO","Médecine dentaire",1,"n/a","Physique",
+"UEH","FO","Médecine dentaire",2,"n/a","Anatomie tete et cou",
+"UEH","FO","Médecine dentaire",2,"n/a","Biochimie",
+"UEH","FO","Médecine dentaire",2,"n/a","Bioethique",
+"UEH","FO","Médecine dentaire",2,"n/a","Control de l'infection",
+"UEH","FO","Médecine dentaire",2,"n/a","Epidemiologie",
+"UEH","FO","Médecine dentaire",2,"n/a","Espagnol",
+"UEH","FO","Médecine dentaire",2,"n/a","Histologie generale",
+"UEH","FO","Médecine dentaire",2,"n/a","Materiaux dentaires",
+"UEH","FO","Médecine dentaire",2,"n/a","Microbiologie",
+"UEH","FO","Médecine dentaire",2,"n/a","Physiologie",
+"UEH","FO","Médecine dentaire",2,"n/a","Physiologie Generale",
+"UEH","FO","Médecine dentaire",2,"n/a","Radiologie",
+"UEH","FO","Médecine dentaire",2,"n/a","Radiologie dentaire",
+"UEH","FO","Médecine dentaire",2,"n/a","Statistiques",
+"UEH","FO","Médecine dentaire",3,"n/a","Anesthesiologie",
+"UEH","FO","Médecine dentaire",3,"n/a","Chirurgie buccale",
+"UEH","FO","Médecine dentaire",3,"n/a","Dentisterie operatoire",
+"UEH","FO","Médecine dentaire",3,"n/a","Diagnostic",
+"UEH","FO","Médecine dentaire",3,"n/a","Endodontie",
+"UEH","FO","Médecine dentaire",3,"n/a","Immunologie",
+"UEH","FO","Médecine dentaire",3,"n/a","Materiaux dentaires",
+"UEH","FO","Médecine dentaire",3,"n/a","Paradontologie",
+"UEH","FO","Médecine dentaire",3,"n/a","Pathologie dentaire",
+"UEH","FO","Médecine dentaire",3,"n/a","Pharmacologie",
+"UEH","FO","Médecine dentaire",3,"n/a","Physiopathologie",
+"UEH","FO","Médecine dentaire",3,"n/a","Prothese partielle fixe",
+"UEH","FO","Médecine dentaire",3,"n/a","Prothese Totale",
+"UEH","FO","Médecine dentaire",3,"n/a","Semeiologie",
+"UEH","FO","Médecine dentaire",4,"n/a","Amalgame",
+"UEH","FO","Médecine dentaire",4,"n/a","Composite",
+"UEH","FO","Médecine dentaire",4,"n/a","Dentisterie communautaire",
+"UEH","FO","Médecine dentaire",4,"n/a","Dentisterie preventive",
+"UEH","FO","Médecine dentaire",4,"n/a","Endodontie",
+"UEH","FO","Médecine dentaire",4,"n/a","Orthodontie preventive",
+"UEH","FO","Médecine dentaire",4,"n/a","Pathologie buccale",
+"UEH","FO","Médecine dentaire",4,"n/a","Pedodontie",
+"UEH","FO","Médecine dentaire",4,"n/a","Petite chirurgie",
+"UEH","FO","Médecine dentaire",4,"n/a","Pharmacologie",
+"UEH","FO","Médecine dentaire",4,"n/a","Prothese Partielle Amovible",
+"UEH","FO","Médecine dentaire",4,"n/a","Prothese partielle fixe",
+"UEH","FO","Médecine dentaire",4,"n/a","Prothese Totale",
+"UEH","FO","Médecine dentaire",5,"n/a","Chirurgie ",
+"UEH","FO","Médecine dentaire",5,"n/a","Clinique diagnostic",
+"UEH","FO","Médecine dentaire",5,"n/a","Clinique II",
+"UEH","FO","Médecine dentaire",5,"n/a","Clinique PPF",
+"UEH","FO","Médecine dentaire",5,"n/a","Clinique prothese totale",
+"UEH","FO","Médecine dentaire",5,"n/a","Dentisterie communautaire II",
+"UEH","FO","Médecine dentaire",5,"n/a","Droit medical",
+"UEH","FO","Médecine dentaire",5,"n/a","Neuro",
+"UEH","FO","Médecine dentaire",5,"n/a","Occlusion",
+"UEH","FO","Médecine dentaire",5,"n/a","Orthodontie I(Theorie)",
+"UEH","FO","Médecine dentaire",5,"n/a","Techniques chirurgicales",
+"UEH","CTPEA","Statistique",3,1,"Caclcul differentiel",
+"UEH","CTPEA","Statistique",3,1,"Demographie II",
+"UEH","CTPEA","Statistique",3,1,"Econometrie I",
+"UEH","CTPEA","Statistique",3,1,"Informatique III",
+"UEH","CTPEA","Statistique",3,1,"Integration et mesure ",
+"UEH","CTPEA","Statistique",3,1,"Macroéconomie II",
+"UEH","CTPEA","Statistique",3,1,"MIcroéconomie II",
+"UEH","CTPEA","Statistique",3,1,"Recherche Operationel",
+"UEH","CTPEA","Statistique",3,1,"Statistique appliquees (Atelier)",
+"ESIH","Comptabilité - Economie - Gestion","Gestion",4,1,"Controle de Gestion ","GES0701"
+"ESIH","Comptabilité - Economie - Gestion","Gestion",4,1,"Gestion de la Qualité Totale ","GES0703"
+"ESIH","Comptabilité - Economie - Gestion","Gestion",4,1,"Gestion des PME ()","GES0702"
+"ESIH","Comptabilité - Economie - Gestion","Gestion",4,1,"Méthodologie de la Recherche II ","CGE0701"
+"ESIH","Comptabilité - Economie - Gestion","Gestion",4,1,"Monnaie et Banque","ECO0701"
+"ESIH","Comptabilité - Economie - Gestion","Gestion",4,1,"Sociologie des Organisations ","CGE0702"
+"ESIH","Comptabilité - Economie - Gestion","Gestion",4,2,"Droit International des Affaires ","CGE0801"
+"ESIH","Comptabilité - Economie - Gestion","Gestion",4,2,"E-Commerce ","INF0801"
+"ESIH","Comptabilité - Economie - Gestion","Gestion",4,2,"Gestion de la Production ","INF0803"
+"ESIH","Comptabilité - Economie - Gestion","Gestion",4,2,"Gestion et Résolution des Conflits ","GES0801"
+"ESIH","Comptabilité - Economie - Gestion","Gestion",4,2,"Marketing International ","GES0802"
+"ESIH","Comptabilité - Economie - Gestion","Gestion",4,2,"Processus Décisionnel ","GES0801"
+"ESIH","Comptabilité - Economie - Gestion","Gestion",4,2,"TFE ","TFE0801"
+"ESIH","Comptabilité - Economie - Gestion","Sciences comptables",4,1,"Comptabilité Spécialisée I ","CPT0701"
+"ESIH","Comptabilité - Economie - Gestion","Sciences comptables",4,1,"Fiscalité II ","ECO0702"
+"ESIH","Comptabilité - Economie - Gestion","Sciences comptables",4,1,"Méthodologie de la Recherche II  ","CGE0701"
+"ESIH","Comptabilité - Economie - Gestion","Sciences comptables",4,1,"Monnaie et Banque ","ECO0701"
+"ESIH","Comptabilité - Economie - Gestion","Sciences comptables",4,1,"Théorie et Plan Comptable ","CPT0703"
+"ESIH","Comptabilité - Economie - Gestion","Sciences comptables",4,1,"Vérification I ","CPT0702"
+"ESIH","Comptabilité - Economie - Gestion","Sciences comptables",4,1,"Vérification II ","CPT0704"
+"ESIH","Comptabilité - Economie - Gestion","Sciences comptables",4,2,"Comptabilité Nationale ","CPT0803"
+"ESIH","Comptabilité - Economie - Gestion","Sciences comptables",4,2,"Comptabilité Spécialisée II ","CPT0801"
+"ESIH","Comptabilité - Economie - Gestion","Sciences comptables",4,2,"E-Commerce ","INF0801"
+"ESIH","Comptabilité - Economie - Gestion","Sciences comptables",4,2,"Fiscalité III ","ECO0801"
+"ESIH","Comptabilité - Economie - Gestion","Sciences comptables",4,2,"Gestion et Résolution des Conflits ","GES0801"
+"ESIH","Comptabilité - Economie - Gestion","Sciences comptables",4,2,"TFE ","TFE0801"
+"ESIH","Comptabilité - Economie - Gestion","Sciences comptables",4,2,"Vérification III ","CPT0802"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",1,1,"Introduction à l'Informatique ","INF0101"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",1,1,"Mathématiques pour la décision ","MAT0102"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",1,1,"Methodologie de la Recherche ","CGE0102"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",1,1,"Principes Comptables I ","CPT0101"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",1,1,"Principes d'Administration ","GES0101"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",1,1,"Statistiques Descriptives ","MAT0101"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",1,1,"Techniques d'Expressions Francaises  ","CGE0101"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",1,2,"Anglais Commercial ","CGE0201"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",1,2,"Internet et Moteur de Recherche ","INF0201"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",1,2,"Introduction à l'Economie ","ECO0201"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",1,2,"Introduction au Droit    ","CGE0202"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",1,2,"Mathématiques Financières ","MAT0202"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",1,2,"Principes Comptables II ","CPT0201"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",1,2,"Probabilités ","MAT0201"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",2,1,"Chiffrier Electronique ","INF0301"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",2,1,"Correspondance Administrative ","CGE0301"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",2,1,"Gestion Financière I ","GES0301"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",2,1,"MacroEconomie ","ECO0301"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",2,1,"Prix de Revient I ","CPT0301"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",2,1,"Recherche Opérationnelle I ","MAT0301"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",2,1,"Sociologie Générale ","CGE0302"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",2,2,"Anglais 2 ","CGE0401"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",2,2,"Comptabilité Analytique ","CPT0402"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",2,2,"Droit Social ","CGE0402"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",2,2,"Gestion des Ressources Humaines ","GES0401"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",2,2,"Gestion Financière II ","GES0402"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",2,2,"Introduction au Marketing ","GES0403"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",2,2,"Logiciels Comptables ","CPT0401"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",2,2,"MicroEconomie ","ECO0401"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",2,2,"Recherche Opérationnelle II ","MAT0401"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",3,1,"Budgétisation ","ECO0501"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",3,1,"Comportement Organisationnel ","GES0501"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",3,1,"Comptabilité Intermédiaire I ","CPT0501"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",3,1,"Droit Commercial  ","CGE0501"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",3,1,"Prix de Revient II ","CPT0502"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",3,1,"SGBD ","INF0501"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",3,2,"Access ","INF0602"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",3,2,"Analyse Financière ","GES0601"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",3,2,"Comptabilité Intermédiaire II ","CPT0601"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",3,2,"Création d'Entreprises ","GES0602"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",3,2,"Fiscalité I ","ECO0601"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",3,2,"Gestion des Projets ","GES0603"
+"ESIH","Comptabilité - Economie - Gestion","Sciences de l'entreprise",3,2,"MIS  ","INF0601"
+"ESIH","Informatique","Sciences informatiques",1,1,"Administration Systeme Windows",
+"ESIH","Informatique","Sciences informatiques",1,1,"Algebre Lineaire 1",
+"ESIH","Informatique","Sciences informatiques",1,1,"Analyse Geometrique",
+"ESIH","Informatique","Sciences informatiques",1,1,"Calcul I",
+"ESIH","Informatique","Sciences informatiques",1,1,"Calcul Integral I ",
+"ESIH","Informatique","Sciences informatiques",1,1,"Cinematique",
+"ESIH","Informatique","Sciences informatiques",1,1,"Electrostatique",
+"ESIH","Informatique","Sciences informatiques",1,1,"Francais ",
+"ESIH","Informatique","Sciences informatiques",1,1,"Mathématiques",
+"ESIH","Informatique","Sciences informatiques",1,1,"MS Office",
+"ESIH","Informatique","Sciences informatiques",1,1,"Statistiques",
+"ESIH","Informatique","Sciences informatiques",1,1,"Techniques d'expression anglaise",
+"ESIH","Informatique","Sciences informatiques",1,2,"Alegre lineaire II",
+"ESIH","Informatique","Sciences informatiques",1,2,"Calcul II",
+"ESIH","Informatique","Sciences informatiques",1,2,"Calcul integral II",
+"ESIH","Informatique","Sciences informatiques",1,2,"Cinematique",
+"ESIH","Informatique","Sciences informatiques",1,2,"Francais ",
+"ESIH","Informatique","Sciences informatiques",1,2,"Intégral II",
+"ESIH","Informatique","Sciences informatiques",1,2,"Introduction a l'informatique II",
+"ESIH","Informatique","Sciences informatiques",1,2,"Programmation Fondamentale I",
+"ESIH","Informatique","Sciences informatiques",1,2,"Technique d'expressions anlglaise",
+"ESIH","Informatique","Sciences informatiques",2,1,"Anglais",
+"ESIH","Informatique","Sciences informatiques",2,1,"Circuits Logiques",
+"ESIH","Informatique","Sciences informatiques",2,1,"Equations Différentielles   ",
+"ESIH","Informatique","Sciences informatiques",2,1,"Internet et HTML",
+"ESIH","Informatique","Sciences informatiques",2,1,"Mathématiques Discrètes ",
+"ESIH","Informatique","Sciences informatiques",2,1,"Programmation en C++",
+"ESIH","Informatique","Sciences informatiques",2,1,"Programmation Fondamentale II",
+"ESIH","Informatique","Sciences informatiques",2,2,"Analyse Vectorielle",
+"ESIH","Informatique","Sciences informatiques",2,2,"Anglais",
+"ESIH","Informatique","Sciences informatiques",2,2,"Circuit Maker ",
+"ESIH","Informatique","Sciences informatiques",2,2,"Circuits Logiques II",
+"ESIH","Informatique","Sciences informatiques",2,2,"Circuits Logiques II (Circuit Maker)",
+"ESIH","Informatique","Sciences informatiques",2,2,"Economie",
+"ESIH","Informatique","Sciences informatiques",2,2,"Probabilité  ",
+"ESIH","Informatique","Sciences informatiques",2,2,"Structure de Données en C",
+"ESIH","Informatique","Sciences informatiques",3,1,"Analyse des Circuits",
+"ESIH","Informatique","Sciences informatiques",3,1,"Architecture des Ordinateurs ",
+"ESIH","Informatique","Sciences informatiques",3,1,"Electronique Numerique",
+"ESIH","Informatique","Sciences informatiques",3,1,"Linux",
+"ESIH","Informatique","Sciences informatiques",3,1,"Micro-Processeurs",
+"ESIH","Informatique","Sciences informatiques",3,1,"Programmation Linéaire  ",
+"ESIH","Informatique","Sciences informatiques",3,1,"Réseaux I ",
+"ESIH","Informatique","Sciences informatiques",3,1,"Statistiques-Mathématiques ",
+"ESIH","Informatique","Sciences informatiques",3,1,"Systeme d'Exploitation des Ordinateurs",
+"ESIH","Informatique","Sciences informatiques",3,1,"Visual Basic",
+"ESIH","Informatique","Sciences informatiques",3,2,"Algorithme et Programmation en Java",
+"ESIH","Informatique","Sciences informatiques",3,2,"Analyse Numérique",
+"ESIH","Informatique","Sciences informatiques",3,2,"Electronique Analogique I",
+"ESIH","Informatique","Sciences informatiques",3,2,"Infographie",
+"ESIH","Informatique","Sciences informatiques",3,2,"Recherche Operationnelle",
+"ESIH","Informatique","Sciences informatiques",3,2,"Réseaux II",
+"ESIH","Informatique","Sciences informatiques",4,1,"Administration Reseau Linux",
+"ESIH","Informatique","Sciences informatiques",4,1,"Analyse des Signaux",
+"ESIH","Informatique","Sciences informatiques",4,1,"Automates",
+"ESIH","Informatique","Sciences informatiques",4,1,"Electronique Analogique",
+"ESIH","Informatique","Sciences informatiques",4,1,"Java Avancé",
+"ESIH","Informatique","Sciences informatiques",4,1,"Management Information Systems",
+"ESIH","Informatique","Sciences informatiques",4,1,"Systeme de Gestion de Base de Donnees",
+"ESIH","Informatique","Sciences informatiques",4,2,"Analyse des Signaux",
+"ESIH","Informatique","Sciences informatiques",4,2,"Comptabilité  Générale",
+"ESIH","Informatique","Sciences informatiques",4,2,"Electronique Analogique III",
+"ESIH","Informatique","Sciences informatiques",4,2,"Génie Logiciel",
+"ESIH","Informatique","Sciences informatiques",4,2,"Oracle",
+"ESIH","Informatique","Sciences informatiques",4,2,"Programmation Réseaux en Java",
+"ESIH","Informatique","Sciences informatiques",4,2,"Réseaux III",
+"UNDH","ESI","Sciences Infirmières",1,1,"Anatomie",
+"UNDH","ESI","Sciences Infirmières",1,1,"Anglais",
+"UNDH","ESI","Sciences Infirmières",1,1,"Anthropologie Medicale",
+"UNDH","ESI","Sciences Infirmières",1,1,"Biologie",
+"UNDH","ESI","Sciences Infirmières",1,1,"Chimie",
+"UNDH","ESI","Sciences Infirmières",1,1,"Espagnol",
+"UNDH","ESI","Sciences Infirmières",1,1,"Ethique Professionnelle",
+"UNDH","ESI","Sciences Infirmières",1,1,"Francais",
+"UNDH","ESI","Sciences Infirmières",1,1,"Histoire de la Profession ",
+"UNDH","ESI","Sciences Infirmières",1,1,"Hygiene personelle",
+"UNDH","ESI","Sciences Infirmières",1,1,"Initiation Informatique",
+"UNDH","ESI","Sciences Infirmières",1,1,"Langage des Signes",
+"UNDH","ESI","Sciences Infirmières",1,1,"Nursing",
+"UNDH","ESI","Sciences Infirmières",1,1,"Puericulture",
+"UNDH","ESI","Sciences Infirmières",1,1,"Secourisme & Pre-desastre",
+"UNDH","ESI","Sciences Infirmières",1,1,"Theologie Fondamentale",
+"UNDH","ESI","Sciences Infirmières",1,2,"Anatomie",
+"UNDH","ESI","Sciences Infirmières",1,2,"Anglais",
+"UNDH","ESI","Sciences Infirmières",1,2,"Anthropologie Chretienne",
+"UNDH","ESI","Sciences Infirmières",1,2,"Anthropologie Medicale",
+"UNDH","ESI","Sciences Infirmières",1,2,"Biologie",
+"UNDH","ESI","Sciences Infirmières",1,2,"Chimie organique",
+"UNDH","ESI","Sciences Infirmières",1,2,"Espagnol",
+"UNDH","ESI","Sciences Infirmières",1,2,"Ethique Professionnelle",
+"UNDH","ESI","Sciences Infirmières",1,2,"Francais",
+"UNDH","ESI","Sciences Infirmières",1,2,"Genetique",
+"UNDH","ESI","Sciences Infirmières",1,2,"Initiation Informatique",
+"UNDH","ESI","Sciences Infirmières",1,2,"Methodologie quantitative",
+"UNDH","ESI","Sciences Infirmières",1,2,"Nursing Pratique",
+"UNDH","ESI","Sciences Infirmières",1,2,"Nursing theorique",
+"UNDH","ESI","Sciences Infirmières",1,2,"Puericulture",
+"UNDH","ESI","Sciences Infirmières",1,2,"Secourisme & Pre-desastre",
+"UNDH","ESI","Sciences Infirmières",2,1,"Anatomie",
+"UNDH","ESI","Sciences Infirmières",2,1,"Anglais",
+"UNDH","ESI","Sciences Infirmières",2,1,"Francais",
+"UNDH","ESI","Sciences Infirmières",2,1,"Informatiques",
+"UNDH","ESI","Sciences Infirmières",2,1,"Langage des Signes",
+"UNDH","ESI","Sciences Infirmières",2,1,"Microbiologie",
+"UNDH","ESI","Sciences Infirmières",2,1,"Nursing",
+"UNDH","ESI","Sciences Infirmières",2,1,"Pathologie",
+"UNDH","ESI","Sciences Infirmières",2,1,"Physiologie",
+"UNDH","ESI","Sciences Infirmières",2,1,"Posologie/Pharmacologie",
+"UNDH","ESI","Sciences Infirmières",2,1,"Psychologie",
+"UNDH","ESI","Sciences Infirmières",2,1,"Puericulture",
+"UNDH","ESI","Sciences Infirmières",2,1,"Semiologie",
+"UNDH","ESI","Sciences Infirmières",2,1,"Stage pratique",
+"UNDH","ESI","Sciences Infirmières",2,2,"Communication",
+"UNIQ","FSED","Sciences de l'education",1,1,"Definition et elaboration des objectifs","ENS-107"
+"UNIQ","FSED","Sciences de l'education",1,1,"Histoire des Idees Pedagogiques","EDU-102"
+"UNIQ","FSED","Sciences de l'education",1,1,"Statistique Appliquee a l' Education","MAT-146"
+"UNIQ","FSED","Sciences de l'education",1,1,"Systemes educatif haitiens ou evolution et structure ","EDU-111"
+"UNIQ","FSED","Sciences de l'education",1,1,"Techniques d' Expression Francaise","FGB-102"
+"UNIQ","FSED","Sciences de l'education",1,2,"Didactique general ","DID-101"
+"UNIQ","FSED","Sciences de l'education",1,2,"Introduction a la Sociologie","FGB-113"
+"UNIQ","FSED","Sciences de l'education",1,2,"Mesure et Evaluation de l' Apprentissage","ENS-105"
+"UNIQ","FSED","Sciences de l'education",1,2,"Psychologie generale","PSY-101"
+"UNIQ","FSED","Sciences de l'education",1,2,"Tecnique d'expression Creole ","FGB-101"
+"UNIQ","FSED","Sciences de l'education",2,1,"Informatique Appliquée a l'Education","INF-108"
+"UNIQ","FSED","Sciences de l'education",2,1,"Introduction a l'Analyse Qualitative","MET-110"
+"UNIQ","FSED","Sciences de l'education",2,1,"Metodologie generale","FGB-103"
+"UNIQ","FSED","Sciences de l'education",2,1,"Phylosofie de l'education ","EDU-100"
+"UNIQ","FSED","Sciences de l'education",2,1,"Planification de Cours","EDU-108"
+"UNIQ","FSED","Sciences de l'education",2,1,"Psycopedagogie des apprentissages","PSY-103"
+"UNIQ","FSED","Sciences de l'education",2,2,"Animation de Groupe Scolaire","ENS-100"
+"UNIQ","FSED","Sciences de l'education",2,2,"Difference individuelle a l'ecole ","Psy-104"
+"UNIQ","FSED","Sciences de l'education",2,2,"Ecole Famille et Societe ou sociologie de l'education ","EDU-106"
+"UNIQ","FSED","Sciences de l'education",2,2,"Introduction a l'Analyse Quantitative ","MET-120"
+"UNIQ","FSED","Sciences de l'education",2,2,"Les Courants Pedagogiques Contemporains","LIH-209"
+"UNIQ","FSED","Sciences de l'education",3,1,"Droit educatif et scolaire","EDU-109"
+"UNIQ","FSED","Sciences de l'education",3,1,"Methode de Recherche","MET-130"
+"UNIQ","FSED","Sciences de l'education",3,1,"Micro enseignement","STP-100"
+"UNIQ","FSED","Sciences de l'education",3,1,"Production de materiel pedagogiques ou fabrication de materiel pedagogique ","DID-110"
+"UNIQ","FSED","Sciences de l'education",3,1,"Stage Administratif","SED-291"
+"UNIQ","FSED","Sciences de l'education",3,2,"Epistemologie des sciences de l'education ","MET-140"
+"UNIQ","FSED","Sciences de l'education",3,2,"Ethique professionel ","FGB-104"
+"UNIQ","FSED","Sciences de l'education",3,2,"Gestion de la Salle de Classe","ENS-209"
+"UNIQ","FSED","Sciences de l'education",3,2,"Leadership et Supervision","ADM-224"
+"UNIQ","FSED","Sciences de l'education",3,2,"Les Didactiques Disciplinaires","DID-102"
+"UNIQ","FSED","Sciences de l'education",3,2,"Projet de fin d'etudes en education ","SED-299"
+"UNIQ","FSED","Sciences de l'education",3,2,"Seminaire de Redaction de Projet ","SED-298"
+"UEH","FAMV","Tronc commun",1,1,"Biologie Generale",
+"UEH","FAMV","Tronc commun",1,1,"Chimie generale et minerale",
+"UEH","FAMV","Tronc commun",1,1,"Dessin techniques 1 et 2",
+"UEH","FAMV","Tronc commun",1,1,"Francais 1 et 2",
+"UEH","FAMV","Tronc commun",1,1,"Geologie generale",
+"UEH","FAMV","Tronc commun",1,1,"Introduction a l'Agriculture I et II",
+"UEH","FAMV","Tronc commun",1,1,"Mathematiques I et II",
+"UEH","FAMV","Tronc commun",1,1,"Physiques I et II ",
+"UEH","FAMV","Tronc commun",1,1,"Physqie I et II ",
+"UEH","FAMV","Tronc commun",1,1,"Travaux pratiques et agricole I et II ",
+"UEH","FAMV","Tronc commun",1,1,"Zoologie generale ",
+"UEH","FAMV","Tronc commun",1,2,"Botanique I ",
+"UEH","FAMV","Tronc commun",1,2,"Chimie Organique",
+"UEH","FAMV","Tronc commun",1,2,"Dessin techniques 1 et 2",
+"UEH","FAMV","Tronc commun",1,2,"Francais 1 et 2",
+"UEH","FAMV","Tronc commun",1,2,"Introduction a l'Agriculture I et II",
+"UEH","FAMV","Tronc commun",1,2,"Mathematiques I et II",
+"UEH","FAMV","Tronc commun",2,1,"Agriculture I et II ",
+"UEH","FAMV","Tronc commun",2,1,"Biochimie Generale I et II ",
+"UEH","FAMV","Tronc commun",2,1,"Botanique II (Taxonomie)",
+"UEH","FAMV","Tronc commun",2,1,"Introduction a l'informatique I et II",
+"UEH","FAMV","Tronc commun",2,1,"Mathematiques III et IV",
+"UEH","FAMV","Tronc commun",2,1,"Microbiologie Generale",
+"UEH","FAMV","Tronc commun",2,1,"Microeconomie",
+"UEH","FAMV","Tronc commun",2,1,"Physique III et IV",
+"UEH","FAMV","Tronc commun",2,1,"Science du sol ",
+"UEH","FAMV","Tronc commun",2,1,"Statistiques I et II ",
+"UEH","FAMV","Tronc commun",2,1,"Travaux pratiques agricoles III et IV",
+"UEH","FAMV","Tronc commun",2,2,"Agriculture I et II ",
+"UEH","FAMV","Tronc commun",2,2,"Anatomie Animal",
+"UEH","FAMV","Tronc commun",2,2,"Biochimie Generale I et II ",
+"UEH","FAMV","Tronc commun",2,2,"Entomologie General",
+"UEH","FAMV","Tronc commun",2,2,"Genetique Qualitative",
+"UEH","FAMV","Tronc commun",2,2,"Introduction a l'informatique I et II",
+"UEH","FAMV","Tronc commun",2,2,"Macro economie I ",
+"UEH","FAMV","Tronc commun",2,2,"Mathematiques III et IV",
+"UEH","FAMV","Tronc commun",2,2,"Physiologie animal",
+"UEH","FAMV","Tronc commun",2,2,"Physiologie vegetale",
+"UEH","FAMV","Tronc commun",2,2,"Physique III et IV",
+"UEH","FAMV","Tronc commun",2,2,"Sociologie generale",
+"UEH","FAMV","Tronc commun",2,2,"Statistique I et II ",
+"UEH","FAMV","Tronc commun",2,2,"Travaux pratiques agricoles III et IV",
+"UEH","FAMV","Tronc commun",3,1,"Ecologie Genrale",
+"UEH","FAMV","Tronc commun",3,1,"Economie Rurale",
+"UEH","FAMV","Tronc commun",3,1,"Enthomologie economique",
+"UEH","FAMV","Tronc commun",3,1,"Geographie Economique",
+"UEH","FAMV","Tronc commun",3,1,"Hydrologie generale",
+"UEH","FAMV","Tronc commun",3,1,"Informatique I et II",
+"UEH","FAMV","Tronc commun",3,1,"Pathologie Générale",
+"UEH","FAMV","Tronc commun",3,1,"Propagation generale",
+"UEH","FAMV","Tronc commun",3,1,"Sociologie rurale",
+"UEH","FAMV","Tronc commun",3,1,"Systemes agraires",
+"UEH","FAMV","Tronc commun",3,1,"Technologie post Récolte",
+"UEH","FAMV","Tronc commun",3,1,"Topographie ",
+"UEH","FAMV","Tronc commun",3,2,"Agronomie I",
+"UEH","FAMV","Tronc commun",3,2,"Carthographie et Photo interpretation I ",
+"UEH","FAMV","Tronc commun",3,2,"Chimie et fertilisation des sols",
+"UEH","FAMV","Tronc commun",3,2,"Complement de mathematique",
+"UEH","FAMV","Tronc commun",3,2,"Conservation des ressources naturelles",
+"UEH","FAMV","Tronc commun",3,2,"Element de comptabilite et de gestion",
+"UEH","FAMV","Tronc commun",3,2,"Informatique I et II",
+"UEH","FAMV","Tronc commun",3,2,"Intro a l'agro-entreprenariat ",
+"UEH","FAMV","Tronc commun",3,2,"Irrigation et drainage",
+"UEH","FAMV","Tronc commun",3,2,"Methodologie et technique de la recherche I ",
+"UEH","FAMV","Tronc commun",3,2,"Nutrition Humaine",
+"UEH","FAMV","Tronc commun",3,2,"Science horticoltes",
+"UEH","FAMV","Tronc commun",3,2,"Zootechnie Generale",
+"UEH","FDS","EN/EM",1,2,"Circuit Electrique",
+"UEH","FDS","EN/EM",1,2,"Vibrations",
+"UEH","FDS","EN/EM",1,"1 et 2","Circuit Electrique",
+"UEH","FDS","EN/EM",1,"1,2,3","Asservissement",
+"UEH","FDS","EN/EM",1,"1,2,3","Circuit Electrique",
+"UEH","FDS","EN/EM",1,"1,2,3","Circuits Logiques",
+"UEH","FDS","EN/EM",1,"1,2,3","Electronique Analogique",
+"UEH","FDS","EN/EM",1,"1,2,3","Electronique de Puissance",
+"UEH","FDS","EN/EM",1,"1,2,3","Electrotechnique ",
+"UEH","FDS","EN/EM",1,"1,2,3","Installations Electriques",
+"UEH","FDS","EN/EM",1,"1,2,3","Systeme Asservissement",
+"UEH","FDS","EN/EM",1,"1,2,3","Theorie de Signal",
+"UEH","FDS","GC/EM/AR",1,"1,2,3","Mécanique des Fluides",
+"UEH","FDS","GC/EM/AR",2,1,"Mécanique des Materiaux",
+"UEH","FDS","GC/EM/EN",2,1,"Analyse Numérique",
+"UEH","FDS","GC/EM/EN",2,1,"Probabilités et Statistiques",
+"UEH","FDS","GC/EM/EN",2,1,"Statistiques",
+"UEH","FDS","GC/EM/EN/AR",2,1,"Analyse Numérique",
+"UEH","FDS","GC/EM/EN/AR",2,2,"Microeconomie",
+"UEH","FDS","GC/EM/EN/AR",2,2,"Structures de Données",
+"UEH","FDS","GC/EN/EM",2,2,"Mathématiques de l'Ingénieur",
+"UEH","FDS","Genie et MPC",4,2,"Programmation",
+"UEH","FDS","MPC",1,1,"Chimie",
+"UEH","FDS","MPC",1,1,"Mécanique",
+"UEH","FDS","MPC",1,1,"Physique",
+"UEH","FDS","MPC",1,1,"Programmation",
+"UEH","FDS","MPC",1,1,"Thermodynamique",
+"UEH","FDS","MPC",1,1,"Thermophysique",
+"UEH","FDS","MPC",1,2,"Algèbre",
+"UEH","FDS","MPC",1,2,"Analyse",
+"UEH","FDS","MPC",1,2,"Electronique",
+"UEH","FDS","MPC",1,2,"Géometrie",
+"UEH","FDS","MPC",1,2,"Physique",
+"UEH","FDS","MPC",4,1,"Algèbre",
+"UEH","FDS","MPC",4,1,"Chimie",
+"UEH","FDS","MPC",4,1,"Physique",
+"UEH","FDS","MPC",4,1,"Statistiques",
+"UEH","FDS","MPC",5,1,"Algèbre",
+"UEH","FDS","MPC",5,1,"Analyse",
+"UEH","FDS","MPC",5,1,"Anglais",
+"UEH","FDS","MPC",5,1,"Chimie",
+"UEH","FDS","MPC",5,1,"Chimie Cinétique",
+"UEH","FDS","MPC",5,1,"Dessin Technique",
+"UEH","FDS","MPC",5,1,"Géologie",
+"UEH","FDS","MPC",5,1,"Mathématiques ",
+"UEH","FDS","MPC",5,1,"Physique",
+"UEH","FDS","MPC",5,1,"Physique Conceptuelle",
+"UEH","FDS","MPC",5,2,"Algèbre",
+"UEH","FDS","MPC",5,2,"Algèbre et Géometrie",
+"UEH","FDS","MPC",5,2,"Analyse",
+"UEH","FDS","MPC",5,2,"Chimie",
+"UEH","FDS","MPC",5,2,"Chimie Generale",
+"UEH","FDS","MPC",5,2,"Electromagnetisme",
+"UEH","FDS","MPC",5,2,"Géometrie",
+"UEH","FDS","MPC",5,2,"Géometrie Affines",
+"UEH","FDS","MPC",5,2,"Géometrie Analytique",
+"UEH","FDS","MPC",5,2,"Mécanique",
+"UEH","FDS","MPC",5,2,"Physique",
+"UEH","CTPEA","Tronc commun",1,1,"Algèbre Linéaire I",
+"UEH","CTPEA","Tronc commun",1,1,"Analyse Mathématique  I",
+"UEH","CTPEA","Tronc commun",1,1,"Anglais I",
+"UEH","CTPEA","Tronc commun",1,1,"Comptabilité pour Gestion I",
+"UEH","CTPEA","Tronc commun",1,1,"Economie I",
+"UEH","CTPEA","Tronc commun",1,1,"Statistique",
+"UEH","CTPEA","Tronc commun",1,1,"Techn. D'expression francaise",
+"UEH","CTPEA","Tronc commun",1,2,"Algèbre Linéaire II",
+"UEH","CTPEA","Tronc commun",1,2,"Analyse Mathématique II",
+"UEH","CTPEA","Tronc commun",1,2,"Anglais II",
+"UEH","CTPEA","Tronc commun",1,2,"Comptabilite pour Gestion II",
+"UEH","CTPEA","Tronc commun",1,2,"Economie II",
+"UEH","CTPEA","Tronc commun",1,2,"Espagnol ",
+"UEH","CTPEA","Tronc commun",1,2,"Probabilites I",
+"UEH","CTPEA","Tronc commun",2,1,"Algebre lineaire III",
+"UEH","CTPEA","Tronc commun",2,1,"Analyse math III",
+"UEH","CTPEA","Tronc commun",2,1,"Anglais Economique ",
+"UEH","CTPEA","Tronc commun",2,1,"Comptabilite Nationale I",
+"UEH","CTPEA","Tronc commun",2,1,"Démographie",
+"UEH","CTPEA","Tronc commun",2,1,"Informatique I",
+"UEH","CTPEA","Tronc commun",2,1,"Microéconomie I",
+"UEH","CTPEA","Tronc commun",2,1,"Probabilite II",
+"UEH","CTPEA","Tronc commun",2,2,"Algebre lineaire IV",
+"UEH","CTPEA","Tronc commun",2,2,"Analyse math IV",
+"UEH","CTPEA","Tronc commun",2,2,"Comptabilite Nationale II",
+"UEH","CTPEA","Tronc commun",2,2,"Espagnol Economique",
+"UEH","CTPEA","Tronc commun",2,2,"Informatique II",
+"UEH","CTPEA","Tronc commun",2,2,"Initiation à la Recherche",
+"UEH","CTPEA","Tronc commun",2,2,"Macroéconomie I",
+"UEH","CTPEA","Tronc commun",2,2,"Statistique Mathematique",

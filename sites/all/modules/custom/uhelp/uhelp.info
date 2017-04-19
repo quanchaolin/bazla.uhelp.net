@@ -1,0 +1,5 @@
+name = uhelp
+description = Helper module for the HELP project
+package = UHELP
+core = 7.x
+files[] =  includes/create_accounts.inc

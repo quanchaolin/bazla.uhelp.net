@@ -1,0 +1,36 @@
+<?php 
+
+function uhelp_rules_create_case($application) {
+    civicrm_initialize( );
+    //require_once 'CRM/Core/Config.php';
+    //$config =& CRM_Core_Config::singleton( );
+
+    //require_once 'api/v2/Case.php';
+
+    // create new case
+    $params = array(  
+        'sequential' => 1,
+        'case_type_id'  => '3',
+        'start_date'    => date('Y-m-d'),  
+        'status_id'      => 1, // ongoing
+    );
+         
+    dsm($application, 'my app');
+
+    return;
+
+    $new_case = civicrm_case_add( $params ); 
+/**
+    // configure new case
+    $params = array(  'case_id'          => $new_case['result'],
+    'case_type'        => 'Christmas Case',
+    'contact_id'      => 333, // the client
+    'creator_id'      => 444, // the case manager
+    'activity_subject'=> 'Jingle Bells',
+    'location'        => 'The North Pole',
+    'start_date'      => 20101225,
+    'medium_id'        => '1', //"In Person"
+    'duration'        => '',
+    'details'          => '',1    $params = array(  'case_type_id'  => '
+*/
+}

@@ -1,0 +1,139 @@
+<?php
+
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_install().
+ */
+function reservations_inventory_install() {
+  
+  reservations_inventory_add_inventory_taxonomy();
+  //reservations_inventory_add_field_to_reservable_types();
+}
+
+/**
+ * Creates vocabularies for PBCore genres, langauges, and ratings
+ */
+function reservations_inventory_add_inventory_taxonomy() {
+  
+  //check for existing reservations_inventory vocabulary
+  $vocabularies = taxonomy_get_vocabularies();
+  foreach($vocabularies as $vocab) {
+    if($vocab->machine_name == 'reservations_inventory') {
+      variable_set('reservations_inventory_vid', $vocab->vid);
+    }
+  }
+  
+  // check to see if a vocabulary named reservations_inventory already exists
+  // allows site to rename an existing vocabulary
+  
+  // Create the reservations_inventory vocabulary if it does not exist.
+  $vocabulary = taxonomy_vocabulary_load(variable_get('reservations_inventory_vid', 0));
+  if (!$vocabulary) {
+    $edit = array(
+      'name' => t('Reservations Inventory'),
+      'machine_name' => 'reservations_inventory',
+      'description' => t(''),
+      'hierarchy' => 1,
+      'module' => 'reservations_inventory',
+      'weight' => -10,
+    );
+    $vocabulary = (object) $edit;
+    taxonomy_vocabulary_save($vocabulary);
+    variable_set('reservations_inventory_vid', $vocabulary->vid);
+    
+    // Populate new vocabulary with terms
+    
+    $defatul_inventories = array(
+    'Studio',
+    'Field',
+    'Facilities',
+    );
+        
+    foreach ($genres as $term_name) {
+      $edit = array(
+        'name' => $term_name,
+        'description' => '',
+        'parent' => array(0),
+        'vid' => $vocabulary->vid,
+      );
+      $term = (object) $edit;
+      taxonomy_term_save($term);
+    }
+  }
+
+  // Create the 'pbcore_pbcore_genres' field if it doesn't already exist.
+  if (!field_info_field('field_reservations_inventory')) {
+    $field = array(
+      'field_name' => 'field_' . $vocabulary->machine_name,
+      'type' => 'taxonomy_term_reference',
+      'settings' => array(
+        'allowed_values' => array(
+          array(
+            'vocabulary' => $vocabulary->machine_name,
+            'parent' => 0,
+          ),
+        ),
+      ),
+    );
+    field_create_field($field);
+   
+    // Create the instance on the bundle.
+    $instance = array(
+      'field_name' => 'field_' . $vocabulary->machine_name,
+      'entity_type' => 'node',
+      'label' => $vocabulary->name,
+      'bundle' => 'reservations_inventory',
+      'required' => TRUE,
+      'widget' => array(
+        'type' => 'options_select',
+      ),
+      'display' => array(
+        'default' => array(
+          'type' => 'taxonomy_term_reference_link',
+         'weight' => 10,
+        ),
+        'teaser' => array(
+          'type' => 'taxonomy_term_reference_link',
+         'weight' => 10,
+        ),
+      ),
+    );
+    field_create_instance($instance);
+  }
+      
+  drupal_set_message("Reservation Inventory vocabulary and field created. You must add the field to all reservable content types for inventory to work correctly.");
+}
+
+/**
+ * Implements hook_schema().
+ */
+function reservations_inventory_schema() {
+
+  $schema['reservations_inventory_node_type'] = array(
+    'description' => 'Stores reservation inventory settings for each content types.',
+    'fields' => array(
+      'type' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => "Foreign key for {node_type}.type.",
+      ),
+      'tids' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => "array of term ids",
+      ),
+    ),
+    'primary key' => array('type'),
+  );
+
+  return $schema;
+}
+

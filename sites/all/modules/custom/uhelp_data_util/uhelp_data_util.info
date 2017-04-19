@@ -1,0 +1,6 @@
+name = UHELP Data Util
+description = Functions and methods to help cleanup data
+core = 7.x
+package = UHELP
+
+files[] = uhelp_data_util.module

@@ -39,7 +39,6 @@ function alumni_dashboard_get_field($title, $type, $req=FALSE, $states=array(),
 
 function alumni_dashboard_civicrm_post($op, $object_name, $object_id,
 				       &$object_ref) {
-  //dsm($object_ref, 'Post hook: '.$object_name.' '.$op.' '.$object_id);
   if ($object_name == 'Individual') {
     alumni_dashboard_update_employer_relationships($object_id, $object_ref);
   }
@@ -94,24 +93,33 @@ function alumni_dashboard_update_employer_relationships($contact_id,
     $employer_data[$employer_id] = isset($employer_data[$employer_id]) ?
       $employer_data[$employer_id] : array();
 
-    if (!isset($employer_data[$employer_id]['start']) ||
-	(strtotime($employer_data[$employer_id]['start']) >
-	 strtotime($fields[$employee_fields['Start']]))) {
-      $employer_data[$employer_id]['start'] =
-	$fields[$employee_fields['Start']];
-    }
+    $cached_start = isset($employer_data[$employer_id]['start']) ?
+      strtotime($employer_data[$employer_id]['start']) : NULL;
+    
+    $cached_end = isset($employer_data[$employer_id]['end']) ?
+      $employer_data[$employer_id]['end'] : NULL;
 
-    if (!isset($fields[$employee_fields['End']]) ||
-	!$fields[$employee_fields['End']]) {
+    $cached_end = ($cached_end != 'none') ? strtotime($cached_end) : 'none';
+    
+    $start = isset($fields[$employee_fields['Start']]) ?
+      strtotime($fields[$employee_fields['Start']]) : NULL;
+    $end = isset($fields[$employee_fields['End']]) ?
+      strtotime($fields[$employee_fields['End']]) : NULL;
+
+    if ((!$cached_start && $start) ||
+	($start && ($start < $cached_start))) {
+      $employer_data[$employer_id]['start'] = date('Y-m-d H:i:s',$start);
+    }
+    
+    if (!$end) {
       $employer_data[$employer_id]['end'] = 'none';
     }
-    else if (!isset($employer_data[$employer_id]['end']) ||
-	     (strtotime($employer_data[$employer_id]['end']) <
-	      strtotime($fields[$employee_fields['End']]))) {
-      $employer_data[$employer_id]['end'] =
-	$fields[$employee_fields['End']] ;
+    else if ($cached_end == 'none') {
+      //do nothing, if we have an open ending, we will keep it open
     }
-
+    else if ((!$cached_end && $end) || ($end && ($end > $cached_end))) {
+      $employer_data[$employer_id]['end'] = date('Y-m-d H:m:s',$end);
+    }
   }
 
   foreach($employer_data as $employer_id => $dates)  {
@@ -123,51 +131,59 @@ function alumni_dashboard_update_employer_relationships($contact_id,
 				 'contact_id_a' => $contact_id,
 				 'relationship_type_id' => 5,
 				 ));
+    
     if ($result && isset($result['values']) && $result['values']) {
+      $relationship = $result['values'][0];
+      $start = isset($relationship['start_date']) ? $relationship['start_date']
+	: '';
+      
+      $end = isset($relationship['end_date']) ?	$relationship['end_date'] : '';
+      
       //if relationship, compare relationship end date with latest end date
       // (or null end dat if it exists) for this employer
 
-      $should_delete = FALSE;
+      $should_update = FALSE;
       //compare start and end times, if they differ delete relationship
-      if (strtotime($result['values'][0]['start_date']) !=
-	  strtotime($dates['start'])) {
-	$should_delete = TRUE;
-      }
-      else if (isset($result['values'][0]['end_date']) &&
-	       $result['values'][0]['end_date'] && $dates['end'] == 'none'){
-	$should_delete = TRUE;
-      }
-      else if (isset($result['values'][0]['end_date']) &&
-	       $result['values'][0]['end_date'] &&
-	       strtotime($result['values'][0]['end_date']) !=
-	       strtotime($dates['end'])) {
-	$should_delete = TRUE;
+      if (strtotime($start) != strtotime($dates['start'])) {
+	$relationship['start_date'] = $dates['start'];
+	$should_update = TRUE;
       }
 
-      if (!$should_delete) {
+      if ($end && $dates['end'] == 'none'){
+	$relationship['end_date'] = '';
+	$should_update = TRUE;
+      }
+      else if ($dates['end'] &&
+	       (strtotime($date) != strtotime($dates['end']))) {
+	$relationship['end_date'] = $dates['end'];
+	$should_update = TRUE;
+      }
+
+      if (!$should_update) {
 	//if they don't differ continue
 	continue;
       }
       else {
-	$result = civicrm_api3('Relationship', 'delete',
-			       array('id'=>$result['values'][0]['id']));
+	$result = civicrm_api3('Relationship', 'create', $relationship);
       }
     }
-  
-    $parameters =
-      array(
-	    'sequential' => 1,
-	    'contact_id_a' => $contact_id,
-	    'contact_id_b' => $employer_id,
-	    'relationship_type_id' => 5,
-	    'start_date' => $dates['start'],
-	    );
-    if ($dates['end'] && $dates['end'] != 'none') {
-      $parameters['end_date'] = $dates['end'];
+    else {
+      $parameters =
+	array(
+	      'sequential' => 1,
+	      'contact_id_a' => $contact_id,
+	      'contact_id_b' => $employer_id,
+	      'relationship_type_id' => 5,
+	      'start_date' => $dates['start'],
+	      );
+      if ($dates['end'] && $dates['end'] != 'none') {
+	$parameters['end_date'] = $dates['end'];
+      }
+      //if not create a new one
+      $rel_result = civicrm_api3('Relationship', 'create', $parameters);
+
+      //if no relationship, create one
     }
-    //if not create a new one
-    $rel_result = civicrm_api3('Relationship', 'create', $parameters);
-    //if no relationship, create one
   }
 
 }

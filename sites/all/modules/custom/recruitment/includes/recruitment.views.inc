@@ -1,6 +1,6 @@
 <?php
 
-function alumni_dashboard_views_default_views() {
+function recruitment_views_default_views() {
   ////////////////////////////////////////////////////////////////////////
   //
 

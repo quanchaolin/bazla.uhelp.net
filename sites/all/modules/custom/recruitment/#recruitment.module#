@@ -1,0 +1,33 @@
+<?php
+/**
+ * @file
+ * This module will provide custom functionality for the UHELP alumni dashboard
+ */
+
+function recruitment_init() {
+  module_load_include('inc', 'recruitment', 'includes/cleanup');
+}
+
+function recruitment_menu() {
+
+  $items = array();
+
+  $items['admin/recruitment/cleanup'] =
+    array(
+	  'title' => t('Recruitment Cleanup'),
+	  'type' => MENU_CALLBACK,
+	  'page callback' => 'drupal_get_form',
+	  'page arguments' => array('recruitment_cleanup_form'),
+	  'access arguments' => array(''),
+	  );
+
+  return $items;
+}
+  
+function recruitment_views_api() {
+  return array(
+	       'api' => 3,
+	       'path' =>
+	       drupal_get_path('module', 'recruitment').'/includes'
+	       );
+}

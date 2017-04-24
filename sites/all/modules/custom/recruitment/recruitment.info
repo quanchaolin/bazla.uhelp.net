@@ -1,0 +1,4 @@
+name = recruitment
+description = Helper module for the HELP recruitment
+package = UHELP
+core = 7.x

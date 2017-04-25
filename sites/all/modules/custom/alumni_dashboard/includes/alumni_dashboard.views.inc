@@ -315,6 +315,13 @@ function alumni_dashboard_views_default_views() {
   $handler->display->display_options['filters']['start_date']['operator'] = '>=';
   $handler->display->display_options['filters']['start_date']['value']['value'] = 'now';
   $handler->display->display_options['filters']['start_date']['value']['type'] = 'offset';
+  /* Filter criterion: CiviCRM Custom: event tags: Event Audience */
+  $handler->display->display_options['filters']['event_audience_125']['id'] = 'event_audience_125';
+  $handler->display->display_options['filters']['event_audience_125']['table'] = 'civicrm_value_event_tags_32';
+  $handler->display->display_options['filters']['event_audience_125']['field'] = 'event_audience_125';
+  $handler->display->display_options['filters']['event_audience_125']['value'] = array(
+										       1 => '1',
+										       );
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
@@ -358,7 +365,6 @@ function alumni_dashboard_views_default_views() {
   $handler->display->display_options['filters']['start_date']['value']['value'] = 'now';
   $handler->display->display_options['filters']['start_date']['value']['type'] = 'offset';
   $handler->display->display_options['path'] = 'studentevents';
-  
   
   // Add view to list of views to provide.
   $views[$view->name] = $view;

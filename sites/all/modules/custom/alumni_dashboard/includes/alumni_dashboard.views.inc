@@ -300,14 +300,6 @@ function alumni_dashboard_views_default_views() {
   $handler->display->display_options['sorts']['start_date']['id'] = 'start_date';
   $handler->display->display_options['sorts']['start_date']['table'] = 'civicrm_event';
   $handler->display->display_options['sorts']['start_date']['field'] = 'start_date';
-  /* Filter criterion: CiviCRM Events: Event Type */
-  $handler->display->display_options['filters']['event_type']['id'] = 'event_type';
-  $handler->display->display_options['filters']['event_type']['table'] = 'civicrm_event';
-  $handler->display->display_options['filters']['event_type']['field'] = 'event_type';
-  $handler->display->display_options['filters']['event_type']['value'] = array(
-									       9 => '9',
-									       10 => '10',
-									       );
   /* Filter criterion: CiviCRM Events: Start Date */
   $handler->display->display_options['filters']['start_date']['id'] = 'start_date';
   $handler->display->display_options['filters']['start_date']['table'] = 'civicrm_event';

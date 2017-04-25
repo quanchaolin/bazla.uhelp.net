@@ -604,7 +604,7 @@ function alumni_dashboard_employment_form($form, &$form_state,
       array(
 	    '#type' => 'textfield',
 	    '#required' => false,
-	    '#title' => 'New Salary',
+	    '#title' => 'New Salary (Yearly)',
 	    '#prefix' => $cell,
 	    '#suffix' => '</td>',
 	    '#size' => 10,

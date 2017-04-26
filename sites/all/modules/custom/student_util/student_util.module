@@ -1,0 +1,35 @@
+<?php
+/**
+ * @file
+ * This module will provide custom functionality for the UHELP alumni dashboard
+ */
+
+function student_util_init() {
+  module_load_include('inc', 'student_util',
+  		      'includes/update_help_year');
+}
+
+function student_util_menu() {
+
+  $items = array();
+
+  $items['admin/student/help-year'] =
+    array(
+	  'title' => t('Update Student HELP Year'),
+	  'type' => MENU_CALLBACK,
+	  'page callback' => 'drupal_get_form',
+	  'page arguments' => array('student_util_help_year_form'),
+	  'access arguments' => array('access content'),
+	  );
+
+  return $items;
+}
+ 
+
+function student_util_views_api() {
+  return array(
+	       'api' => 3,
+	       'path' =>
+	       drupal_get_path('module', 'student_util').'/includes'
+	       );
+}

@@ -496,6 +496,216 @@ function alumni_dashboard_views_default_views() {
   // Add view to list of views to provide.
   $views[$view->name] = $view;
 
+
+  ////////////////////////////////////////////////////////////////////////
+  //ALUMNI CONTACT INFO
+  $view = new view();
+  $view->name = 'alumni_contact_info';
+  $view->description = '';
+  $view->tag = 'default';
+  $view->base_table = 'civicrm_contact';
+  $view->human_name = 'Alumni Contact Info';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'Contact Info';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'none';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['style_plugin'] = 'table';
+  /* Footer: Global: Text area */
+  $handler->display->display_options['footer']['area']['id'] = 'area';
+  $handler->display->display_options['footer']['area']['table'] = 'views';
+  $handler->display->display_options['footer']['area']['field'] = 'area';
+  $handler->display->display_options['footer']['area']['content'] = '<a href=\'/content/alumni-update-contact-details\'>Update Contact Info</a>';
+  $handler->display->display_options['footer']['area']['format'] = 'filtered_html';
+  /* Field: CiviCRM Contacts: Contact ID */
+  $handler->display->display_options['fields']['id']['id'] = 'id';
+  $handler->display->display_options['fields']['id']['table'] = 'civicrm_contact';
+  $handler->display->display_options['fields']['id']['field'] = 'id';
+  $handler->display->display_options['fields']['id']['label'] = '';
+  $handler->display->display_options['fields']['id']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['id']['element_label_colon'] = FALSE;
+  /* Field: CiviCRM Address: Full Street Address */
+  $handler->display->display_options['fields']['street_address']['id'] = 'street_address';
+  $handler->display->display_options['fields']['street_address']['table'] = 'civicrm_address';
+  $handler->display->display_options['fields']['street_address']['field'] = 'street_address';
+  $handler->display->display_options['fields']['street_address']['label'] = '';
+  $handler->display->display_options['fields']['street_address']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['street_address']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['street_address']['location_type'] = '0';
+  $handler->display->display_options['fields']['street_address']['location_op'] = '0';
+  $handler->display->display_options['fields']['street_address']['is_primary'] = 1;
+  /* Field: CiviCRM Address: City / Suburb */
+  $handler->display->display_options['fields']['city']['id'] = 'city';
+  $handler->display->display_options['fields']['city']['table'] = 'civicrm_address';
+  $handler->display->display_options['fields']['city']['field'] = 'city';
+  $handler->display->display_options['fields']['city']['label'] = '';
+  $handler->display->display_options['fields']['city']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['city']['alter']['alter_text'] = TRUE;
+  $handler->display->display_options['fields']['city']['alter']['text'] = '[city], ';
+  $handler->display->display_options['fields']['city']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['city']['location_type'] = '0';
+  $handler->display->display_options['fields']['city']['location_op'] = '0';
+  $handler->display->display_options['fields']['city']['is_primary'] = 1;
+  /* Field: CiviCRM Custom: Address Details: Commune */
+  $handler->display->display_options['fields']['commune_45']['id'] = 'commune_45';
+  $handler->display->display_options['fields']['commune_45']['table'] = 'civicrm_value_address_details_14';
+  $handler->display->display_options['fields']['commune_45']['field'] = 'commune_45';
+  $handler->display->display_options['fields']['commune_45']['label'] = '';
+  $handler->display->display_options['fields']['commune_45']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['commune_45']['alter']['alter_text'] = TRUE;
+  $handler->display->display_options['fields']['commune_45']['alter']['text'] = '[commune_45], ';
+  $handler->display->display_options['fields']['commune_45']['element_label_colon'] = FALSE;
+  /* Field: CiviCRM Address: State/Province */
+  $handler->display->display_options['fields']['state_province']['id'] = 'state_province';
+  $handler->display->display_options['fields']['state_province']['table'] = 'civicrm_address';
+  $handler->display->display_options['fields']['state_province']['field'] = 'state_province';
+  $handler->display->display_options['fields']['state_province']['label'] = '';
+  $handler->display->display_options['fields']['state_province']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['state_province']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['state_province']['location_type'] = '0';
+  $handler->display->display_options['fields']['state_province']['location_op'] = '0';
+  $handler->display->display_options['fields']['state_province']['is_primary'] = 1;
+  $handler->display->display_options['fields']['state_province']['prov_display'] = '2';
+  /* Field: CiviCRM Address: Postal Code */
+  $handler->display->display_options['fields']['postal_code']['id'] = 'postal_code';
+  $handler->display->display_options['fields']['postal_code']['table'] = 'civicrm_address';
+  $handler->display->display_options['fields']['postal_code']['field'] = 'postal_code';
+  $handler->display->display_options['fields']['postal_code']['label'] = '';
+  $handler->display->display_options['fields']['postal_code']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['postal_code']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['postal_code']['location_type'] = '0';
+  $handler->display->display_options['fields']['postal_code']['location_op'] = '0';
+  $handler->display->display_options['fields']['postal_code']['is_primary'] = 1;
+  /* Field: CiviCRM Address: Country */
+  $handler->display->display_options['fields']['country']['id'] = 'country';
+  $handler->display->display_options['fields']['country']['table'] = 'civicrm_address';
+  $handler->display->display_options['fields']['country']['field'] = 'country';
+  $handler->display->display_options['fields']['country']['label'] = '';
+  $handler->display->display_options['fields']['country']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['country']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['country']['location_type'] = '0';
+  $handler->display->display_options['fields']['country']['location_op'] = '0';
+  $handler->display->display_options['fields']['country']['is_primary'] = 1;
+  $handler->display->display_options['fields']['country']['country_display'] = '2';
+  /* Field: CiviCRM Email: Email Address */
+  $handler->display->display_options['fields']['email']['id'] = 'email';
+  $handler->display->display_options['fields']['email']['table'] = 'civicrm_email';
+  $handler->display->display_options['fields']['email']['field'] = 'email';
+  $handler->display->display_options['fields']['email']['label'] = '';
+  $handler->display->display_options['fields']['email']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['email']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['email']['location_type'] = '0';
+  $handler->display->display_options['fields']['email']['location_op'] = '0';
+  $handler->display->display_options['fields']['email']['is_primary'] = 1;
+  /* Field: CiviCRM Phone Details: Phone */
+  $handler->display->display_options['fields']['phone']['id'] = 'phone';
+  $handler->display->display_options['fields']['phone']['table'] = 'civicrm_phone';
+  $handler->display->display_options['fields']['phone']['field'] = 'phone';
+  $handler->display->display_options['fields']['phone']['label'] = '';
+  $handler->display->display_options['fields']['phone']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['phone']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['phone']['location_type'] = '0';
+  $handler->display->display_options['fields']['phone']['location_op'] = '0';
+  $handler->display->display_options['fields']['phone']['is_primary'] = 1;
+  $handler->display->display_options['fields']['phone']['phone_type'] = '0';
+  /* Field: Global: Custom text */
+  $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['table'] = 'views';
+  $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['label'] = '';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<table><tr><td>Address:<br/>[street_address]<br/>[commune_45][city][state_province] [postal_code]<br/>[country]</td>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td>Email: [email]<br/>Phone: [phone]</td></tr></table>';
+  $handler->display->display_options['fields']['nothing']['element_label_colon'] = FALSE;
+  /* Contextual filter: CiviCRM Drupal match table: Drupal User ID */
+  $handler->display->display_options['arguments']['uf_id']['id'] = 'uf_id';
+  $handler->display->display_options['arguments']['uf_id']['table'] = 'civicrm_uf_match';
+  $handler->display->display_options['arguments']['uf_id']['field'] = 'uf_id';
+  $handler->display->display_options['arguments']['uf_id']['default_action'] = 'default';
+  $handler->display->display_options['arguments']['uf_id']['default_argument_type'] = 'current_user';
+  $handler->display->display_options['arguments']['uf_id']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['uf_id']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['uf_id']['summary_options']['items_per_page'] = '25';
+  
+  $views[$view->name] = $view;
+
+  ////////////////////////////////////////////////////////////////////////
+  //ALUMNI
+  $view = new view();
+  $view->name = 'alumni_status';
+  $view->description = '';
+  $view->tag = 'default';
+  $view->base_table = 'civicrm_contact';
+  $view->human_name = 'Alumni Status';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'Status';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'none';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_options']['columns'] = array(
+									 'id' => 'id',
+									 );
+  $handler->display->display_options['style_options']['default'] = '-1';
+  $handler->display->display_options['style_options']['info'] = array(
+								      'id' => array(
+										    'sortable' => 0,
+										    'default_sort_order' => 'asc',
+										    'align' => '',
+										    'separator' => '',
+										    'empty_column' => 0,
+										    ),
+								      );
+  /* Footer: Global: Text area */
+  $handler->display->display_options['footer']['area']['id'] = 'area';
+  $handler->display->display_options['footer']['area']['table'] = 'views';
+  $handler->display->display_options['footer']['area']['field'] = 'area';
+  $handler->display->display_options['footer']['area']['content'] = '<a href=\'/content/alumni-status\'>Update Contact Info</a>';
+  $handler->display->display_options['footer']['area']['format'] = 'filtered_html';
+  /* Field: CiviCRM Contacts: Contact ID */
+  $handler->display->display_options['fields']['id']['id'] = 'id';
+  $handler->display->display_options['fields']['id']['table'] = 'civicrm_contact';
+  $handler->display->display_options['fields']['id']['field'] = 'id';
+  $handler->display->display_options['fields']['id']['label'] = '';
+  $handler->display->display_options['fields']['id']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['id']['element_label_colon'] = FALSE;
+  /* Field: CiviCRM Custom: Alumni Status: Current Status */
+  $handler->display->display_options['fields']['current_status_128']['id'] = 'current_status_128';
+  $handler->display->display_options['fields']['current_status_128']['table'] = 'civicrm_value_alumni_status_34';
+  $handler->display->display_options['fields']['current_status_128']['field'] = 'current_status_128';
+  /* Field: CiviCRM Custom: Alumni Status: What am I looking for */
+  $handler->display->display_options['fields']['what_am_i_looking_for_129']['id'] = 'what_am_i_looking_for_129';
+  $handler->display->display_options['fields']['what_am_i_looking_for_129']['table'] = 'civicrm_value_alumni_status_34';
+  $handler->display->display_options['fields']['what_am_i_looking_for_129']['field'] = 'what_am_i_looking_for_129';
+  /* Contextual filter: CiviCRM Drupal match table: Drupal User ID */
+  $handler->display->display_options['arguments']['uf_id']['id'] = 'uf_id';
+  $handler->display->display_options['arguments']['uf_id']['table'] = 'civicrm_uf_match';
+  $handler->display->display_options['arguments']['uf_id']['field'] = 'uf_id';
+  $handler->display->display_options['arguments']['uf_id']['default_action'] = 'default';
+  $handler->display->display_options['arguments']['uf_id']['default_argument_type'] = 'current_user';
+  $handler->display->display_options['arguments']['uf_id']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['uf_id']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['uf_id']['summary_options']['items_per_page'] = '25';
+  
+
+  $views[$view->name] = $view;
+
   // ...Repeat all of the above for each view the module should provide.
 
   // At the end, return array of default views.

@@ -37,6 +37,31 @@ function alumni_dashboard_get_field($title, $type, $req=FALSE, $states=array(),
   return $field;
 }
 
+function alumni_dashboard_webform_submission_insert($node, $submission) {
+  //the webform node is different on stage and live
+  if ($node->nid != 34728 && $node->nid != 35179) {
+    return;
+  }
+  $contact_id = alumni_dashboard_get_logged_in_contact();
+  $commune = $submission->data[9][0];
+  $commune = $commune ? $commune : '';
+
+  $result = civicrm_api3('Address', 'get',
+			 array(
+			       'sequential' => 1,
+			       'contact_id' => $contact_id,
+			       'is_primary' => 1,
+			       ));
+  if ($result && isset($result['values']) && $result['values']) {
+    $address_id = $result['values'][0]['id'];
+    $params = array('sequential' => 1,
+		    'id' => $address_id,
+		    'contact_id' => $contact_id,
+		    'custom_45' => $commune,);
+    $result = civicrm_api3('Address', 'create', $params);
+  }
+}
+
 function alumni_dashboard_civicrm_post($op, $object_name, $object_id,
 				       &$object_ref) {
   if ($object_name == 'Individual') {

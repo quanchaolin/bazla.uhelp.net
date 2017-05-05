@@ -85,22 +85,30 @@ function alumni_dashboard_employment_form_submit($form, &$form_state) {
 	    $create_result['values']) {
 	  //GET NEW CONTACT ID
 	  $employer_id = $create_result['values'][0]['id'];
-	  $add_result =
-	    civicrm_api3('Address', 'create',
-			 array(
-			       'sequential' => 1,
-			       'contact_id' => $employer_id,
-			       'location_type_id' => 3,
-			       'street_address' =>
-			       $new_contact['street_address_1'],
-			       'supplemental_address_1' =>
-			       $new_contact['street_address_2'],
-			       'city' => $new_contact['city'],
-			       'postal_code' => $new_contact['code'],
-			       'state_province_id' => $new_contact['state'],
-			       'country_id' => $new_contact['country'],
-			       //'custom_45' => $new_contact['commune'],
-			       ));
+	  $params =
+	    	 array(
+		       'sequential' => 1,
+		       'contact_id' => $employer_id,
+		       'location_type_id' => 3,
+		       'street_address' =>
+		       $new_contact['street_address_1'],
+		       'supplemental_address_1' =>
+		       $new_contact['street_address_2'],
+		       'city' => $new_contact['city'],
+		       'postal_code' => $new_contact['code'],
+		       );
+
+	  if ($new_contact['state']) {
+	    $params['state_province_id'] = $new_contact['state'];
+	  }
+	  if ($new_contact['country']) {
+	    $params['country_id'] = $new_contact['country'];
+	  }
+	  if ($new_contact['commune']) {
+	    $params['custom_45'] = $new_contact['commune'];
+	  }
+
+	  $add_result = civicrm_api3('Address', 'create', $params);
 	}	
 	//PUT NEW CONTACT IN USER ENTERED EMPLOYER GROUP
 	$params = array(
@@ -171,7 +179,7 @@ function alumni_dashboard_employment_form_validate($form, &$form_state) {
     if ($new_employer) {
       $employer_id = NULL;
       $new_contact = $fields['new_contact'];
-      $employer_name = $new_contact['employer_name'];
+      $employer_name = $new_contact['employer_name'];      
       $street_address_1 = $new_contact['street_address_1'];
       $street_address_2 = $new_contact['street_address_2'];
       $code = $new_contact['code'];
@@ -233,6 +241,7 @@ function alumni_dashboard_employment_form_validate($form, &$form_state) {
     $currency = isset($fields[$employee_fields['Currency']]) ?
       $fields[$employee_fields['Currency']] : '';
 
+    /**
     if ($new_employer && (!$employer_name || !$street_address_1 || !$code ||
 			  !$city || !$state    || !$country)) {
       $contact_fields = array('employer_name', 'street_address_1', 'code',
@@ -251,6 +260,13 @@ function alumni_dashboard_employment_form_validate($form, &$form_state) {
 	  form_set_error($form_field);
 	}
       }
+    }
+    */
+    if ($new_employer && !$employer_name) {
+      $form_field = 'employment_grid_cells]['.$job_id.'][new_contact][employer_name';
+      $msg = t("If you are trying to add a new Employer to Bazla you must " .
+	"fill out all the necessary fields highlighted in red below.");
+      form_set_error($form_field, $msg);
     }
 
     if (!$new_employer && $employer && !$employer_id) {
@@ -481,20 +497,10 @@ function alumni_dashboard_employment_form($form, &$form_state,
 		  ':input[name="employment_grid_cells['.
 		  $set_id.'][new_employer]"]' => array('checked' => FALSE),
 		  ),
-	    'required' =>
-	    array(
-		  ':input[name="employment_grid_cells['.
-		  $set_id.'][new_employer]"]' => array('checked' => FALSE),
-		  ),
 	    );
 	    
     $checked_state =
       array('visible' =>
-	    array(
-		  ':input[name="employment_grid_cells['.
-		  $set_id.'][new_employer]"]' => array('checked' => TRUE),
-		  ),
-	    'required' =>
 	    array(
 		  ':input[name="employment_grid_cells['.
 		  $set_id.'][new_employer]"]' => array('checked' => TRUE),
@@ -533,26 +539,6 @@ function alumni_dashboard_employment_form($form, &$form_state,
       alumni_dashboard_get_field(t("Street Address 2"), 'textfield', FALSE,
 				 $checked_state, "", '', 12);
 
-    $form['employment_grid_cells'][$set_id]['new_contact']['city'] =
-      alumni_dashboard_get_field(t("City"), 'textfield', FALSE,
-				 $checked_state, "", '', 13);
-
-    $sql="select id,value from civicrm_option_value where option_group_id=91";
-    $results = db_query($sql);
-    $options = array(0=>'- Select -');
-    while ($result = $results->fetchObject()) {
-      $options[$result->id] = $result->value;
-    }
-    
-    //$form['employment_grid_cells'][$set_id]['new_contact']['commune'] =
-    //  alumni_dashboard_get_field(t("Commune"), 'select', FALSE,
-    //				 $checked_state, "", '', 14, '',$options);
-
-    $form['employment_grid_cells'][$set_id]['new_contact']['code'] =
-      alumni_dashboard_get_field(t("Postal Code"), 'textfield', FALSE,
-				 $checked_state, "", '', 15);
-
-
     
     $sql ="select id, name from civicrm_country order by id=1094 desc, " .
       "id= 1228 desc, name asc";
@@ -564,10 +550,9 @@ function alumni_dashboard_employment_form($form, &$form_state,
 
     $form['employment_grid_cells'][$set_id]['new_contact']['country'] =
       alumni_dashboard_get_field(t("Country"), 'select', FALSE,
-				 $checked_state, "", '', 16, '', $options);
-
+				 $checked_state, "", '', 13, '', $options,
+				 1094);
     
-
     $sql ="select id, name from civicrm_state_province ".
       "order by country_id=1094 desc, country_id=1228 desc, ".
       "country_id=1039 desc, country_id asc, name asc";
@@ -579,7 +564,27 @@ function alumni_dashboard_employment_form($form, &$form_state,
 
     $form['employment_grid_cells'][$set_id]['new_contact']['state'] =
       alumni_dashboard_get_field(t("State"), 'select', FALSE,
-				 array(), "", '', 17, '', $options);
+				 array(), "", '', 14, '', $options);
+
+    $sql="select id,value from civicrm_option_value where option_group_id=91";
+    $results = db_query($sql);
+    $options = array(0=>'- Select -');
+    while ($result = $results->fetchObject()) {
+      $options[$result->value] = $result->value;
+    }
+
+    $form['employment_grid_cells'][$set_id]['new_contact']['commune'] =
+      alumni_dashboard_get_field(t("Commune"), 'select', FALSE,
+    				 $checked_state, "", '', 15,
+				 t("Only for Haitian Employers"), $options);
+
+    $form['employment_grid_cells'][$set_id]['new_contact']['city'] =
+      alumni_dashboard_get_field(t("City"), 'textfield', FALSE,
+				 $checked_state, "", '', 16);
+    
+    $form['employment_grid_cells'][$set_id]['new_contact']['code'] =
+      alumni_dashboard_get_field(t("Postal Code"), 'textfield', FALSE,
+				 $checked_state, "", '', 17);
 
 
     $form['employment_grid_cells'][$set_id]['cell_end'] =

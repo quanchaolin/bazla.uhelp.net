@@ -232,3 +232,85 @@ function alumni_dashboard_get_logged_in_contact() {
   return $contact_id;
 }
 
+function alumni_dashboard_contact_info_header() {
+  $ret = '';
+  $contact_id = alumni_dashboard_get_logged_in_contact();
+
+  civicrm_initialize();
+  
+  $result = civicrm_api3('Contact', 'get', array(
+						 'sequential' => 1,
+						 'id' => $contact_id,
+						 ));
+
+  if ($result && isset($result['values']) && $result['values']) {
+    $contact = $result['values'][0];
+
+    $ret .= t("Name:").' '.$contact['display_name']."<br/>";
+
+    $result = civicrm_api3('Relationship', 'get',
+			   array(
+				 'sequential' => 1,
+				 'contact_id_a' => 1,
+				 'contact_id_b' => $contact_id,
+				 'relationship_type_id' => 50,
+				 ));
+
+    if ($result && isset($result['values']) && $result['values']) {
+      foreach ($result['values'] as $k => $relationship) {
+	$start = isset($relationship['start_date']) ?
+	  date('M Y', strtotime($relationship['start_date'])) : '';
+	
+	
+	$end = isset($relationship['end_date']) ?
+	  date('M Y', strtotime($relationship['end_date'])) : '';
+
+	$help = civicrm_api3('Contact', 'get', array(
+						    'sequential' => 1,
+						    'id' => $relationship['contact_id_a'],
+						    ));
+	
+	if ($help && isset($help['values']) && $help['values']) {
+	  
+	  $help_name = $help['values'][0]['display_name'];
+	  $start = $start ? "From $start" : "";
+	  $end = $end ? "- $end" : "";
+	  $ret .= "Enrolled at <strong>$help_name</strong> $start $end </br>";
+	}
+      }
+    }
+
+    
+    $result = civicrm_api3('Relationship', 'get',
+			   array(
+				 'sequential' => 1,
+				 'contact_id_a' => $contact_id,
+				 'relationship_type_id' => 54,
+				 ));
+    
+    if ($result && isset($result['values']) && $result['values']) {
+      foreach ($result['values'] as $k => $relationship) {
+	$uni = civicrm_api3('Contact', 'get', array(
+						    'sequential' => 1,
+						    'id' => $relationship['contact_id_b'],
+						    ));
+	
+	$start = isset($relationship['start_date']) ?
+	  date('M Y', strtotime($relationship['start_date'])) : '';
+	
+	
+	$end = isset($relationship['end_date']) ?
+	  date('M Y', strtotime($relationship['end_date'])) : '';
+      
+	if ($uni && isset($uni['values']) && $uni['values']) {
+	  $uni_name = $uni['values'][0]['display_name'];
+	  $start = $start ? "From $start" : "";
+	  $end = $end ? "- $end" : "";
+	  $ret .= "Enrolled at <strong>$uni_name</strong> $start $end </br>";
+	}
+
+      }
+    }
+  }
+  return $ret."<br/>";
+}

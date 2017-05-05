@@ -519,6 +519,11 @@ function alumni_dashboard_views_default_views() {
   $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['style_plugin'] = 'table';
+  /* Header: Global: PHP */
+  $handler->display->display_options['header']['php']['id'] = 'php';
+  $handler->display->display_options['header']['php']['table'] = 'views';
+  $handler->display->display_options['header']['php']['field'] = 'php';
+  $handler->display->display_options['header']['php']['php_output'] = '<?php print alumni_dashboard_contact_info_header();?>';
   /* Footer: Global: Text area */
   $handler->display->display_options['footer']['area']['id'] = 'area';
   $handler->display->display_options['footer']['area']['table'] = 'views';
@@ -638,7 +643,7 @@ function alumni_dashboard_views_default_views() {
   $views[$view->name] = $view;
 
   ////////////////////////////////////////////////////////////////////////
-  //ALUMNI
+  //ALUMNI STATUS
   $view = new view();
   $view->name = 'alumni_status';
   $view->description = '';

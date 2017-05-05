@@ -13,6 +13,8 @@ function dorm_management_init() {
   		      'includes/computed_fields');
   module_load_include('inc', 'dorm_management',
   		      'includes/entity_api');
+  module_load_include('inc', 'dorm_management',
+  		      'includes/view_headers');
 		      
   drupal_add_css(drupal_get_path('module', 'dorm_management') .
                  '/dorm_management.css');

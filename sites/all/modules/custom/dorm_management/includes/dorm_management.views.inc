@@ -361,6 +361,11 @@ return TRUE;
 										     'empty_column' => 0,
 										     ),
 								      );
+  /* Header: Global: PHP */
+  $handler->display->display_options['header']['php']['id'] = 'php';
+  $handler->display->display_options['header']['php']['table'] = 'views';
+  $handler->display->display_options['header']['php']['field'] = 'php';
+  $handler->display->display_options['header']['php']['php_output'] = '<?php print dorm_management_room_assignments_header();?>';
   /* Field: Content: Nid */
   $handler->display->display_options['fields']['nid']['id'] = 'nid';
   $handler->display->display_options['fields']['nid']['table'] = 'node';
@@ -461,6 +466,7 @@ print dorm_management_dorm_student_assignments($row);
 
   /* Display: Dorm Room View Field */
   $handler = $view->new_display('block', 'Dorm Room View Field', 'block_1');
+  $handler->display->display_options['defaults']['header'] = FALSE;
   $handler->display->display_options['defaults']['fields'] = FALSE;
   /* Field: Content: Nid */
   $handler->display->display_options['fields']['nid']['id'] = 'nid';
@@ -495,6 +501,7 @@ print dorm_management_dorm_student_assignments($row);
 
   /* Display: Bed For Contact ID */
   $handler = $view->new_display('block', 'Bed For Contact ID', 'block_2');
+  $handler->display->display_options['defaults']['header'] = FALSE;
   $handler->display->display_options['defaults']['relationships'] = FALSE;
   /* Relationship: Content: Bed Assignments (field_dorm_room_students) */
   $handler->display->display_options['relationships']['field_dorm_room_students_value']['id'] = 'field_dorm_room_students_value';

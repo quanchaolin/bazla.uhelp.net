@@ -436,6 +436,10 @@ print dorm_management_dorm_student_assignments($row);
 ?>';
   $handler->display->display_options['fields']['php']['use_php_click_sortable'] = '0';
   $handler->display->display_options['fields']['php']['php_click_sortable'] = '';
+  /* Sort criterion: Content: Sort (field_dorm_room_sort) */
+  $handler->display->display_options['sorts']['field_dorm_room_sort_value']['id'] = 'field_dorm_room_sort_value';
+  $handler->display->display_options['sorts']['field_dorm_room_sort_value']['table'] = 'field_data_field_dorm_room_sort';
+  $handler->display->display_options['sorts']['field_dorm_room_sort_value']['field'] = 'field_dorm_room_sort_value';
   /* Sort criterion: Content: Room Number (field_dorm_room_number) */
   $handler->display->display_options['sorts']['field_dorm_room_number_value']['id'] = 'field_dorm_room_number_value';
   $handler->display->display_options['sorts']['field_dorm_room_number_value']['table'] = 'field_data_field_dorm_room_number';
@@ -578,7 +582,6 @@ print dorm_management_dorm_student_assignments($row);
   $handler->display->display_options['filters']['type']['value'] = array(
 									 'dorm_bed' => 'dorm_bed',
 									 );
-  
   // Add view to list of views to provide.
   $views[$view->name] = $view;
 

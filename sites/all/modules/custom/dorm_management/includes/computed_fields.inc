@@ -56,7 +56,16 @@ function computed_field_field_dorm_student_display_name_compute(&$entity_field, 
 // Get Contact details for the user.
   $contact = civicrm_api( 'contact','get',$params );
   
-  dsm($contact['values'][$cidtouse]['display_name']);
   $entity_field[0]['value'] =$contact['values'][$cidtouse]['display_name'];
   return $contact['values'][$cidtouse]['display_name'];
+}
+
+function computed_field_field_dorm_room_sort_compute(&$entity_field, $entity_type, $entity,
+						     $field, $instance, $langcode, $items) {
+  $room_number = dorm_management_get_entity_single_value_field($entity,
+							       'field_dorm_room_number',
+							       'value');
+  $room_number = preg_replace('/[^0-9\-]/', '', $room_number);
+  $sort = (int) $room_number;
+  $entity_field[0]['value'] = $sort;
 }

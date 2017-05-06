@@ -15,6 +15,8 @@ function dorm_management_init() {
   		      'includes/entity_api');
   module_load_include('inc', 'dorm_management',
   		      'includes/view_headers');
+  module_load_include('inc', 'dorm_management',
+  		      'includes/resave_rooms');
 		      
   drupal_add_css(drupal_get_path('module', 'dorm_management') .
                  '/dorm_management.css');
@@ -25,6 +27,14 @@ function dorm_management_init() {
 function dorm_management_menu() {
 
   $items = array();
+  $items['admin/dorm/rooms/resave'] =
+      array(
+	    'title' => t('Resave Rooms'),
+	    'type' => MENU_CALLBACK,
+	    'page callback' => 'drupal_get_form',
+	    'page arguments' => array('alumni_dashboard_resave_room_nodes'),
+	    'access arguments' => array('administer nodes'),
+	    );
 
   return $items;
 }

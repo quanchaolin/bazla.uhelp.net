@@ -52,7 +52,14 @@ function dorm_management_relationship_type_transform($row) {
 function dorm_management_dorm_student_assignments($row) {
   $node = node_load($row->nid);
   $ret = '<ul>';
+
   $beds = $node->field_dorm_room_students[LANGUAGE_NONE];
+  
+  $node->field_cmptd_available_beds[LANGUAGE_NONE][0]['value'] =
+    dorm_managment_available_beds($node);
+  field_attach_update('node', $node);      
+  entity_get_controller('node')->resetCache(array($node->nid));
+  
   if ($beds) {
     foreach ($beds as $data) {      
       $name = '';

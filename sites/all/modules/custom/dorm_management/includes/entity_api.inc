@@ -44,7 +44,11 @@ function dorm_management_update_room_availability($entity) {
 
   $nid = db_query($sql)->fetchField();
   $room = node_load($nid);
-  node_save($room);
+
+  $room->field_cmptd_available_beds[LANGUAGE_NONE][0]['value'] =
+    dorm_managment_available_beds($room);
+  field_attach_update('node', $room);      
+  entity_get_controller('node')->resetCache(array($node->nid));
 }
 function dorm_management_update_relationship($entity, $op) {  
   $contact = NULL;
@@ -52,6 +56,18 @@ function dorm_management_update_relationship($entity, $op) {
   if ($parent_field_name && $parent_field_name == 'field_dorm_room_students') {
 
     $field_name = 'field_dorm_studentcontact';
+
+    //FIND THE BUILDING
+    $item_id = $entity->item_id;
+    $nid = db_query("SELECT entity_id FROM field_data_field_dorm_room_students ".
+		    "WHERE field_dorm_room_students_value = " . $item_id)->fetchField();
+    
+    $room = node_load($nid);
+    $building_id =
+      dorm_management_get_entity_single_value_field($room,
+						    'field_dorm_building',
+						    'contact_id');
+
     $contact_id =
       dorm_management_get_entity_single_value_field($entity,
 						    $field_name,
@@ -79,16 +95,6 @@ function dorm_management_update_relationship($entity, $op) {
     if ($dorm_management_original_bed_occupier && 
 	$dorm_management_original_bed_occupier != $contact_id) {
       
-      //FIND THE BUILDING
-      $item_id = $entity->item_id;
-      $nid = db_query("SELECT entity_id FROM field_data_field_dorm_room_students ".
-		      "WHERE field_dorm_room_students_value = " . $item_id)->fetchField();
-    
-      $room = node_load($nid);
-      $building_id =
-	dorm_management_get_entity_single_value_field($room,
-						      'field_dorm_building',
-						      'contact_id');
 
       //find if the original now has a bed somewhere else in same building,
       //if so continue

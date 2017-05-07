@@ -2,16 +2,19 @@
 
 function dorm_management_entity_update($entity, $type){
   if ($type == 'field_collection_item') {
+    dorm_management_update_room_availability($entity);
     dorm_management_update_relationship($entity, 'update');
   }
 }
 function dorm_management_entity_insert($entity, $type){
   if ($type == 'field_collection_item') {
+    dorm_management_update_room_availability($entity);
     dorm_management_update_relationship($entity, 'insert');
   }
 }
 function dorm_management_entity_delete($entity, $type){
   if ($type == 'field_collection_item') {
+    dorm_management_update_room_availability($entity);
     dorm_management_update_relationship($entity, 'delete');
   }
 }
@@ -33,7 +36,17 @@ function dorm_management_entity_presave($entity, $type){
   }
 }
 
-function dorm_management_update_relationship($entity, $op) {
+function dorm_management_update_room_availability($entity) {
+  $sql =
+    "SELECT entity_id 
+     FROM field_data_field_dorm_room_students 
+     WHERE field_dorm_room_students_value= ". $entity->item_id;
+
+  $nid = db_query($sql)->fetchField();
+  $room = node_load($nid);
+  node_save($room);
+}
+function dorm_management_update_relationship($entity, $op) {  
   $contact = NULL;
   $parent_field_name = isset($entity->field_name) ? $entity->field_name : '';
   if ($parent_field_name && $parent_field_name == 'field_dorm_room_students') {
@@ -67,8 +80,15 @@ function dorm_management_update_relationship($entity, $op) {
 	$dorm_management_original_bed_occupier != $contact_id) {
       
       //FIND THE BUILDING
-      ///fixme!!!!
-      $building_id = 201;
+      $item_id = $entity->item_id;
+      $nid = db_query("SELECT entity_id FROM field_data_field_dorm_room_students ".
+		      "WHERE field_dorm_room_students_value = " . $item_id)->fetchField();
+    
+      $room = node_load($nid);
+      $building_id =
+	dorm_management_get_entity_single_value_field($room,
+						      'field_dorm_building',
+						      'contact_id');
 
       //find if the original now has a bed somewhere else in same building,
       //if so continue
@@ -102,7 +122,6 @@ function dorm_management_update_relationship($entity, $op) {
 	  $rel_result = civicrm_api3('Relationship', 'create',
 				     $relationship);
 
-	  
 	}
 	
 
@@ -114,74 +133,73 @@ function dorm_management_update_relationship($entity, $op) {
 							  $field_name,
 							  'value');
     if ($contact) {
-      //fetch the building contact id
-      $results = db_query("SELECT entity_id FROM field_data_field_dorm_room_students WHERE field_dorm_room_students_value = " . $entity->item_id);
-      $result = $results->fetchObject();
-      if ($result && $result->entity_id) {
-	$room_id = $result->entity_id;
-	$room = node_load($room_id);
-	$building_id =
-	  dorm_management_get_entity_single_value_field($room,
-							'field_dorm_building',
-							'contact_id');
-
-	//see if there is a relationship
-	$result = civicrm_api3('Relationship', 'get',
-			   array(
-				 'sequential' => 1,
-				 'contact_id_b' => $building_id,
-				 'contact_id_a' => $contact_id,
-				 'relationship_type_id' => 13,
-				 ));
-	if ($result && isset($result['values']) && $result['values']) {
-	  //if relationship, compare relationship end date with latest end date
-	  // (or null end dat if it exists) for this employer
-	  $relationship = $result['values'][0];
-
-	  if ($op == 'delete') {
-	    //delete relationship
-	    //fixme, update relationship instead
-	    
-	    $result = civicrm_api3('Relationship', 'delete',
-				   array('id'=>$relationship['id']));
-		
-	  }
-	  else if ((strtotime($date) != strtotime($relationship['start_date']))
-		   || strtotime($relationship['end_date'])) {
-	    ////else if relationshp start date doesn't match update relationshp
-	    $parameters =
-	      array(
-		    'sequential' => 1,
-		    'id' => $relationship['id'], 
-		    'contact_id_a' => $contact_id,
-		    'contact_id_b' => $building_id,
-		    'relationship_type_id' => 13,
-		    'start_date' => $date,
-		    'end_date' => date('Y-m-d',strtotime('10 years')),
-		    'is_active' => 1,
-		      );
-	    //update relationship
-	    $rel_result = civicrm_api3('Relationship', 'create',
-				       $parameters);
-	  }
-	  else {
-	  ////else do nothing
-	  }
+      //see if there is a relationship
+      $result = civicrm_api3('Relationship', 'get',
+			     array(
+				   'sequential' => 1,
+				   'contact_id_b' => $building_id,
+				   'contact_id_a' => $contact_id,
+				   'relationship_type_id' => 13,
+				   ));
+      if ($result && isset($result['values']) && $result['values']) {
+	//if relationship, compare relationship end date with latest end date
+	// (or null end dat if it exists) for this employer
+	$relationship = $result['values'][0];
+	
+	if ($op == 'delete') {
+	  //delete relationship
+	  $parameters =
+	    array(
+		  'sequential' => 1,
+		  'id' => $relationship['id'], 
+		  'contact_id_a' => $contact_id,
+		  'contact_id_b' => $building_id,
+		  'relationship_type_id' => 13,
+		  'start_date' => $date,
+		  'end_date' => date('Y-m-d H:i:s'),
+		  'is_active' => 0,
+		  );
+	  //update relationship
+	  $rel_result = civicrm_api3('Relationship', 'create',
+				     $parameters);
+	  	  
+	}
+	else if ((strtotime($date) != strtotime($relationship['start_date']))
+		 || strtotime($relationship['end_date'])) {
+	  ////else if relationshp start date doesn't match update relationshp
+	  $parameters =
+	    array(
+		  'sequential' => 1,
+		  'id' => $relationship['id'], 
+		  'contact_id_a' => $contact_id,
+		  'contact_id_b' => $building_id,
+		  'relationship_type_id' => 13,
+		  'start_date' => $date,
+		  'end_date' => '',
+		  'is_active' => 1,
+		  );
+	  //update relationship
+	  $rel_result = civicrm_api3('Relationship', 'create',
+				     $parameters);
 	}
 	else {
-	  //if there is no relationship create it
-	      $parameters =
-		array(
-		      'sequential' => 1,
-		      'contact_id_a' => $contact_id,
-		      'contact_id_b' => $building_id,
-		      'relationship_type_id' => 13,
-		      'start_date' => $date,
-		      );
-	      //if not create a new one
-	      $rel_result = civicrm_api3('Relationship', 'create',
-					 $parameters);
+	  ////else do nothing
 	}
+      }
+      //no relationship exists with building
+      else {
+	//if there is no relationship create it
+	$parameters =
+	  array(
+		'sequential' => 1,
+		'contact_id_a' => $contact_id,
+		'contact_id_b' => $building_id,
+		'relationship_type_id' => 13,
+		'start_date' => $date,
+		);
+	//if not create a new one
+	$rel_result = civicrm_api3('Relationship', 'create',
+				   $parameters);
       }
     }
   }

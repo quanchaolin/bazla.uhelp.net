@@ -546,6 +546,14 @@ print dorm_management_dorm_student_assignments($row);
   $handler->display->display_options['fields']['field_dorm_students_bed_number']['table'] = 'field_data_field_dorm_students_bed_number';
   $handler->display->display_options['fields']['field_dorm_students_bed_number']['field'] = 'field_dorm_students_bed_number';
   $handler->display->display_options['fields']['field_dorm_students_bed_number']['relationship'] = 'field_dorm_room_students_value';
+  /* Field: Field collection item: Field collection item ID */
+  $handler->display->display_options['fields']['item_id']['id'] = 'item_id';
+  $handler->display->display_options['fields']['item_id']['table'] = 'field_collection_item';
+  $handler->display->display_options['fields']['item_id']['field'] = 'item_id';
+  $handler->display->display_options['fields']['item_id']['relationship'] = 'field_dorm_room_students_value';
+  $handler->display->display_options['fields']['item_id']['label'] = '';
+  $handler->display->display_options['fields']['item_id']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['item_id']['separator'] = '';
   $handler->display->display_options['defaults']['arguments'] = FALSE;
   /* Contextual filter: Field collection item: Student (field_dorm_studentcontact) */
   $handler->display->display_options['arguments']['field_dorm_studentcontact_contact_id']['id'] = 'field_dorm_studentcontact_contact_id';
@@ -561,7 +569,6 @@ print dorm_management_dorm_student_assignments($row);
   $handler->display->display_options['arguments']['field_dorm_building_contact_id']['id'] = 'field_dorm_building_contact_id';
   $handler->display->display_options['arguments']['field_dorm_building_contact_id']['table'] = 'field_data_field_dorm_building';
   $handler->display->display_options['arguments']['field_dorm_building_contact_id']['field'] = 'field_dorm_building_contact_id';
-  $handler->display->display_options['arguments']['field_dorm_building_contact_id']['default_action'] = 'not found';
   $handler->display->display_options['arguments']['field_dorm_building_contact_id']['default_argument_type'] = 'fixed';
   $handler->display->display_options['arguments']['field_dorm_building_contact_id']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['field_dorm_building_contact_id']['summary']['format'] = 'default_summary';

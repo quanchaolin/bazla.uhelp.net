@@ -17,6 +17,8 @@ function dorm_management_init() {
   		      'includes/view_headers');
   module_load_include('inc', 'dorm_management',
   		      'includes/resave_rooms');
+  module_load_include('inc', 'dorm_management',
+  		      'includes/form_api');
 		      
   drupal_add_css(drupal_get_path('module', 'dorm_management') .
                  '/dorm_management.css');

@@ -9,6 +9,8 @@ function email_notifications_init() {
   		      'includes/settings_form');
   module_load_include('inc', 'email_notifications',
   		      'includes/emails');
+  module_load_include('inc', 'email_notifications',
+		      'includes/misc');
   drupal_add_css(drupal_get_path('module', 'alumni_dashboard') .
                  '/email_notifications.css');
 

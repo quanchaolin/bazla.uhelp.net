@@ -681,7 +681,7 @@ function alumni_dashboard_views_default_views() {
   $handler->display->display_options['footer']['area']['id'] = 'area';
   $handler->display->display_options['footer']['area']['table'] = 'views';
   $handler->display->display_options['footer']['area']['field'] = 'area';
-  $handler->display->display_options['footer']['area']['content'] = '<a href=\'/content/alumni-status\'>Update Contact Info</a>';
+  $handler->display->display_options['footer']['area']['content'] = '<a href=\'/content/alumni-status\'>Update Your Status</a>';
   $handler->display->display_options['footer']['area']['format'] = 'filtered_html';
   /* Field: CiviCRM Contacts: Contact ID */
   $handler->display->display_options['fields']['id']['id'] = 'id';

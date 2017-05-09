@@ -1,36 +1,4 @@
 <?php
-
-function email_notifications_send($type, $data) {
-  $target = email_notificaitons_get_target_email($type);
-  if (!$target) {
-    //if the target doesn't exist than we will not send an email
-    dsm("skipping");
-    return;
-  }
-  
-  $sender = variable_get('email_notifications_sender');
-  if (!$sender) {
-    drupal_set_message("Error Code #3498 no sender set! go to ".
-		       l("the settings", "/admin/config/notifications"), 'error');
-    return;
-  }
-  $subject = $msg = '';
-  $function = 'email_notifications_' . $type;
-
-  $msg = "<html><head></head><body>" . $msg . "</body></html>";
-  
-  $function($data, $subject, $msg);
-
-  $headers =
-    //    'From: ' . $sender . "\r\n" .
-    'Reply-To: ' . $sender . "\r\n" .
-    'X-Mailer: PHP/' . phpversion()  . "\r\n";
-    ;
-  
-  mail($target, $subject, $msg, $headers);
-  
-  //mail($target, $subject, $msg);
-}
 /**        
 */
 function email_notifications_alumni_employment($data, &$subject, &$msg) {
@@ -57,34 +25,45 @@ function email_notifications_alumni_milestone($data, &$subject, &$msg) {
 
 /**        
 */
-function email_notifications_alunni_status($data, &$subject, &$msg) {
-  dsm($data,"alum");
+function email_notifications_alumni_status($data, &$subject, &$msg) {
+  $status = $data['status'];    
+  $looks = $data['looks'];
+  $date = $data ['date'];
+  $alumni_link = $data['alumni_link'];
+  $alumni_name = $data['alumni_name'];
+
+  $subject = $alumni_name . " changed their status.";
+  
+  $msg = $alumni_name . ' changed their status on '. $date;
+  $msg .= "\n\nCurrent Status: " . $status;
+  $msg .= "\n\nCurrently Looking For: " . $looks;  
 }
 /**        
 */
 function email_notifications_alumni_address($data, &$subject, &$msg) {
-  dsm($data,"add");
-}
+  $street = $data['street'];
+  $street2 = $data['street2'];
+  $city = $data['city'];
+  $state = $data['state'];
+  $country = $data['country'];
+  $code = $data['code']; 
+  $phone = $data['phone'];
+  $email = $data['email'];
+  $commune = $data['commune'];
+  $alumni_link = $data['alumni_link'];
+  $alumni_name = $data['alumni_name']; 
+  $date = $data['date'];
 
-function email_notificaitons_get_target_email($type) {
-  $toggle = variable_get($type.'_toggle', FALSE);
-  if (!$toggle) {
-    return FALSE;
-  }
+  $subject = $alumni_name . ' has updated their contact info.';
 
-  $target = variable_get($type.'_email', FALSE);
-
-  if ($target) {
-    return $target;
-  }
-
-  $target = variable_get('email_notifications_default_target');
-
-  if (!$target) {
-    drupal_set_message("Error Code #3733 no default target set! go to ".
-		       l("the settings", "/admin/config/notifications"), 'error');
-   
-  }
-
-  return $target;
+  $msg = $alumni_name . ' updated their contact info on ' . $date . '.';
+  $msg .= "\n\n". $alumni_link;
+  $msg .= "\n\n". $street;
+  $msg .= "\n". $street2;
+  $msg .= "\n". $city;
+  $msg .= "\n". $commune;
+  $msg .= "\n". $state;
+  $msg .= "\n". $country;
+  $msg .= "\n". $email;
+  $msg .= "\n". $phone;
 }

@@ -44,16 +44,14 @@ function alumni_dashboard_milestones_form_submit($form, &$form_state) {
 	db_query("SELECT display_name from civicrm_contact where id=$contact_id")
 	->fetchField();
 	
-      $alumni_link = l($alumni_name, "/civicrm/contact/view",
-		       array('query' => array('cid' => $contact_id)));
-
       global $base_url;
       $alumni_link = $base_url . "/civicrm/contact/view?cid=" . $contact_id;
+      
       $data = array('milestone' => $fields[$milestone_fields['Milestone']],
 		    'details' => $fields[$milestone_fields['Details']],
 		    'alumni_link' => $alumni_link,
 		    'alumni_name' => $alumni_name, 
-		    'date' => date('M d Y', strtotime($date)));
+		    'date' => date('d M Y', strtotime($date)));
       
       
       email_notifications_send('alumni_milestone', $data);

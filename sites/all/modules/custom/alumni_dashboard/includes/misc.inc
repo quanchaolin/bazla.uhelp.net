@@ -38,29 +38,139 @@ function alumni_dashboard_get_field($title, $type, $req=FALSE, $states=array(),
 }
 
 function alumni_dashboard_webform_submission_insert($node, $submission) {
+  //FIXME UPDATE THIS ONCE DB'S PULLED DOWN FROM LIVE
   //the webform node is different on stage and live
-  if ($node->nid != 34728 && $node->nid != 35179) {
-    return;
+  if ($node->nid == 34728 && $node->nid == 35179) {
+    $contact_id = alumni_dashboard_get_logged_in_contact();
+    $commune = $submission->data[9][0];
+    $phone = $submission->data[10][0];
+    $email = $submission->data[11][0];
+    
+    $commune = $commune ? $commune : '';
+    
+    $result = civicrm_api3('Address', 'get',
+			   array(
+				 'sequential' => 1,
+				 'contact_id' => $contact_id,
+				 'is_primary' => 1,
+				 ));
+    if ($result && isset($result['values']) && $result['values']) {
+      $address_id = $result['values'][0]['id'];
+      $params = array('sequential' => 1,
+		      'id' => $address_id,
+		      'contact_id' => $contact_id,
+		      'custom_45' => $commune,);
+      $result = civicrm_api3('Address', 'create', $params);
+    }
+    
+    if (module_exists('email_notifications')) {
+      $address = $result['values'][0];
+      $alumni_name =
+	db_query("SELECT display_name from civicrm_contact where id=$contact_id")
+	->fetchField();
+      
+      global $base_url;
+      $alumni_link = $base_url . "/civicrm/contact/view?cid=" . $contact_id;
+      
+      $country =
+	db_query("select name from civicrm_country where id = " . $address['country_id'])
+	->fetchField();
+      $state =
+	db_query("select name from civicrm_state_province where id = " .
+		 $address['state_province_id'])
+	->fetchField();
+      
+      $data = array('street' => $address['street_address'],
+		    'street2' => $address['supplemental_address_1'],
+		    'city' => $address['city'],
+		    'state' => $state,
+		    'country' => $country,
+		    'code' => $address['postal_code'],
+		    'phone' => $phone,
+		    'email' => $email,
+		    'commune' => $commune,
+		    'alumni_link' => $alumni_link,
+		    'alumni_name' => $alumni_name, 
+		    'date' => date('d M Y'));
+      
+      
+      email_notifications_send('alumni_address', $data);
+    }
   }
-  $contact_id = alumni_dashboard_get_logged_in_contact();
-  $commune = $submission->data[9][0];
-  $commune = $commune ? $commune : '';
+  //FIXME UPDATE THIS ONCE DB'S PULLED DOWN FROM LIVE
+  //different node nids and field keys on testing sites and live
+  else if (($node->nid == 34727 || $node->nid == 35180) &&
+	   module_exists('email_notifications')) {
+    if ($node->nid == 35180) {
+      $status_key = 3;
+      $look_key = 4;
+    }
+    else {
+      $status_key = 5;
+      $look_key = 6;
+    }
+    
+    $contact_id = alumni_dashboard_get_logged_in_contact();
+    $alumni_name =
+      db_query("SELECT display_name from civicrm_contact where id=$contact_id")
+      ->fetchField();
+    
+    global $base_url;
+    $alumni_link = $base_url . "/civicrm/contact/view?cid=" . $contact_id;
+    
+    //FIXME FIND OUT A WAY NOT TO HARD CODE
+    $status_option_group_id =
+      db_query("select option_group_id from civicrm_custom_field where id= 128")
+      ->fetchField();
 
-  $result = civicrm_api3('Address', 'get',
-			 array(
-			       'sequential' => 1,
-			       'contact_id' => $contact_id,
-			       'is_primary' => 1,
-			       ));
-  if ($result && isset($result['values']) && $result['values']) {
-    $address_id = $result['values'][0]['id'];
-    $params = array('sequential' => 1,
-		    'id' => $address_id,
-		    'contact_id' => $contact_id,
-		    'custom_45' => $commune,);
-    $result = civicrm_api3('Address', 'create', $params);
+    $options = alumni_dashboard_civicrm_get_options($status_option_group_id, $value);
+    $statuses = '';
+    $separator = '';
+    foreach($submission->data[$status_key] as $value) {
+      $statuses .= $separator . $options[$value];
+      $separator = '' ? ', ' : ', ';
+    }
+
+    $look_option_group_id =
+      db_query("select option_group_id from civicrm_custom_field where id= 129")
+      ->fetchField();
+
+    $options = alumni_dashboard_civicrm_get_options($look_option_group_id);
+    
+    $looks = '';
+    $separator = '';
+    foreach($submission->data[$look_key] as $value) {
+      $looks .= $separator . $options[$value];
+      $separator = '' ? ', ' : ', ';
+    }
+
+    $data = array(
+		  'status' => $statuses,
+		  'looks' => $looks,
+		  'alumni_link' => $alumni_link,
+		  'alumni_name' => $alumni_name, 
+		  'date' => date('d M Y'));
+
+    email_notifications_send('alumni_status', $data);
   }
 }
+function alumni_dashboard_civicrm_get_options($gid) {
+  $options = array();
+  $results = civicrm_api3("OptionValue","get",
+			  array ('sequential' =>'1',
+				 'option_group_id' => $gid));
+  if ($results && isset($results['values'])) {
+    foreach ($results['values'] as $result) {
+      $label = $result['label'];
+      $value = $result['value']; 
+      $options[$value] = $label;
+    }
+  }
+  
+  return $options;
+
+}
+
 
 function alumni_dashboard_civicrm_post($op, $object_name, $object_id,
 				       &$object_ref) {

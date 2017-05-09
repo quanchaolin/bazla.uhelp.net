@@ -2,7 +2,6 @@
 /**        
 */
 function email_notifications_alumni_employment($data, &$subject, &$msg) {
-  dsm($data,"employ");
   $new_employer = $data['new_employer'];
   $existing_job = $data['existing_job'];
   $alumni_link = $data['alumni_link'];

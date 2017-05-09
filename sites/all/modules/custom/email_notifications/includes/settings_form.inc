@@ -12,7 +12,7 @@ function email_notifications_settings_form($form, &$form_state) {
 	  '#suffix' => '<hr>',
 	  '#required' => TRUE
 	  );
-
+  /**
     $form['email_notifications_sender'] =
     array(
 	  '#title' => t("Sender Email"),
@@ -22,7 +22,7 @@ function email_notifications_settings_form($form, &$form_state) {
 	  '#suffix' => '<hr>',
 	  '#required' => TRUE
 	  );
-
+  */
   $notification_types = array();
   drupal_alter("email_notifications_types", $notification_types);
 

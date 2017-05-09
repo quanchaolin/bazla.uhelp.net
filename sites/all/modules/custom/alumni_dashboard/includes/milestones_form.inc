@@ -38,7 +38,26 @@ function alumni_dashboard_milestones_form_submit($form, &$form_state) {
       "', '".$date . "')";
 
     db_query($sql);
-    
+
+    if (module_exists('email_notifications')) {
+      $alumni_name =
+	db_query("SELECT display_name from civicrm_contact where id=$contact_id")
+	->fetchField();
+	
+      $alumni_link = l($alumni_name, "/civicrm/contact/view",
+		       array('query' => array('cid' => $contact_id)));
+
+      global $base_url;
+      $alumni_link = $base_url . "/civicrm/contact/view?cid=" . $contact_id;
+      $data = array('milestone' => $fields[$milestone_fields['Milestone']],
+		    'details' => $fields[$milestone_fields['Details']],
+		    'alumni_link' => $alumni_link,
+		    'alumni_name' => $alumni_name, 
+		    'date' => date('M d Y', strtotime($date)));
+      
+      
+      email_notifications_send('alumni_milestone', $data);
+    }
   }
 }
 function alumni_dashboard_milestones_form_validate($form, &$form_state) {
@@ -237,7 +256,21 @@ function alumni_dashboard_milestones_form($form, &$form_state,
 	  '#prefix' => "<tr class='$row_class'><td colspan=2>&nbsp;</td><td>",
 	  '#suffix' => "</td></tr>",
 	  );
-
+  /**
+  $form['milestones_grid_cells']['remove_row_button'] = 
+    array(
+	  '#type' => 'submit',
+	  '#value' => t('Remove New Row'),
+	  '#submit' => array('alumni_dashboard_remove_row'),
+	  '#ajax' =>
+	  array(
+		'callback' => 'alumni_dashboard_milestones_grid_callback',
+		'wrapper' => 'milestones-grid-wrapper',
+		),
+	  '#prefix' => "<tr class='$row_class'><td colspan=2>&nbsp;</td><td>",
+	  '#suffix' => "</td></tr>",
+	  );
+  */
   $row_class = ($row_class == 'padded_odd') ? 'padded_even' : 'padded_odd';
   $form['milestones_grid_cells']['submit_button'] = 
     array(

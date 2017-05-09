@@ -1,0 +1,40 @@
+<?php
+/**
+ * @file
+ * This module will provide custom functionality for the UHELP email notifications
+ */
+
+function email_notifications_init() {
+  module_load_include('inc', 'email_notifications',
+  		      'includes/settings_form');
+  module_load_include('inc', 'email_notifications',
+  		      'includes/emails');
+  drupal_add_css(drupal_get_path('module', 'alumni_dashboard') .
+                 '/email_notifications.css');
+
+}
+
+
+function email_notifications_menu() {
+
+  $items = array();
+  $items['admin/config/notifications'] =
+      array(
+	    'title' => t('Email Notfication Settings'),
+	    'type' => MENU_NORMAL_ITEM,
+	    'page callback' => 'drupal_get_form',
+	    'page arguments' => array('email_notifications_settings_form'),
+	    'access arguments' => array('access administration pages'),
+	    
+	    );
+
+  return $items;
+}
+  
+function email_notifications_views_api() {
+  return array(
+	       'api' => 3,
+	       'path' =>
+	       drupal_get_path('module', 'email_notifications').'/includes'
+	       );
+}

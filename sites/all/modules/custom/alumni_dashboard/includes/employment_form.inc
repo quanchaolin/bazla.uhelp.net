@@ -20,6 +20,16 @@ function alumni_dashboard_add_another_row($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
 }
 
+function alumni_dashboard_remove_row($form, &$form_state) {
+
+  if (!isset($form_state['num_rows'])) {
+    $form_state['num_rows'] = 0;
+  }
+  $form_state['num_rows']--;
+
+  $form_state['rebuild'] = TRUE;
+}
+
 function alumni_dashboard_employment_form_submit($form, &$form_state) {
   $contact_id = alumni_dashboard_get_logged_in_contact();
   

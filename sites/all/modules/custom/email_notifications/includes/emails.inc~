@@ -1,0 +1,30 @@
+<?php
+
+/**        
+*/
+function email_notifications_alumni_employment($data) {
+  dsm($data,"employ");
+}
+/**        
+*/
+function email_notifications_alunni_milestone($data) {
+  dsm($data,"mile");
+  if (variable_get('alumni_milestone_toggle')) {
+    $milestone = $data['milestone'];
+    $details = $data['details'];
+    $date = $data ['date'];
+
+    $msg = "Date: ". $date . "Milestone: " . $milestone . "Details"; 
+    $subject = '';
+  }
+}
+/**        
+*/
+function email_notifications_alunni_status($data) {
+  dsm($data,"alum");
+}
+/**        
+*/
+function email_notifications_alumni_address($data) {
+  dsm($data,"add");
+}

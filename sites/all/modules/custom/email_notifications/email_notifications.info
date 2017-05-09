@@ -1,0 +1,4 @@
+name = uhelp
+description = Helper module for managing email notifications
+package = UHELP
+core = 7.x

@@ -314,3 +314,10 @@ function alumni_dashboard_contact_info_header() {
   }
   return $ret."<br/>";
 }
+
+function alumni_dashboard_email_notifications_types_alter(&$types) {
+  $types[] = 'alumni_employment';
+  $types[] = 'alumni_milestone';
+  $types[] = 'alumni_status';
+  $types[] = 'alumni_address';
+}

@@ -43,15 +43,18 @@ function alumni_dashboard_employment_form_submit($form, &$form_state) {
   $values = $form_state['values']['employment_grid_cells'];
   
   foreach ($values as $job_id => $fields) {
+    $existing_job = FALSE;
     $existing_employer = isset($fields[$employee_fields['Employer']]) ?
       $fields[$employee_fields['Employer']] : NULL;
     $new_employer = (isset($fields['new_employer']) && $fields['new_employer'])
-      ? $fields['new_employer'] : NULL;
+      ? $fields['new_employer'] : FALSE;
     $end_date = isset($fields[$employee_fields['End']]) ?
       $fields[$employee_fields['End']] : '';
     
-    
+    $updating = FALSE;
     if (!$existing_employer && !$new_employer && $end_date) {
+      $updating = TRUE;
+      $existing_job = TRUE;
       $end_date = strtotime($end_date);
       $end_date = date('Y-m-d H:i:s', $end_date);
 
@@ -75,9 +78,25 @@ function alumni_dashboard_employment_form_submit($form, &$form_state) {
 	"WHERE id = $job_id";
       db_query($sql);
 
+      $sql =
+	"SELECT employer_85, start_date_87, job_title_86, salary_yearly__90, currency_91 ".
+	"FROM civicrm_value_employment_history_26 " .
+	"WHERE id = $job_id";
+
+      $result = db_query($sql)->fetchObject();
+
+      if ($result) {
+	$start_date = $result->start_date_87;
+	$employer_id = $result->employer_85;
+	$title = $result->job_title_86;
+	$currency = $result->currency_91;
+	$salary = $result->salary_yearly__90;
+      }
+      
       alumni_dashboard_update_employer_relationships($contact_id);
     }
     else if ($existing_employer || $new_employer){
+      $updating = TRUE;
       if ($new_employer) {
 	//CREATE NEW CONTACT
 	$new_contact = $fields['new_contact'];
@@ -148,17 +167,58 @@ function alumni_dashboard_employment_form_submit($form, &$form_state) {
       //FIXME, FIND OUT HOW TO USE CIVICRM API TO SAVE A NEW MULTI VALUE
       //FIELD, TRIED ABOVE WITHOUT SUCCESS SO FOR NOW DIRECT QUERY INSERT
       $salary = str_replace('$', '', $fields[$employee_fields['Salary']]);
+      $title = $fields[$employee_fields['Job Title']];
+      $currency = $fields[$employee_fields['Currency']]; 
       $sql =
 	"INSERT INTO civicrm_value_employment_history_26 " .
 	"(entity_id, employer_85, job_title_86, start_date_87, end_date_88, " .
 	" salary_yearly__90, currency_91) VALUES " .
-	"(".$contact_id.", " . $employer_id . ", '".
-	$fields[$employee_fields['Job Title']] . "', '".
+	"(".$contact_id.", " . $employer_id . ", '".$title. "', '".
 	$start_date . "', ".$end_date . ", ". $salary . ", '".
-	$fields[$employee_fields['Currency']] . "') ";
+	$currency . "') ";
 
       db_query($sql);
       alumni_dashboard_update_employer_relationships($contact_id);
+      
+    }
+
+    if ($updating && module_exists('email_notifications')) {
+      global $base_url;
+	    
+      $alumni_name =
+	db_query("SELECT display_name from civicrm_contact where id=$contact_id")
+	->fetchField();
+	
+      $alumni_link = $base_url . "/civicrm/contact/view?cid=" . $contact_id;
+
+      $employer_name =
+	db_query("SELECT display_name from civicrm_contact where id=$employer_id")
+	->fetchField();
+	
+      $employer_link = $base_url . "/civicrm/contact/view?cid=" . $employer_id;
+
+      $end = strtotime($end_date);
+      if ($end) {
+	$end_date = date('d M Y', $end);
+      }
+      else {
+	$end_date = '';
+      }
+
+      $data = array(
+		    'new_employer' => $new_employer,
+		    'existing_job' => $existing_job,
+		    'alumni_link' => $alumni_link,
+		    'alumni_name' => $alumni_name,
+		    'employer_name' => $employer_name,
+		    'employer_link' => $employer_link,
+		    'salary' => $salary,
+		    'title' => $title,
+		    'currency' => $currency, 
+		    'start_date' => date('d M Y', strtotime($start_date)),
+      		    'end_date' => $end_date);
+      
+      email_notifications_send('alumni_employment', $data);
     }
   }
 }

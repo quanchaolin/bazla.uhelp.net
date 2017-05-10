@@ -25,6 +25,21 @@ function dorm_management_form_alter(&$form, &$form_state, $form_id) {
     
     $form['#validate'][] = 'dorm_management_bed_assignment_validate';
   }
+  //UPDATE CONTACT FORM SO THAT IF YOU PASS IN A CATEGORY ID THE CATEGORY WILL DEFAULT TO IT
+  //AND DISABLE THE FIELD
+  else if ($form_id == 'contact_site_form') {
+    $category = filter_input(INPUT_GET, 'category');
+
+    if ($category) {
+      $form['cid']['#default_value'] = $category;
+      $form['cid']['#disabled'] = TRUE;
+
+      if ($category == 2) {
+	drupal_set_title("Contact us about updating incorrect information about you in Bazla");
+      }
+    }
+    
+  }
 }
 
 

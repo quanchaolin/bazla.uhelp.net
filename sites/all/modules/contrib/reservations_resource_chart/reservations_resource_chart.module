@@ -1,0 +1,1967 @@
+<?php
+
+/**
+ * Implements hook_init().
+ */
+function reservations_resource_chart_init() {
+  drupal_add_css(drupal_get_path('module', 'reservations_resource_chart') . 
+		 '/reservations_resource_chart.css');
+
+  //if the reservations staff module is turned on and its got a higher
+  //weight than us we'll need to bump up our weight otherwise we lose
+  //the default value from the chart
+  if (module_exists('reservations_staff')) {
+    $sql = "
+      SELECT name, weight 
+      FROM {system} 
+      WHERE name='reservations_resource_chart'
+      OR name= 'reservations_staff'";
+    $results = db_query($sql);
+    while ($module = $results->fetchObject()) {
+      if ($module->name == 'reservations_resource_chart') {
+	$chart_weight = $module->weight;
+      }
+      else {
+	$staff_weight = $module->weight;
+      }
+    }
+    if ($staff_weight >= $chart_weight) {
+      $new_weight = $staff_weight + 1;
+      db_query("UPDATE {system} SET weight = $new_weight 
+                WHERE name='reservations_resource_chart'");
+    }
+  }
+}
+
+function reservations_resource_chart_views_api() {
+  return array(
+	       'api' => 3,
+	       'path' => 
+	       drupal_get_path('module', 
+			       'reservations_resource_chart').'/inc'
+	       );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function reservations_resource_chart_menu() {
+  $items = array();
+  
+  //THE MAIN MENU ITEM FOR THE CHART THAT HAS A CALL BACK FUNCTION THAT 
+  //BUILDS THE CHART ITSELF
+  $items['admin/reservations/manage/chart'] = 
+    array(
+	  'title' => t("Daily Resource Chart"),
+	  'page callback' => 'drupal_get_form',
+	  'page arguments' => array('reservations_resource_chart_form'),    
+	  'access arguments' => array('manage reservations'),
+	  'description' => t("Chart showing reservations"),
+	  );
+
+  //A CHART FOCUSED FOR PRODUCERS RATHER THAN ADMINS
+  $items['reservations/facility-chart'] = 
+    array(
+	  'title' => t("Daily Resource Chart"),
+	  'page callback' => 'drupal_get_form',
+	  'page arguments' => array('reservations_resource_chart_form'),
+	  'access arguments' => array('access content'),
+	  );
+
+  //ADD MENU ITEMS THAT WILL SHOW UP IN THE ADMIN RESERVATONS MENU PAGE
+  $vid = variable_get('reservations_inventory_vid', 0);
+  $terms = taxonomy_get_tree($vid);
+  $inventories = array();
+  foreach ($terms as $term) {
+    $items['admin/reservations/' . $term->tid . '/daily-reservation-chart'] = 
+      array(
+	    'title' => t('Daily Resource Chart for @term_name', 
+			 array('@term_name'=>$term->name)),
+	    'page callback' => 'reservations_resources_chart_page_redirect',
+	    'page arguments' => array(2),
+	    'access arguments' => array('manage reservations'),
+	    'description' =>t("Chart showing reservations for this inventory"),
+	    'type' => MENU_NORMAL_ITEM,
+	    'weight' => 1000,
+	    );
+  }
+
+
+  $items['admin/config/reservations/chart'] =
+    array(
+          'title' => 'Reservation Resource Chart Configuration',
+	  'description' => 'Reservation Resource Settings Form',
+	  'page callback' => 'drupal_get_form',
+	  'page arguments' => 
+	  array('reservations_resource_chart_settings_form'),
+	  'access arguments' => array('manage reservations'),
+	  'type' => MENU_NORMAL_ITEM,
+	  );
+  
+  return $items;
+}
+
+function reservations_resources_chart_page_redirect($tid) {
+  drupal_goto('admin/reservations/manage/chart'."/".$tid);
+}
+
+/**
+ * admin configuration page
+ *
+ */
+function reservations_resource_chart_settings_form($form, $form_state) {
+
+  $form = array();
+  $form['chart_settings'] = array(
+			    '#type' => 'fieldset',
+			    '#title' => t('Chart Settings'),
+			    );
+
+  $elements = array('staff_start' => 
+		    array('size'=>3,
+			  'title'=>t('Staff Start'),
+			  'help'=>t('The start time of the chart for staff.')),
+		    'staff_end' =>  
+		    array('size'=>3,
+			  'title'=>t('Staff End'),
+			  'help'=>t('The end time of the chart for staff.')),
+		    'project_field_name' => 
+		    array('size'=>50,
+			  'title'=>t("Project Field"),
+			  'help'=>
+			  t("Name of project field on reservation")),
+		    'custom_chart_item_ids' => 
+		    array('size'=>50,
+			  'title'=>t("Custom Chart nid's"),
+			  'help'=>
+			  t("Enter the nid's of the items you'd like to ".
+                             "appear on your custom chart separated by ".
+			    " commas.")),
+		    'custom_chart_arg_name' =>  
+		    array('size'=>50,
+			  'title'=>t('Custom Chart Argument Name'),
+			  'help'=>t('This will be the last bit of the URL. '.
+				    'When this is used instead of a inventory'.
+				    " tid it will only show the above set ".
+				    "of nid's rather than all or a particular".
+				    " inventory.")),
+		    'custom_chart_title' =>  
+		    array('size'=>50,
+			  'title'=>t('Custom Chart Title'),
+			  'help'=>
+			  t('The title to display on the custom chart'))
+		    );
+  
+  foreach($elements as $name => $values) {
+    $var_name = 'reservations_resource_chart_' . $name;
+    
+    $form['chart_settings'][$var_name] = 
+      array(
+	    '#type' => 'textfield',
+	    '#title' => $values['title'],
+	    '#default_value' => variable_get($var_name),
+	    '#description' => $values['help'],
+	    '#size' => $values['size'],
+	    );
+  }
+
+  $elements = array(
+		    'multiple_chart_orientation' =>  
+		    array('title'=>t('Multiple Days Chart Orientation'),
+			  'options'=> array(1=>'Vertically', 
+					    0=>'Horizontally'),
+			  'help'=>
+			  t('Should Different Days dipslay horizontally 
+                             or Vertically.')),
+		    'display_reservation_id' =>  
+		    array('title'=>t('Display Reservation ID on Chart?'),
+			  'options'=> array(1=>'Display ID', 
+					    0=>'Hide ID'),
+			  'help'=>
+			  t('Can help with visual debugging.')),
+		    'staff_category' => 
+		    array('title'=>t('Display Category Dropdown to Staff?'),
+			  'options'=> array(1=>'Yes', 0=>'No'),
+			  'help'=>t('Display Type Filter on Staff Chart?.')),
+		    'staff_type' => 
+		    array('title'=>t('Display Type Dropdown to Staff?'),
+			  'options'=> array(1=>'Yes', 0=>'No'),
+			  'help'=>t('Display Type Filter on Staff Chart?.')),
+		    'staff_item' => 
+		    array('title'=>t('Display Item Dropdown to Staff?'),
+			  'options'=> array(1=>'Yes', 0=>'No'),
+			  'help'=>t('Display Item Filter on Staff Chart?.')),
+		    'staff_end_date' => 
+		    array('title'=>t('Display End Date to Staff?'),
+			  'options'=> array(1=>'Yes', 0=>'No'),
+			  'help'=>t('Display Item Filter on Staff Chart?.')),
+		    'public_category' => 
+		    array('title'=>t('Display Category Dropdown to the Public?'
+				     ),
+			  'options'=> array(1=>'Yes', 0=>'No'),
+			  'help'=>t('Display Type Filter on Public Chart?.')),
+		    'public_type' => 
+		    array('title'=>t('Display Type Dropdown to the Public?'),
+			  'options'=> array(1=>'Yes', 0=>'No'),
+			  'help'=>t('Display Type Filter on Public Chart?.')),
+		    'public_item' => 
+		    array('title'=>t('Display Item Dropdown to the Public?'),
+			  'options'=> array(1=>'Yes', 0=>'No'),
+			  'help'=>t('Display Item Filter on Public Chart?.')),
+		    'public_end_date' => 
+		    array('title'=>t('Display End Date?'),
+			  'options'=> array(1=>'Yes', 0=>'No'),
+			  'help'=>t('Display Item Filter on Public Chart?.')),
+		    
+		    'staff_dow' =>
+		    array('title'=>t('Display Day of Week?'),
+			  'options'=> array(1=>'Yes', 0=>'No'),
+			  'help'=>
+			  t('Display Day of Week Filter on Public Chart?.')),
+		    'public_dow' =>
+		    array('title'=>t('Display Day of Week?'),
+			  'options'=> array(1=>'Yes', 0=>'No'),
+			  'help'=>
+			  t('Display Day of Week Filter on Staff Chart?.')),
+		    );
+  
+  foreach ($elements as $name=>$values) {
+    $var_name = 'reservations_resource_chart_' . $name . '_filter';
+    $form['chart_settings'][$var_name] = 
+      array(
+	    '#title' => $values['title'],
+	    '#description' => $values['help'],
+	    '#type' => 'select',
+	    '#options' => $values['options'],
+	    '#default_value' => variable_get($var_name, 1),
+	    );
+  }
+  
+  return system_settings_form($form);  
+}
+  
+/**
+ * Called by reservations_resource_chart_menu()
+ *  This function will use the reservations_daily_chart view to offer an
+ * exposed date filter and then display the results in a custom chart where
+ * each column is a 30 minute time block and each row is a particular
+ * researvable item. 
+ * @returns $ret - html for the hook_menu page we are describing
+ */
+function reservations_resource_chart_form($form, $form_state, 
+					  $arg_string = FALSE) {
+  
+  $is_admin_mode = (arg(0) == 'admin') ? TRUE : FALSE;
+
+  $args = reservations_resource_chart_special_args($form_state, $arg_string);
+  drupal_set_title($args['title']);
+
+  //fetch our view
+  $view = views_get_view('reservations_daily_chart');
+
+  //prepare array of args to pass to view
+  $view_args = array($args['date_arg']);
+  if ($args['inventories']) {
+    $view_args[] = implode('+',$args['inventories']);
+  }
+
+  //set view arguments (date + optional inventory(ies))
+  $view->set_arguments($view_args);
+  
+  //build our veiw query then execute it.
+  $view->build('chart_reservations');  
+
+  //execute the query and grab the results
+  $view->execute('chart_reservations');
+  $view_results = $view->result;
+  
+  $start_date = $args['start'];
+
+  //loop through reservations and store in thier proper day index
+  $chart_reservations = array();
+  foreach($view_results as $result) {
+
+    $date_field = $result->field_field_reservations_date[0]['raw'];
+    $start_object =
+      new DateTime($date_field['value'], 
+		   new DateTimeZone($date_field['timezone_db']));
+
+    $start_object->setTimeZone(new DateTimeZone($date_field['timezone']));
+    $start_day = $start_object->format('d');
+
+    $end_object =
+      new DateTime($date_field['value2'], 
+		   new DateTimeZone($date_field['timezone_db']));
+
+    $end_object->setTimeZone(new DateTimeZone($date_field['timezone']));
+    if ($end_object->format('H:i:s') == '00:00:00') {
+      date_modify($end_object, '-1 second');
+    }
+    $end_day = $end_object->format('d');
+
+    $result->start_time = $start_object->format('Y-m-d H:i:s');
+    $result->end_time = $end_object->format('Y-m-d H:i:s');
+      
+    if ($start_day != $end_day) {
+      $interval = DateInterval::createFromDateString('1 day');
+
+      $period_start = 
+	new DateTime($start_object->format('Y-m-d 00:00:00'));
+
+      $period_end = 
+	new DateTime($end_object->format('Y-m-d 00:00:01'));
+
+      $period = new DatePeriod($period_start, $interval, 
+			       $period_end);
+
+      foreach($period as $date_object) {
+	$date_index = $date_object->format('Y-m-d');
+	
+	$day = $date_object->format('d');
+	if ($start_day != $day) {
+	  $result->start_time = $date_object->format('Y-m-d 00:00:00');
+	}
+
+	if ($end_day != $day) {
+	  $result->end_time = $date_object->format('Y-m-d 23:59:59');
+	}
+	else {
+	  $result->end_time = $end_object->format('Y-m-d H:i:s');
+	}
+
+	$chart_reservations[$date_index] = $chart_reservations[$date_index] ? 
+	  $chart_reservations[$date_index] : array();
+
+	$chart_reservations[$date_index][] = clone $result;
+	
+	if ($date_object > $args['end_object']) {
+	  break;
+	}
+      }
+    }
+    else {
+      $date_index = $start_object->format('Y-m-d');
+      $chart_reservations[$date_index] = $chart_reservations[$date_index] ? 
+	$chart_reservations[$date_index] : array();
+      
+      $chart_reservations[$date_index][] = clone $result;
+    }    
+  }
+
+  $has_items_to_display = FALSE;
+
+  $interval = DateInterval::createFromDateString('1 day');
+  
+  $period = new DatePeriod($args['start_object'], $interval, 
+			   $args['end_object']->modify( '+1 day'));
+
+  $content_types = node_type_get_types();
+
+  foreach($period as $date_object) {
+    $day = $date_object->format('Y-m-d');
+    $bucket_res[$day] = $bucket_res[$day] ? $bucket_res[$day] : array();
+
+    //ITEM RESERVATIONS
+    $reservation_items =
+      reservations_resource_chart_get_item_reservations($day,
+							$chart_reservations,
+							$bucket_res);
+
+    //BUCKET CATEGORIES
+    $vid = variable_get('reservations_grouping_vid', 0);
+    $terms = taxonomy_get_tree($vid);
+    $bucket_categories = array();
+    foreach ($terms as $term) {
+      $bucket_categories[$term->tid] = array(); 
+    }
+
+    //RESERVABLE CONTENT TYPES
+    // Loop through each reserable type, placing it into the bucket categories
+    // array along with any reservations attached to it.
+    $reservable_types = reservations_content_types();
+    
+    $reservable_types = array_reverse($reservable_types);
+    
+    foreach ($reservable_types as $bucket_content_type=>$reservable_type) {
+      
+      if (reservations_resource_chart_inventory_check($reservable_type
+						      ['inventory_tids'],
+						      $args['inventories'])){
+	
+	$grouping_tid = $reservable_type['reservations_grouping'];
+	
+	$items = reservations_resource_chart_get_items_for_type
+	  ($reservation_items, $bucket_content_type, $args, $grouping_tid, 
+	   $item_options, $type_options, $category_options, $content_types,
+	   $is_admin_mode);
+	
+	if (count($items)) {
+	  $has_items_to_display = TRUE;
+	}
+
+	$bucket_categories[$grouping_tid][$bucket_content_type] = $items;
+	
+      }
+    }
+    $input_dow = filter_input(INPUT_GET, 'dow');
+    $dow = date('l', strtotime($day));
+
+    //THIS IS THE DAY OF WEEK FILTER, IF IT DOESN'T MATCH GO UP TO THE TOP OF 
+    //THE LOOP
+    if (isset($input_dow) && $input_dow && $input_dow != $dow) {
+      continue;
+    }
+
+    //HTML TABLE DISPLAYING THE CART
+    $charts[$day] = 
+      reservations_resource_chart_get_chart_html($bucket_categories, 
+						 $bucket_res[$day],
+						 $day);
+  }
+
+  if (!$has_items_to_display) {
+    $markup = reservations_resource_chart_get_no_resources_msg($args);
+  }
+  else {
+    $vert_orientation = 
+      variable_get('reservations_resource_chart_multiple_chart_'.
+		   'orientation_filter', 0);
+    $markup = "<table><tr>";
+    ksort($charts);
+    foreach ($charts as $day => $chart) {
+      if ($chart) {
+	$markup .= "<td><h2>".date('l F d, Y', strtotime($day)).
+	  "</h2>$chart</td>";
+	if ($vert_orientation) {
+	  $markup .= "</tr><tr>";
+	}
+      }
+    }
+    $markup .= "</tr></table>";
+  }
+
+  $rows = array(array(array('data' => 'Uncomfirmed',
+			    'align' => 'center',
+			    'class' => 'reservations_unconfirmed'),
+		      array('data' => 'Comfirmed',
+			    'align' => 'center',
+			    'class' => 'reservations_confirmed'),
+		      array('data' => 'Checked Out',
+			    'align' => 'center',
+			    'class' => 'reservations_checked_out'),
+		      array('data' => 'Checked In',
+			    'align' => 'center',
+			    'class' => 'reservations_checked_in'),
+		      array('data' => 'Live',
+			    'align' => 'center',
+			    'class' => 'reservations_live'),
+		      array('data' => 'Live Checked In',
+			    'align' => 'center',
+			    'class' => 'reservations_live_checked_in')));
+
+  if ($is_admin_mode) {
+    $legend = "<h2>Legend</h2>".
+      theme_table(array('header'=>array(),
+			'rows'=>$rows,
+			'attributes'=>array()));
+    $markup .= $legend;
+  }
+
+    
+  $form = array();
+  $form['#tree'] = TRUE;
+  $form['#attributes']['enctype'] = 'multipart/form-data';
+
+  $form = reservations_resource_chart_search_filters($form, $form_state,
+						     $bucket_categories,
+						     $item_options,
+						     $type_options,
+						     $category_options);
+
+  $form['chart'] = array(
+			 '#type' => 'markup',
+			 '#markup' => $markup,
+			 );
+
+  return $form;
+  
+}
+
+/**
+ * validate hookd of reservations_resource_chart_form
+ */
+function reservations_resource_chart_form_validate($form,$form_state) {
+  $start = reservations_resource_chart_get_form_input($form_state,
+						      'filters', 'start');
+
+  $start = $start ? $start : date('Y-m-d');
+
+  $end = reservations_resource_chart_get_form_input($form_state,
+						    'filters', 'end');
+  $end = $end ? $end : $start;
+
+  $start_object = reservations_resource_chart_input_to_time_object($start);
+  
+  $end_object = reservations_resource_chart_input_to_time_object($end);
+
+  if ($start_object > $end_object) {
+    form_set_error('filters][end',
+		     t("If you enter a end date it must be greater than  ".
+		       "or equal to the start date."));
+
+  }
+
+  //fetch the max advance time
+  $max_advance = 
+    variable_get('reservations_max_days_advance_reservation', 30);
+
+  //see if max advance time is greater than max advance time
+  $diff = $end_object->getTimestamp() - $start_object->getTimestamp();
+  $diff = $diff / (60*60*24);
+  $is_manager = user_access('manage reservations');
+
+  if (!$is_manager && $diff > $max_advance) {
+    form_set_error('filters][end',
+		   t("You may only search for @max days at a time.",
+		     array('@max' => $max_advance)));
+  }
+}
+
+
+/**
+ * submit hookd of reservations_resource_chart_form
+ */
+function reservations_resource_chart_form_submit($form,$form_state) {
+  $start = reservations_resource_chart_get_form_input($form_state,
+						      'filters', 'start');
+
+  $start = $start ? $start : date('Y-m-d');
+
+  $end = reservations_resource_chart_get_form_input($form_state,
+						    'filters', 'end');
+  $end = $end ? $end : $start;
+
+  $start_object = reservations_resource_chart_input_to_time_object($start);
+  
+  $end_object = reservations_resource_chart_input_to_time_object($end);
+
+  $type = $form_state['values']['filters']['type'];
+  $item = $form_state['values']['filters']['item'];
+  $dow = $form_state['values']['filters']['dow'];
+  $category = $form_state['values']['filters']['category'];
+
+
+  drupal_goto(current_path(), 
+	      array('query'=>
+		    array('start'=>$start_object->format('Y-m-d'),
+			  'end'=>$end_object->format('Y-m-d'),
+			  'type'=>$type,
+			  'item'=>$item,
+			  'category'=>$category,
+			  'dow'=>$dow)));
+}
+
+function reservations_resource_chart_search_filters($form,$form_state,
+						    $bucket_categories,
+						    $item_options,
+						    $type_options,
+						    $category_options) {
+  $is_admin_mode = (arg(0) == 'admin') ? TRUE : FALSE;
+
+  $input_type = filter_input(INPUT_GET, 'type');
+  $input_item = filter_input(INPUT_GET, 'item');
+  $input_category = filter_input(INPUT_GET, 'category');
+  $input_dow = filter_input(INPUT_GET, 'dow');
+  $start = filter_input(INPUT_GET, 'start');
+  $end = filter_input(INPUT_GET, 'end');
+  $default_start = $start ? $start : date('Y-m-d H:i:s', strtotime('now'));
+  $default_end = ($end && $start != $end) ? $end : '';
+
+  asort($type_options);
+  $type_options = array_merge(array('<select>'), $type_options);
+
+  asort($item_options);
+
+  $tmp = array(0=>'<select>');
+  foreach ($item_options as $k=>$v) {
+    $tmp[$k] = $v;
+  }
+  $item_options = $tmp;
+
+  asort($category_options);
+
+  $tmp = array(0=>'<select>');
+  foreach ($category_options as $k=>$v) {
+    $tmp[$k] = $v;
+  }
+  $category_options = $tmp;
+
+  $dow_options = array(
+		       0=>'<select>',
+		       'Monday' => 'Monday',
+		       'Tuesday' => 'Tuesday',
+		       'Wednesday' => 'Wednesday',
+		       'Thursday' => 'Thursday',
+		       'Friday' => 'Friday',
+		       'Saturday' => 'Saturday',
+		       'Sunday' => 'Sunday',
+		       );
+
+  $form['filters'] = array(
+				 '#type' => 'fieldset',
+				 "#prefix" => '<div id="form-slot_grid">',
+				 "#suffix" => '</div>',
+				 '#collapsible' => FALSE,
+				 );
+
+  
+
+  $form['filters']['start'] =  
+    array(
+	  '#type' => 'date_popup',
+	  '#date_label_position' => 'within',
+	  '#date_format' => 'm/d/Y',
+	  '#default_value' => $default_start,
+	  '#size' => 15,
+	  '#description' => '',
+	  '#prefix' =>"<table><tr><td><strong>Start:</strong></td><td>",
+	  '#suffix' => "</td>",
+	  );
+
+   if (($is_admin_mode && 
+	variable_get('reservations_resource_chart_staff_end_date_filter', 1))||
+       (!$is_admin_mode &&
+	variable_get('reservations_resource_chart_public_end_date_filter',1))){
+     $form['filters']['end'] = 
+       array(
+	     '#type' => 'date_popup',
+	     '#date_label_position' => 'within',
+	     '#description' => t("Note: large date ranges may cause long page".
+				 " load times, possibly a full minute."),
+	     '#size' => 15,
+	     '#date_format' => 'm/d/Y',
+	     '#default_value' => $default_end,
+	     '#prefix' => "<td><strong>End:</strong></td><td>",
+	     '#suffix' => "</td>",
+	     );
+   }
+
+
+   if (($is_admin_mode && 
+	variable_get('reservations_resource_chart_staff_dow_filter', 1)) ||
+       (!$is_admin_mode &&
+	variable_get('reservations_resource_chart_public_dow_filter',1))){
+     $form['filters']['dow'] = 
+       array(
+	     '#type' => 'select',
+	     '#options' => $dow_options,
+	     '#default_value' => $input_dow,
+	     '#prefix' => "<td><strong>Day of Week: </strong></td><td>",
+	      '#suffix' => "</td></tr></table><table><tr>",
+	     );
+   }
+   
+   if (($is_admin_mode && 
+	variable_get('reservations_resource_chart_staff_category_filter', 1))||
+       (!$is_admin_mode &&
+	variable_get('reservations_resource_chart_public_category_filter',1))){
+     $form['filters']['category'] = 
+       array(
+	     '#type' => 'select',
+	     '#options' => $category_options,
+	     '#default_value' => $input_category,
+	     '#prefix' => "<td><strong>Category: </strong></td><td>",
+	     '#suffix' => "</td>",
+	     );
+   }
+   
+   if (($is_admin_mode && 
+	variable_get('reservations_resource_chart_staff_type_filter', 1)) ||
+       (!$is_admin_mode &&
+	variable_get('reservations_resource_chart_public_type_filter', 1))) {
+     $form['filters']['type'] = 
+       array(
+	     '#type' => 'select',
+	     '#options' => $type_options,
+	     '#default_value' => $input_type,
+	     '#prefix' => "<td><strong>Type: </strong></td><td>",
+	     '#suffix' => "</td>",
+	     );
+   }
+   if ($item_options && count($item_options) > 1 && ($is_admin_mode && 
+	variable_get('reservations_resource_chart_staff_item_filter', 1)) ||
+       (!$is_admin_mode &&
+	variable_get('reservations_resource_chart_public_item_filter',1))){
+     $form['filters']['item'] = 
+       array(
+	     '#type' => 'select',
+	     '#options' => $item_options,
+	     '#default_value' => $input_item,
+	     '#prefix' => "<td><strong>Item: </strong></td><td>",
+	     '#suffix' => "</td>",
+	     );
+   }
+
+   if ($is_admin_mode) {
+     $inventory_arg = arg(4);
+     $reset_link = "admin/reservations/manage/chart";
+   }
+   else {
+    $inventory_arg = arg(2);
+    $reset_link = "reservations/facility-chart";
+   }
+   if ($inventory_arg) {
+     $reset_link .= "/" . $inventory_arg;
+   }
+   
+   $reset_link = l(t("Reset"), $reset_link);
+
+   $form['filters']['submit'] = array(
+				      '#type' => 'submit',
+				      '#value' => t('View Chart'),
+				      '#prefix' => "<td>",
+				      '#suffix' => $reset_link.
+				      "</td></tr></table>",
+				      );
+   return $form;
+}
+
+function reservations_resource_chart_input_to_time_object($time_string) {
+  $field = field_info_field('field_reservations_date');
+  $field_tz = $field['settings']['tz_handling'];
+
+  if ($field_tz == 'site') {
+    $timezone = date_default_timezone(FALSE);
+  }
+  else if ($field == 'utc') {
+    $timezone = 'UTC';
+  }
+  
+  $time_object = new DateTime($time_string, new DateTimeZone($timezone));
+
+  return $time_object;
+
+}
+function reservations_resource_chart_get_form_input($form_state, $key1,
+						    $key2 = NULL,
+						    $key3 = NULL,
+						    $key4 = NULL) {
+
+  if ($key4) {
+    return $form_state['values'][$key1][$key2][$key3][$key4];
+  }
+  else if ($key3) {
+    return $form_state['values'][$key1][$key2][$key3];
+  }
+  else if ($key2) {
+    return $form_state['values'][$key1][$key2];
+  }
+  else if ($key1) {
+    return $form_state['values'][$key1];
+  }
+  else {
+    return NULL;
+  }
+}
+
+function reservations_resource_chart_inventory_check($type_inventory_tids,
+						     $arg_inventory_tids){
+  if (!$arg_inventory_tids[0]) {
+    return TRUE;
+  }
+  foreach($type_inventory_tids as $tid) {
+    if(in_array($tid, $arg_inventory_tids)){
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+function reservations_resource_chart_get_chart_html($bucket_categories,
+						    $bucket_res, 
+						    $start_date) {
+  global $user;
+  
+  //does logged in user have manage reservations perms?
+  $is_manager = user_access('manage reservations');
+  $is_admin_mode = (arg(0) == 'admin') ? TRUE : FALSE;      
+  //$is_manager = FALSE; // ********** fixme: testing non-managers
+
+  
+  $dow = date('l', strtotime($start_date));
+  $dow_int = date('N', strtotime($dow));
+
+
+  // managers are automatically set to use the resource config hours
+  // even if a facility is closed, managers can override
+  if ($is_manager) {
+    $header_start_hour = 
+      variable_get('reservations_resource_chart_staff_start', 9);
+
+    $header_end_hour = 
+      variable_get('reservations_resource_chart_staff_end', 24);     
+    
+    $header_start_minute = 0;
+    $header_end_minute = 0;
+  } 
+  else {
+    // non-managers use inventory hours if they exists, if not, 
+    // use reservation api configured hours
+
+    $exist_inventory_hrs = FALSE;
+    if (module_exists('reservations_inventory')) {
+      //find inventory tid (if it exists) from the URL
+      $inventory_arg = $is_admin_mode ? arg(4) : arg(2);
+      $inventory_tid = is_numeric($inventory_arg) ? $inventory_arg : 0;
+      
+      //$is_admin_mode = FALSE; //********** fixme: testing non-manager
+      //$inventory_tid = 1680; // ********** fixme: testing non-manager 
+      $hours_of_operation_inv = module_invoke(
+            'reservations_inventory', 'get_hours_of_operation', $inventory_tid);            
+      $exist_inventory_hrs = $hours_of_operation_inv['exist_inventory_hrs'];
+      $hours_array = $hours_of_operation_inv[$dow_int];   
+    }    
+    
+    if (!$exist_inventory_hrs) {
+      // no inventory hours of operation avaialble
+      $var_name = 'reservations_hours_' . strtolower($dow);
+      $hours = variable_get($var_name);
+      $hours_array = explode('-', $hours);    
+    }
+
+    $time = array_shift($hours_array);   
+    $time_array = explode(':', $time);
+    $header_start_hour = $time_array[0];
+   
+    $header_start_minute = ($time_array[1] >= 0 && $time_array[1] < 30) 
+      ? 0 : 30;
+
+    $time = array_shift($hours_array);
+    $time_array = explode(':', $time);
+    $header_end_hour = $time_array[0];
+    if ($time_array[1] == '00') {
+      $header_end_minute = 0;
+    }
+    else if ($time_array[1] > 30 && $time_array[1] < 60) {
+      $header_end_hour++;
+      $header_end_minute = 0;
+    }
+    else {
+      $header_end_minute = 30;
+    } 
+  }
+
+  $row_end_timestamp = 
+    reservations_resource_chart_get_timestamp($start_date, 
+					      $header_end_hour,
+					      $header_end_minute);
+  $row_start_timestamp = 
+    reservations_resource_chart_get_timestamp($start_date, 
+					      $header_start_hour,
+					      $header_start_minute);
+
+
+  foreach($bucket_categories as $bucket_tid => $buckets) {
+    
+    foreach ($buckets as $bucket_name => $bucket_items) {
+      $todays_reservations = $bucket_res[$bucket_name];
+      if ($todays_reservations) {
+	$reservations = array();
+	
+	$reservation_count = count($todays_reservations);
+
+	$placed_reservation = FALSE;
+	foreach ($todays_reservations as $index => $item_reservation) {
+	  reset($bucket_items);
+	  foreach ($bucket_items as $key=>$bucket_item) {
+	    $var_name = 'last_end_time_' . $bucket_item->type . '_' .$key;
+	    if (!$$var_name) {
+	      $$var_name = 0;
+	    }
+	    $tmp = date('h:ia', $$var_name);
+
+	    if (strtotime($item_reservation->reserve_start_time) >=
+		$$var_name) {
+	      $bucket_items[$key]->reservations[] = $item_reservation;
+	      $$var_name = strtotime($item_reservation->reserve_end_time);
+	      $placed_reservation = TRUE;
+	      break;
+	    }
+	    $placed_reservation = FALSE;
+	  }
+	  if ($bucket_items && $is_manager && $placed_reservation == FALSE) {
+	    drupal_set_message(t("Error Code #343431: Could not place bucket ".
+				 "reservation."));
+	    
+	  }
+	}
+      }
+      foreach ($bucket_items as $bucket_item) {
+	$permission = 'edit own '.$bucket_item->type.' content';
+	$can_reserve_item = user_access($permission);
+
+	if (!$can_reserve_item) {
+	  continue;
+	}
+
+	$block_start_timestamp = $row_start_timestamp;	
+	
+	$item_nid = $bucket_item->nid;
+
+	if ($is_manager) {
+	  $item_title = isset($bucket_item->code) ? 
+	    $bucket_item->code : $bucket_item->title;
+	  $item_title = 
+	    l($item_title, 'node/' . $item_nid, 
+	      array(
+		    'attributes' => 
+		    array(
+			  'title' => 
+			  t("This represents a slot in a bucket, not an " .
+			    " actual item"),
+			  ),
+	    	    'html' => TRUE,
+		    )
+	      );
+	  
+	}
+	else {
+	  $item_title = $bucket_item->title;
+	}
+
+	$reservations = (isset($bucket_item->reservations) && 
+			 is_array($bucket_item->reservations)) ? 
+	  $bucket_item->reservations : array();
+      
+	$has_reservations = false;
+        $reservation_start_blocks = array();
+
+	foreach ($reservations as $index => $item_reservation) {
+	  $tmp = strtotime($item_reservation->reserve_start_time);
+
+	  if ($tmp < $row_start_timestamp) {
+	    $item_reservation->reserve_start_time = 
+	      date('Y-m-d H:i:s', $row_start_timestamp);
+	  }
+
+	  if ($item_reservation->check_out_time) {
+	     $check_out_time = strtotime($item_reservation->check_out_time);
+          }
+          else {
+            $check_out_time = null;
+          }
+          if ($item_reservation->check_in_time) {
+	     $check_in_time = strtotime($item_reservation->check_in_time);
+          }
+          else {
+            $check_in_time = null;
+          }
+
+	  //IF THE CHECKOUT TIME IS LATER THAN THE RESERVE END TIME WE HAVE
+	  //ISSUES
+	  if($check_out_time &&
+	     $check_out_time >=strtotime($item_reservation->reserve_end_time)){
+
+            $item = node_load($item_reservation->item_id);
+            $future_checkout_time_error = 
+	          "The reservation ".
+              l($item_reservation->reservation_id.
+	      	" ($item_reservation->name) ",
+	      		'node/'.
+	      	$item_reservation->reservation_id).
+              " for ".l($item->title, "node/$item->nid").
+                " cannot be displayed because its check out time,  " .
+	      $item_reservation->check_out_time.
+                " is later than its intended check in time, ".
+	      $item_reservation->reserve_end_time.
+	      ".<br/>";
+	    continue;
+          }
+	  
+	  //PUT RESERVATIONS INTO THEIR TIME BLOCKS
+	  $has_reservations = true;
+
+          //figure out what time to use for the start of the res block
+          //it will either be the reserve_start_time or the check_in_time
+          if ($check_out_time &&
+              (!$check_in_time ||
+	       $check_out_time < $check_in_time )) {
+            $index = $check_out_time;
+            $minutes = date('i', $index);
+            if ($minutes != 0 AND $minutes != 30 ) {
+              if ($minutes < 30) {
+                $index = mktime(date('H', $index), 0, 0,
+				date('m', $index),date('d', $index),
+				date('Y', $index));
+              }
+              else  {
+                $index = mktime(date('H', $index), 30, 0,
+				date('m', $index),date('d', $index),
+				date('Y', $index));
+              }
+            }
+            else {
+              $index = mktime(date('H', $index), date('i', $index), 0,
+			      date('m', $index),date('d', $index),
+			      date('Y', $index));
+            }
+          }
+	  else {
+            $index = strtotime($item_reservation->reserve_start_time);
+          }
+
+	  $item_reservation->res_block_start_time = $index;
+          if ( $index < $block_start_timestamp ) {
+            $index = $block_start_timestamp;
+          }
+
+          //figure out what time to use for the end of the res block
+          //it will either be the reserve_start_time or the check_in_time
+          if ($check_in_time &&
+              $check_out_time < $check_in_time ) {
+            $minutes = date('i', $check_in_time);
+            if ($minutes != 0 AND $minutes != 30 ) {
+              if ($minutes < 30) {
+                $check_in_time = mktime(date('H', $check_in_time), 30, 0,
+					date('m', $check_in_time),
+					date('d', $check_in_time),
+					date('Y', $check_in_time));
+              }
+	      else  {
+		$check_in_time = mktime(date('H', $check_in_time), 0, 0,
+					date('m', $check_in_time),
+					date('d', $check_in_time),
+					date('Y', $check_in_time)) + 60*60;
+	      }
+	    }
+	    else {
+		$check_in_time = mktime(date('H', $check_in_time), 
+					date('i', $check_in_time), 0,
+					date('m', $check_in_time),
+					date('d', $check_in_time),
+					date('Y', $check_in_time));
+	    }
+	    if ( $check_in_time > $row_end_timestamp ) {
+	      $check_in_time = $row_end_timestamp;
+	    }
+	    $item_reservation->res_block_end_time = $check_in_time;
+	  }
+	  else {
+            $item_reservation->res_block_end_time = 
+	      strtotime($item_reservation->reserve_end_time);
+
+            if ( $item_reservation->res_block_end_time > $row_end_timestamp ) {
+              $item_reservation->res_block_end_time = $row_end_timestamp;
+            }
+          }
+	  //Put the reservations in the arrays, one for checking on reservation
+          //overlaps, one for displaying on the grid
+          $reservation_start_blocks[$index][$item_reservation->reservation_id]
+	    = $item_reservation;
+          $tmp_time = strtotime($item_reservation->reserve_start_time);
+          $original_reserve_times[$tmp_time][$item_reservation->reservation_id]
+            = $item_reservation;
+
+	}//end of loop processing reservations for an item
+	//all reservations should be in $reservation_start_blocks and 
+	//$original_reserve_times
+	if ($has_reservations) {
+	  //only here if you there needs to be logging for debugging
+	}
+	
+	$overlap_errors =
+	  reservations_resource_chart_overlap_check($original_reserve_times,
+						    $reservation_start_blocks);
+	if ($has_reservations) {
+	  //only here if you there needs to be logging for debugging
+	}
+	if ($wrong_day_error) {
+	  $errors .= $wrong_day_error;
+          $wrong_day_error = null;
+	}
+        if ($future_checkout_time_error) {
+          $errors .= $future_checkout_time_error;
+          $future_checkout_time_error = null;
+	}
+        if ($overlap_errors) {
+          $errors .= $overlap_errors;
+          $overlap_errors = null;
+        }
+        if ($reversed_check_in_error) {
+          $errors .= $reversed_check_in_error;
+	  $reversed_check_in_error = null;
+        }
+
+	$img_path = drupal_get_path('module', 'reservations_resource_chart').
+	  "/images/green_square_plus.gif";
+
+	if($is_admin_mode) {
+	  $label = "-*-"; 
+	}
+	else {
+	  $label = "<img class='reservations_resource_chart_add_img' 
+                       src='/$img_path' height=20 width=20>";
+	}
+	
+	$row_values = array();
+	$row_values[] = array('data' => $item_title,);
+
+	if (!$has_reservations) {
+          for ($block_end_timestamp = $block_start_timestamp + 60*30;
+	       $block_end_timestamp < $row_end_timestamp + 60 * 30;
+	       $block_end_timestamp += 60*30) {
+	   
+	    $url_timestamp = $block_end_timestamp-60*30;
+        
+	    $title = date('g:ia', $url_timestamp) . " ".$bucket_item->title;
+
+	    $add_reservation_link =  
+	      reservations_resource_chart_get_add_link($label, $item_nid,
+						       $bucket_item->type,
+						       $title,
+						       $url_timestamp);
+	    
+	    $data = $add_reservation_link;
+	    
+            $row_values[] = array('data'=>$data);
+          }
+        }
+	
+	//THIS ROW HAS RESERVATIONS SO WE WILL PLACE THE RESERVATIONS 
+	if ($has_reservations) {
+	  $counter_test = 0;
+          for ($block_end_timestamp = $block_start_timestamp + 60*30;
+	       ($block_end_timestamp <= $row_end_timestamp);
+	       $block_end_timestamp += 60*30) {
+	    
+	    if ($counter_test == 50) {
+	      drupal_set_message("Infinite Loop Error #787438");
+	      break;
+	    }
+	    $counter_test++;
+            if (array_key_exists($block_start_timestamp,
+				 $reservation_start_blocks)) {
+              $data='';
+
+              $item_reservation=
+		$reservation_start_blocks[$block_start_timestamp];
+
+              $reservation_id = $item_reservation->reservation_id;
+	      $reserve_end_timestamp = $item_reservation->res_block_end_time;
+
+              $col_span=($reserve_end_timestamp-$block_start_timestamp)/
+		(30*60);
+
+              $reservation_name=$item_reservation->name;
+           
+              $text = "<span class = 'reservations_internal_grid'>";
+
+              $display_class = NULL;
+	      if (!$is_admin_mode) {
+		//do nothing
+	      }
+              else if ($item_reservation->livefeed &&
+		       $item_reservation->check_in_time) {
+                $display_class = 'reservations_live_checked_in';
+              }
+
+	      else if ($item_reservation->livefeed) {
+		$display_class = 'reservations_live';
+	      }
+	      else if ($item_reservation->status ==
+		       RESERVATIONS_STATUS_UNCONFIRMED) {
+                $display_class = 'reservations_unconfirmed';
+	      }     
+              else if ($item_reservation->check_in_time) {
+                $display_class = 'reservations_checked_in';
+              }
+              else if ($item_reservation->check_out_time) {
+                $display_class = 'reservations_checked_out';
+              }
+              else {
+                $display_class = 'reservations_confirmed';
+              }
+
+	      $title = date('g:ia',$block_start_timestamp).
+		" $reservation_name $bucket_item->title";
+
+	      $text .= "<span class='$display_class'>";
+		
+	      if ($is_manager) {
+		$link_label = $reservation_name;
+		$var_name = 'reservations_resource_chart_display_' .
+		  'reservation_id_filter';
+		$display_id = variable_get($var_name);
+		$link_label .= $display_id ? " " .$reservation_id : "";
+		
+		$edit_reservation_link =
+		  l($link_label, "node/".$reservation_id."/edit",
+		    array(
+			  'attributes' => 
+			  array(
+				'class' =>
+				array('resource-chart-username'),
+				'title' => $title . ' (' . $reservation_id .
+				')',
+				),
+			    ));	
+		$text .= $edit_reservation_link;
+	      }
+	      else {
+		$text .= ($user->name != $item_reservation->name) ?
+		  t("Reserved") : t("Reserved By Me");
+		$display_class = ($user->name == $item_reservation->name) ? 
+		  'reservations_checked_out' : '';
+	      }
+	      $text .= "</span>";
+	    
+	      
+	      $cell_classes = array('resource-chart-username');
+              if ( $display_class ) {
+                $cell_classes[] = $display_class;
+              }
+              $row_values[]  = array('data'=>$text,
+                                     'colspan'=>$col_span,
+                                     'align'=>'center',
+                                     'class' => 'resource-chart-username '.
+				     $display_class,
+                                     );
+	      $block_start_timestamp = $reserve_end_timestamp;	      
+              $block_end_timestamp=$reserve_end_timestamp;
+	    }
+	    else {
+	      $url_timestamp=$block_start_timestamp;
+	      $title = date('g:ia', $url_timestamp) . " " . 
+		$bucket_item->title;
+	      $add_reservation_link = 
+		reservations_resource_chart_get_add_link($label, $item_nid,
+							 $bucket_name,
+							 $title,
+							 $url_timestamp);
+	      
+	      $data = $add_reservation_link;
+	      $block_start_timestamp = $block_end_timestamp;
+	      $row_values[] = array('data'=>$data);
+	    }
+
+
+	  }
+	}//finshed building row 
+	$rows[] = $row_values;	    
+      }//end of bucket items
+    }//end of buckets
+  }// end of bucket terms
+
+
+  $headers = reservations_resource_chart_get_headers($header_start_hour,
+						     $header_start_minute,
+						     $header_end_hour,
+						     $header_end_minute);
+
+  $attributes = array(
+		      'border'      => 1,
+		      'cellspacing' => 0,
+		      'cellpadding' => 0,
+		      'class'       => array('resource-daily-chart')
+		      );
+  // including 'class'       => 'resource-daily-chart' and sticky 
+  // causes error
+  $table = theme_table(array('header'=>$headers,
+			     'rows'=>$rows,
+			     'attributes'=>$attributes, 'sticky' => TRUE));
+
+  return $table;
+}
+
+function reservations_resource_chart_get_add_link($label, $item_nid, 
+						  $bucket_name, $title,
+						  $url_timestamp) {
+
+  //find inventory tid (if it exists) from the URL
+  $is_admin_mode = (arg(0) == 'admin') ? TRUE : FALSE;
+  $inventory_arg = $is_admin_mode ? arg(4) : arg(2);
+  $inventory_tid = is_numeric($inventory_arg) ? $inventory_arg : 0;
+
+  $url = "node/add/reservations-reservation";
+  $url .= ($inventory_tid) ? "/inventory/" . $inventory_tid : "";
+  $add_reservation_link =
+    l($label, $url,
+      array(
+	    'attributes' => array(
+				  'class' =>
+				  array('facilities-grid'),
+				  'title' => $title,
+				  ),
+	    
+	    'query' => array(
+			     'start_time' => $url_timestamp,
+			     'item_nid' => $item_nid,
+			     'bucket_name' => $bucket_name,
+			     ),
+	    'html' => TRUE,
+	    ));
+  
+  return $add_reservation_link;
+}
+
+function reservations_resource_chart_get_timestamp($date_string,
+						   $hour = 0,
+						   $minute = 0,
+						   $second = 0) {
+  $timestamp = strtotime($date_string);
+  $ret_stamp = mktime($hour, $minute, $second,
+		      date('n', $timestamp),
+		      date('j', $timestamp),
+		      date('Y', $timestamp));
+ 
+  return $ret_stamp;
+}
+
+function reservations_resource_chart_get_headers($header_start_hour,
+						 $header_start_minute,
+						 $header_end_hour,
+						 $header_end_minute){
+  $headers = array();
+
+  $column_count = (($header_end_hour - $header_start_hour));
+
+  if ($header_end_minute > $header_start_minute) {
+    $column_count ++;
+  }
+  else if ($header_start_minute > 0 && $header_end_minute > 0) {
+    $column_count ++;
+  }
+
+  $data = t("ITEM");
+  $headers[] = array('data' => $data);
+
+  for ($i = $header_start_hour; 
+       $i < $column_count + $header_start_hour; 
+       $i++) {
+
+    $hour = ($i<=12) ? $i : $i-12;
+     
+    if (!($i == $header_start_hour && $header_start_minute > 0)) {
+      $data = $hour.":00";
+      $headers[] = array('data' => $data);
+    }
+    if (!($i == $column_count + $header_start_hour - 1 && 
+	  $header_end_minute > 0)) {
+      
+      $data = $hour.":30";
+      $headers[] = array('data' => $data);
+      
+    }
+    
+  }
+  return $headers;
+}
+
+/**
+ * @param $results the reservations for a particular day 
+ */
+function reservations_resource_chart_get_item_reservations($day,
+							   $results,
+							   &$bucket_res) {
+
+  $field = field_info_field('field_reservations_date');
+  $field_tz = $field['settings']['tz_handling'];
+
+  //iterate over results, store in array
+  foreach($results[$day] as $k=>$result) {
+    $data = $result->_field_data['nid']['entity'];
+    $status = $data->reservations_reservation_status;      
+    //THESE SHOULD BE FILTERED OUT BY THE VIEW, BUT KEEPING HERE JUST IN CASE
+    if ($status == RESERVATIONS_STATUS_CANCELLED ||
+	$status == RESERVATIONS_STATUS_DENIED ||
+	$status == RESERVATIONS_STATUS_NO_SHOW) {
+      continue;
+    }
+
+    $should_ignore_unconfirmed = 
+      variable_get('reservations_ignore_unconfirmed_reservations', FALSE);
+    
+    if ($should_ignore_unconfirmed && 
+	$status == RESERVATIONS_STATUS_UNCONFIRMED) {
+      continue;
+    }
+
+    $res_node = node_load($result->nid);
+    $field_name =
+      variable_get('reservations_resource_chart_project_field_name');
+
+    $pid =
+      reservations_resource_chart_get_single_field_value($res_node,
+							 $field_name,
+							 'target_id');
+    $project = $pid ? node_load($pid) : NULL;
+    if ($project) {
+      $livefeed =
+	reservations_resource_chart_get_single_field_value($project,
+							   'field_device',
+							   'tid');
+    }
+    else {
+      $livefeed = NULL;
+    }
+
+    $reserve_start_time = $result->start_time;
+
+    $reserve_end_time = $result->end_time;
+    
+    $reserve_end_time = 
+      reservations_resource_chart_end_time_shift($reserve_end_time);
+    
+    if ($status == RESERVATIONS_STATUS_PENDING ||
+	$status == RESERVATIONS_STATUS_UNCONFIRMED) {
+      $check_out_time = $check_in_time = NULL;
+    }
+    else if ($status == RESERVATIONS_STATUS_CHECKED_OUT) {
+      $check_out_time = $reserve_start_time;
+      $check_in_time = NULL;
+    }
+    else  if ($status == RESERVATIONS_STATUS_CHECKED_IN) {
+      $check_out_time = $reserve_start_time;
+      $check_in_time = $reserve_end_time;
+    }
+    else {
+      $check_out_time = $check_in_time = NULL;
+    }
+
+    foreach ($data->reservations_reservation_items as $did=>$item_result) {
+      $item_reservation = new stdClass();
+      $item_reservation->check_out_time = $check_out_time;
+      $item_reservation->check_in_time = $check_in_time;
+      $item_reservation->item_id = $item_result['reservations_item_nid'];
+      $item_reservation->name = $data->name;
+      $item_reservation->reservation_id = $data->nid;
+      $item_reservation->reserve_start_time = $reserve_start_time;
+      $item_reservation->reserve_end_time = $reserve_end_time;
+      $item_reservation->status = $status;
+      $item_reservation->livefeed = $livefeed;
+      
+      $type = $item_result['type'];
+      $bucket_res[$day][$type] = $bucket_res[$day][$type] ? 
+	$bucket_res[$day][$type] : array();
+
+      if (reservations_type_setting($type) == 'bucket') {
+	$bucket_res[$day][$type][] = $item_reservation;
+      }
+      else {
+	$reservation_items[$item_result['reservations_item_nid']][] = 
+	  $item_reservation;
+      }
+    }
+  }
+
+  return $reservation_items;
+}
+
+function reservations_resource_chart_get_no_resources_msg($args) {
+  
+  $ret = "";
+  $title = $args['title'];
+  if ($title) {
+    $ret .= "<h2>".t("No resources to display for @title",
+		     array('@title' =>$title))."</h2>";
+  }
+  else {
+    $ret .= "<h2>".t("No resources to display.")."</h2>";
+  }
+  //fixme, change message when in producer mode
+  $ret .= t("A resource is a type of reservable item that is reserved 
+            specifically, generally something like a studio or a resource.
+            To display on the chart it must be a valid reservable resource
+            and it needs it's grouping field set.");
+
+  return $ret;
+}
+
+function reservations_resource_chart_get_items_for_type(&$reservation_items,
+							$bucket_content_type,
+							$args,
+							$category_id,
+							&$item_options, 
+							&$type_options, 
+							&$category_options,
+							$content_types,
+							$is_admin_mode) {
+  $cache_var_name = 'reservation_resource_chart_item_cache_'.
+    $bucket_content_type;
+  $cache_options_var_name = 'reservation_resource_chart_item_option_cache_'.
+    $bucket_content_type;
+
+  global $$cache_var_name;
+
+  if (isset($$cache_var_name)) {
+    $tmp = $$cache_var_name;
+    $items = array();
+    foreach ($tmp as $item) {
+      $item->reservations = NULL;
+      $items[] = $item;
+    }
+    $$cache_var_name = $tmp;
+  }
+  else {
+    $items = array();
+    $item_options = $item_options ? $item_options: array();
+    $type_options = $type_options ? $type_options : array();
+    $category_options = $category_options ? $category_options : array();
+
+    $field_info = field_info_field('field_facility_code');
+    
+    if ($field_info) {
+      $fields = "n.nid, n.type, n.title , c.field_facility_code_value as code,
+        i.reservations_default_availability"; 
+      $facility_code_join = 
+        " LEFT JOIN field_revision_field_facility_code c
+         ON c.revision_id=i.vid ";
+    }
+    else {
+      $fields = "n.nid, n.type, n.title , i.reservations_default_availability";
+      $facility_code_join = "";
+    }
+
+    $sql = "
+      SELECT $fields
+      FROM  node n
+      INNER JOIN reservations_node_type nt ON n.type = nt.type 
+      LEFT JOIN reservations_reservation_item_node i ON n.vid = i.vid 
+      $facility_code_join
+      WHERE i.reservations_sub_type = 1     
+      AND n.type='$bucket_content_type' 
+      AND i.reservations_default_availability = 1 
+      ORDER BY n.title desc
+    ";
+    $results = db_query($sql);
+   
+    $counter = 0;
+    $buckets = array();
+    while ($result = $results->fetchObject()) {
+      $counter ++;
+      $item = new stdClass();
+      $item->title = (reservations_type_setting($result->type) == 'bucket') ?
+	$content_types[$result->type]->name . " #". $counter : $result->title;
+
+      $item->nid = $result->nid;
+      $item->type = $bucket_content_type;
+      $item->code = $result->code;
+      $item->status = $result->reservations_default_availability;
+      $item->category = $category_id;
+
+      //if we have custom ids, filter out item before it's values go into
+      //the dropdown option arrays
+
+      if (isset($args['custom_item_ids']) && $args['custom_item_ids'] &&
+	  !in_array($item->nid, $args['custom_item_ids'])) {
+	continue;
+      }
+
+      //if not in admin mode, filter out if user does not have permission
+      if (!$is_admin_mode) {
+      	$permission = 'edit own '.$result->type.' content';
+	$can_reserve_item = user_access($permission);
+
+	if (!$can_reserve_item) {
+	  continue;
+	}
+
+      }
+
+      
+      //fill the arrays to be used on teh dropdown filters
+      if (reservations_type_setting($result->type) != 'bucket') {
+	$item_options[$item->nid] = $item->title;
+      }
+
+      $type_options[$bucket_content_type] = 
+	node_type_get_name(node_load($item->nid));
+
+      $category_options[$category_id] = 
+	taxonomy_term_load($category_id)->name;
+
+      //see if we are trying to filter this item out with the filters
+      if (isset($args['item_ids']) && $args['item_ids'] &&
+	  !in_array($item->nid, $args['item_ids'])) {
+	continue;
+      }
+      if (isset($args['types']) && $args['types'] &&
+	  !in_array($item->type, $args['types'])) {
+	continue;
+      }
+
+      if (isset($args['categories']) && $args['categories'] &&
+	  !in_array($category_id, $args['categories'])) {
+	continue;
+      }
+
+      //item passed all tests, display the row for the item on teh chart
+      $item->reservations = NULL;
+      $items[] = $item;
+    }
+    $$cache_var_name = $items;
+  }
+
+
+  $ret = array();
+
+  foreach ($items as $item) {
+    //if we aren't a bucket, stick the item's reservations on the item
+    if (reservations_type_setting($result->type) != 'bucket') {
+      if (isset($reservation_items[$item->nid])) {
+	$item->reservations = $reservation_items[$item->nid];
+      }
+    }
+    $ret[] = $item;
+  }
+  return $ret;
+
+}
+
+function reservations_resource_chart_overlap_check(&$original_reserve_times,
+						  &$reservation_start_blocks){
+
+  $overlaps = array();
+  $error_message = NULL;
+  if ( is_array($reservation_start_blocks) &&
+       ! empty($reservation_start_blocks) )
+    {
+      $prev_reservation = null;
+      foreach ( $original_reserve_times as $index => $reservations) {
+	foreach ($reservations as $reservation_id => $reservation) {
+	  if ( $prev_reservation && ($reservation->reserve_start_time <
+				     $prev_reservation->reserve_end_time) &&
+	       !$prev_reservation->check_in_time ) {
+	    $overlaps[] = array($prev_reservation, $reservation);
+	  }
+	}
+	$prev_reservation = $reservation;
+      }
+      $original_reserve_times = null;
+      reset($reservation_start_blocks);
+      $prev_reservation = null;
+      $nudged_reservations = null;
+      $altered_reservation_start_blocks = array();
+      $counter = 0;
+      $block_keys = array_keys($reservation_start_blocks);
+      asort($block_keys);
+      $first_time = true;
+
+      while ($first_time ||
+	     ($nudged_reservations && (count($nudged_reservations) > 0)) ||
+	     ($reservations && (count($reservations) > 0))) {
+	$first_time = false;
+	$start_time = array_shift($block_keys);
+	$reservations = $reservation_start_blocks[$start_time];
+
+	$res_keys = array();
+	if ($reservations) {
+	  $res_keys = array_keys($reservations);
+	}
+
+	//nudged reservations are ones that we will try to put into the next
+	//timeblock
+	if ($nudged_reservations) {
+	  if ($res_keys) {
+	    $res_keys = array_merge(array_keys($nudged_reservations), 
+				    $res_keys);
+	  }
+	  else {
+	    $res_keys = array_keys($nudged_reservations);
+	  }
+	  foreach($nudged_reservations as $reservation_id => $reservation) {
+	    $reservations[$reservation_id] = $reservation;
+	  }
+	}
+
+	$nudged_reservations = array();
+	$nudge_remaining_reservations = false;
+	foreach ($res_keys as $k=> $reservation_id) {
+	  $reservation = $reservations[$reservation_id];
+
+	  //if this boolean has been set to true, it means we need to move
+	  //all of the rest of the reservations that were entered into the
+	  //$reservation_start_blocks array at $start_time to the next
+	  //$start_time
+	  if ( $nudge_remaining_reservations) {
+	    if ( $reservation->res_block_start_time ==
+		 $prev_reservation->res_block_start_time) {
+	      $reservation->res_block_start_time  += 30*60;
+	    }
+
+	    $nudged_reservations[$reservation->reservation_id] = $reservation;
+	    continue;
+	  }
+	  //if $reservation->res_block_start_time equals res_block_end_time
+	  //we will not be able to display this reservation
+	  if ($reservation->res_block_start_time ==
+              $reservation->res_block_end_time) {
+	    $item = node_load($reservation->item_id);
+          $error_message .= "Cannot display ".
+            l($reservation->reservation_id." ($reservation->name) ",
+            'node/'.$reservation->reservation_id)." reservation for " .
+	    l($item->title, "node/$item->nid").
+	    " because there are too many overlaps (of check out/in times) at ".
+	    date('g:ia', $prev_reservation->res_block_start_time)."<br/>";
+	  continue;
+	  }
+
+	  //if two or more reservations have teh same res_block_start_time
+	  //then we will store the one with the earliest res_block_end_time
+	  //in the $altered_reservation_start_blocks array
+	  if ( $prev_reservation && ($reservation->res_block_start_time ==
+				     $prev_reservation->res_block_start_time)){
+	    //go into this if if we are replacing teh $prev_reservation
+	    //with $reservation in the $altered_reservation_start_blocks array
+	    if ($reservation->res_block_end_time <
+		$prev_reservation->res_block_end_time) {
+
+	      $altered_reservation_start_blocks
+		[$reservation->res_block_start_time] = $reservation;
+
+	      $prev_reservation->res_block_start_time  += 30*60;
+	      $nudged_reservations[$prev_reservation->reservation_id] = 
+		$prev_reservation;
+	      $prev_reservation = $reservation;
+	    }
+	    //go into the else if we will push $reservation to the next
+	    //time block
+	    else {
+	      $reservation->res_block_start_time  += 30*60;
+	      $nudged_reservations[$reservation->reservation_id] = 
+		$reservation;
+
+	      $nudge_remaining_reservations = true;
+	    }
+	    continue;
+	  }
+	  //will go into this block if the $prev_reservation overlaps
+	  //$reservation
+	  else if ( $prev_reservation && 
+		    ($reservation->res_block_start_time <
+		     $prev_reservation->res_block_end_time) ) {
+
+	    $new_cur_start = $reservation->res_block_start_time;
+	    $new_prev_end = $prev_reservation->res_block_end_time;
+	    //first see if you can move the prev_reservations end time without
+	    //making it a zero length block
+	    while ($new_cur_start < $new_prev_end) {
+	      $new_prev_end -= 30*60;
+
+	      //see if backing the end time a half hour still allows 
+	      //reservation to show up
+	      if ($new_cur_start >= $new_prev_end &&
+		  $new_prev_end > $prev_reservation->res_block_start_time) {
+		$prev_reservation->res_block_end_time = $new_prev_end;
+
+              $altered_reservation_start_blocks
+                [$prev_reservation->res_block_start_time] = $prev_reservation;
+              $altered_reservation_start_blocks
+		[$reservation->res_block_start_time]
+                = $reservation;
+              $prev_reservation = $reservation;
+	      }
+	      //we've backed up too far
+	      else if ($new_cur_start >= $new_prev_end) {
+		$new_cur_start += 30*60;
+		$reservation->res_block_start_time = $new_cur_start;
+		$nudge_remaining_reservations = true;
+		$nudged_reservations[$reservation->reservation_id] = 
+		  $reservation;
+	      }
+	    }
+	  }
+	  else {
+	    $altered_reservation_start_blocks
+	      [$reservation->res_block_start_time] = $reservation;
+	  }
+	  $prev_reservation = $reservation;
+	}//END OF FOR LOOP
+      }//end of while loop
+      $reservation_start_blocks = $altered_reservation_start_blocks;
+    }
+
+  if ( $overlaps ) {
+    $error_message .= "There are overlaps on reservation times! The " .
+      "following pairs of reservations overlap: <br/> ";
+    foreach ( $overlaps as $overlap ) {
+      $res1 = $overlap[0];
+      $res2 = $overlap[1];
+      $item = node_load($res1->item_id);
+      $error_message .= l($item->title.":", "node/$item->nid").
+        l($res1->reservation_id." ($res1->name)",
+          'node/'.$res1->reservation_id) ." overlaps ".
+	l($res2->reservation_id." ($res2->name)",
+          'node/'.$res2->reservation_id)."<br/>";
+    }
+  }
+  
+  return $error_message;
+}
+
+//this function bumps reserve end time one second when it was set to H:59:59
+//to prevent validation errors on back to back reservations
+function reservations_resource_chart_end_time_shift($reserve_end_time) {
+  $timestamp = strtotime($reserve_end_time);
+  if (date('s', $timestamp) == 59) {
+    $timestamp ++;
+  }
+
+  return date('Y-m-d H:i:s', $timestamp);
+}
+
+function reservations_resource_chart_form_alter(&$form,&$form_state,$form_id) {
+  if ($form_id== 'reservations_reservation_node_form') {
+    //fetch timestamp from query string
+    $start_time = filter_input(INPUT_GET, 'start_time');
+
+    $lang = $form['language']['#value'];
+    
+    $item_nid = filter_input(INPUT_GET, 'item_nid');
+    $bucket_name = filter_input(INPUT_GET, 'bucket_name');
+    //set item_nid from query string
+
+    if (isset($item_nid) && is_numeric($item_nid) &&
+	reservations_type_setting($bucket_name) != 'bucket') {
+      $form['choice_wrapper']['reservations_reservation_items']['choice_1']
+	['reservations_item_nid']['#default_value']  = $item_nid;
+    }
+    else if ($bucket_name && 
+	     reservations_type_setting($bucket_name) == 'bucket') {
+      $form['choice_wrapper']['reservations_reservation_items']['choice_1']
+	['reservations_item_nid']['#default_value']  = $bucket_name;
+      
+    }
+
+    if (isset($start_time) && is_numeric($start_time)) {
+      $start_time = $start_time - date('Z', $start_time);
+      if ($bucket_name && 
+	  reservations_type_setting($bucket_name) == 'bucket') {
+	$end_time = $start_time + 24*60*60;
+      }
+      else {
+	$end_time = $start_time + 60*60;
+      }
+
+      //set start date/end date and time
+      $form['field_reservations_date'][$lang][0]['#default_value'] = 
+	array('value'=>	date('Y-m-d H:i:s', $start_time),
+	      'value2'=>date('Y-m-d H:i:s', $end_time));
+    }
+  }
+}
+
+/**
+ *
+ */
+function reservations_resource_chart_special_args($form_state,
+						  $arg_string) {
+
+  $ret = array();
+  $ret['inventories'] = array();
+  $ret['item_ids'] = array();
+  $ret['custom_item_ids'] = array();
+  $ret['types'] = array();
+  $ret['categories'] = array();
+  $ret['date_arg'] = '';
+  $ret['start'] = '';
+  $ret['end'] = '';
+  $ret['title'] = '';
+  $ret['url_special_arg'] = '';
+  
+  $start = filter_input(INPUT_GET, 'start');
+  $end = filter_input(INPUT_GET, 'end');
+
+  $start = $start ? $start : date('Y-m-d', strtotime('now'));
+  $end = $end ? $end : date('Y-m-d', strtotime('now'));
+  
+  $ret['start'] = $start;
+  $ret['end'] = $end;
+
+  $start_object = reservations_resource_chart_input_to_time_object($start);
+  $end_object = reservations_resource_chart_input_to_time_object($end);
+
+  $ret['start_object'] = $start_object;
+  $ret['end_object'] = $end_object;
+
+  $ret['start_timestamp'] = $start_object->getTimestamp();
+  $ret['end_timestamp'] = $end_object->getTimestamp();
+
+  $ret['date_arg'] = $start . '--' . $end;
+
+  $custom_chart_url_arg = 
+    variable_get('reservations_resource_chart_custom_chart_arg_name', 
+		 "studio-chart");
+
+  $custom_chart_title = 
+    variable_get('reservations_resource_chart_custom_chart_title', 
+		 "Studio Resource Chart");
+
+  if ($arg_string == $custom_chart_url_arg) {
+    $ret['title'] = $custom_chart_title;
+    $ret['url_special_arg'] = $arg_string;
+
+    $item_ids = 
+      variable_get('reservations_resource_chart_custom_chart_item_ids', '');
+
+    $item_ids = explode(',', $item_ids);
+    $ret['custom_item_ids'] = $item_ids[0] ? $item_ids : array();
+    foreach($ret['custom_item_ids'] as $item_id) {
+      $node = node_load($item_id);
+      $tids = reservations_inventory_get_inventory_tids($node->type);
+      //fixme deal with multiple inventories since data model supports a 
+      //content type being in multiple inventories
+      $tid = (is_array($tids)) ? $tids[0] : $tid;
+      $ret['inventories'][] = $tid;
+    }
+    $ret['mode'] = 'custom';
+  }
+  else if (isset($arg_string) && $arg_string && is_numeric($arg_string)) {
+    $term = taxonomy_term_load($arg_string);
+    $title = t("@inventory Resource Chart", 
+	       array('@inventory' => $term->name));
+
+    $ret['title'] = htmlspecialchars_decode($title);
+    $ret['inventories'][] = $arg_string;
+    $ret['mode'] = 'default';
+  }
+  else {
+    $ret['title'] = t("Reservation Resource Chart");
+    $ret['mode'] = 'default';
+  }
+
+  $ret['title'] .= " For " . date('l F d, Y', strtotime($start));
+  $ret['title'] .= ($start != $end) ? "--" . 
+    date('l F d, Y', strtotime($end)) : '';
+ 
+  $ret['types'] = filter_input(INPUT_GET, 'type') ?
+    array(filter_input(INPUT_GET, 'type')) : $ret['types'];
+
+  //if we have a item id from the url that will trump any previous ones
+  //search filters have precedence
+  $ret['item_ids'] = filter_input(INPUT_GET, 'item') ? 
+    array(filter_input(INPUT_GET, 'item')) : $ret['item_ids'];
+
+  $ret['categories'] = filter_input(INPUT_GET, 'category') ? 
+    array(filter_input(INPUT_GET, 'category')) : $ret['categories'];
+   
+  return $ret;
+}
+
+/**
+ * Helper function to get a single value off of a entity
+ */
+function reservations_resource_chart_get_single_field_value($entity, 
+							    $field_name,
+							    $index = 'value') {
+  if (isset($entity->{$field_name})) {
+    $field = $entity->{$field_name};
+    if (isset($field[LANGUAGE_NONE]) &&
+        isset($field[LANGUAGE_NONE][0]) &&
+        isset($field[LANGUAGE_NONE][0][$index])) {
+      return $field[LANGUAGE_NONE][0][$index];
+    }
+  }
+  return NULL;
+}
+

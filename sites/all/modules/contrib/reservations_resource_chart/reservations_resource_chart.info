@@ -1,0 +1,13 @@
+name = CMA Reservations: Resource Chart
+description = "Will display a chart(s) of reservations"
+package = Reservations
+core = 7.x
+files[] = reservations_resource_chart.css
+project_status_url = https://github.com/cm-advanced/reservations_resource_chart
+
+version = "7.x-1.0"
+
+dependencies[] = reservations
+
+
+

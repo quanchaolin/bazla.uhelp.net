@@ -1,18 +1,5 @@
-/#.htaccess*
-/.htaccess*
-/.htpasswd*
-/check.php*
-/test.php*
-/test.txt*
-
-
-
-# Ignore everything in default directory
-sites/default/*
-sites/default/.*
-
 # Ignore configuration files that may contain sensitive information.
-sites/*/*settings*
+sites/*/settings*.php
 
 # Ignore paths that contain user-generated content.
 sites/*/files

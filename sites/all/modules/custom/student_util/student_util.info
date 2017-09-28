@@ -1,4 +1,4 @@
-name = uhelp
-description = Helper module for the HELP alumni dashboard
+name = uhelp student util module
+description = uhelp student_util
 package = UHELP
 core = 7.x

@@ -20,10 +20,12 @@ function email_notifications_init() {
 function email_notifications_menu() {
 
   $items = array();
-  $items['admin/config/notifications'] =
+  $items['admin/config/people/email_notifications'] =
       array(
 	    'title' => t('Email Notfication Settings'),
-	    'type' => MENU_NORMAL_ITEM,
+	    'description' =>
+	    t('Enable and Configure Email notifications for certain user ' .
+	      'actions, like almuni updating their employment history'),
 	    'page callback' => 'drupal_get_form',
 	    'page arguments' => array('email_notifications_settings_form'),
 	    'access arguments' => array('access administration pages'),

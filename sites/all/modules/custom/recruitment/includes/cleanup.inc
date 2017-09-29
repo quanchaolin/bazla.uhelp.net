@@ -50,6 +50,7 @@ function recruitement_relationships() {
 			       'relationship_type_id' => 40,
 			       'options' => array('limit' => 1000),
 			       'end_date' => array('IS NULL' => 1),
+			       'is_active' => 1,
 			       ));
 
   if ($result && isset($result['values']) && $result['values']) {
@@ -57,13 +58,14 @@ function recruitement_relationships() {
       $relationships[] = $value;
     }
   }
-
+  
   $result = civicrm_api3('Relationship', 'get',
 			 array(
 			       'sequential' => 1,
 			       'relationship_type_id' => 39,
 			       'options' => array('limit' => 1000),
 			       'end_date' => array('IS NULL' => 1),
+			       'is_active' => 1,
 			       ));
 
   if ($result && isset($result['values']) && $result['values']) {

@@ -45,12 +45,17 @@ function dorm_management_update_room_availability($entity) {
   $nid = db_query($sql)->fetchField();
   $room = node_load($nid);
 
+  if (!$room) {
+    $nid = arg(1);
+    $room = node_load($nid);
+  }
+
   $room->field_cmptd_available_beds[LANGUAGE_NONE][0]['value'] =
     dorm_managment_available_beds($room);
   field_attach_update('node', $room);      
   entity_get_controller('node')->resetCache(array($node->nid));
 }
-function dorm_management_update_relationship($entity, $op) {  
+function dorm_management_update_relationship($entity, $op) {
   $contact = NULL;
   $parent_field_name = isset($entity->field_name) ? $entity->field_name : '';
   if ($parent_field_name && $parent_field_name == 'field_dorm_room_students') {
@@ -63,6 +68,11 @@ function dorm_management_update_relationship($entity, $op) {
 		    "WHERE field_dorm_room_students_value = " . $item_id)->fetchField();
     
     $room = node_load($nid);
+    if (!$room) {
+      $nid = arg(1);
+      $room = node_load($nid);
+    }
+    
     $building_id =
       dorm_management_get_entity_single_value_field($room,
 						    'field_dorm_building',

@@ -184,7 +184,17 @@ class Net_SMTP
         $this->pipelining = $pipelining;
 
         $this->_socket = new Net_Socket();
-        $this->_socket_options = $socket_options;
+        // lottie - OPENFLOWS - SMTPT STARTTLS change for CiviSMTP
+        // https://forum.civicrm.org/index.php?topic=37194.0
+        // remove after upgrade to 4.22+
+        //$this->_socket_options = $socket_options;
+        $this->_socket_options = array(
+            'ssl' => array(
+                'verify_peer'=>false,
+                'verify_peer_name'=>false,
+                'allow_self_signed'=>true
+             )
+         );
         $this->_timeout = $timeout;
 
         /* Include the Auth_SASL package.  If the package is available, we 

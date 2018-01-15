@@ -613,7 +613,7 @@ GROUP BY  currency
 
     // handle custom data.
     if (!empty($params['hidden_custom'])) {
-      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Pledge', CRM_Core_DAO::$_nullObject, $params['id']);
+      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Pledge', NULL, $params['id']);
       $pledgeParams = array(array('pledge_id', '=', $params['id'], 0, 0));
       $customGroup = array();
       // retrieve custom data
@@ -748,22 +748,22 @@ GROUP BY  currency
 
       $pledgeFields = array(
         'pledge_status' => array(
-          'title' => 'Pledge Status',
+          'title' => ts('Pledge Status'),
           'name' => 'pledge_status',
           'data_type' => CRM_Utils_Type::T_STRING,
         ),
         'pledge_frequency_unit' => array(
-          'title' => 'Pledge Frequency Unit',
+          'title' => ts('Pledge Frequency Unit'),
           'name' => 'pledge_frequency_unit',
           'data_type' => CRM_Utils_Type::T_ENUM,
         ),
         'pledge_frequency_interval' => array(
-          'title' => 'Pledge Frequency Interval',
+          'title' => ts('Pledge Frequency Interval'),
           'name' => 'pledge_frequency_interval',
           'data_type' => CRM_Utils_Type::T_INT,
         ),
         'pledge_contribution_page_id' => array(
-          'title' => 'Pledge Contribution Page Id',
+          'title' => ts('Pledge Contribution Page Id'),
           'name' => 'pledge_contribution_page_id',
           'data_type' => CRM_Utils_Type::T_INT,
         ),

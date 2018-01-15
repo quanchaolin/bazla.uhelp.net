@@ -272,12 +272,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Generate ID for some reason & purpose that is unknown & undocumented.
-   */
-  public static function generateID() {
-  }
-
-  /**
    * Add one or more css classes to the form.
    *
    * @param string $className
@@ -1796,13 +1790,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param bool $required
    * @param string $defaultCurrency
    * @param bool $freezeCurrency
+   * @param bool $setDefaultCurrency
    */
   public function addCurrency(
     $name = 'currency',
     $label = NULL,
     $required = TRUE,
     $defaultCurrency = NULL,
-    $freezeCurrency = FALSE
+    $freezeCurrency = FALSE,
+    $setDefaultCurrency = TRUE
   ) {
     $currencies = CRM_Core_OptionGroup::values('currencies_enabled');
     $options = array('class' => 'crm-select2 eight');
@@ -1818,7 +1814,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $config = CRM_Core_Config::singleton();
       $defaultCurrency = $config->defaultCurrency;
     }
-    $this->setDefaults(array($name => $defaultCurrency));
+    // In some case, setting currency field by default might override the default value
+    //  as encountered in CRM-20527 for batch data entry
+    if ($setDefaultCurrency) {
+      $this->setDefaults(array($name => $defaultCurrency));
+    }
   }
 
   /**

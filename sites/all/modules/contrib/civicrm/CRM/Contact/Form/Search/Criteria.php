@@ -299,6 +299,7 @@ class CRM_Contact_Form_Search_Criteria {
       'street_address' => array(ts('Street Address'), $attributes['street_address'], NULL, NULL),
       'supplemental_address_1' => array(ts('Supplemental Address 1'), $attributes['supplemental_address_1'], NULL, NULL),
       'supplemental_address_2' => array(ts('Supplemental Address 2'), $attributes['supplemental_address_2'], NULL, NULL),
+      'supplemental_address_3' => array(ts('Supplemental Address 3'), $attributes['supplemental_address_3'], NULL, NULL),
       'city' => array(ts('City'), $attributes['city'], NULL, NULL),
       'postal_code' => array(ts('Postal Code'), $attributes['postal_code'], NULL, NULL),
       'country' => array(ts('Country'), $attributes['country_id'], 'country', FALSE),
@@ -434,6 +435,8 @@ class CRM_Contact_Form_Search_Criteria {
     }
     CRM_Core_Form_Date::buildDateRange($form, 'relation_start_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
     CRM_Core_Form_Date::buildDateRange($form, 'relation_end_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
+
+    CRM_Core_Form_Date::buildDateRange($form, 'relation_active_period_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
 
     // Add reltionship dates
     CRM_Core_Form_Date::buildDateRange($form, 'relation_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);

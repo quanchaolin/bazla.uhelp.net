@@ -109,15 +109,15 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *   Should form building stop at this point?
    */
   public function buildForm(&$form) {
-    if ($this->_processorName == 'PayPal Express' || $this->_processorName == 'PayPal Pro') {
+    if ($this->supportsPreApproval()) {
       $this->addPaypalExpressCode($form);
-      if ($this->_processorName == 'PayPal Express') {
+      if ($this->_processorName == ts('PayPal Express')) {
         CRM_Core_Region::instance('billing-block-post')->add(array(
           'template' => 'CRM/Financial/Form/PaypalExpress.tpl',
           'name' => 'paypal_express',
         ));
       }
-      if ($this->_processorName == 'PayPal Pro') {
+      if ($this->_processorName == ts('PayPal Pro')) {
         CRM_Core_Region::instance('billing-block-pre')->add(array(
           'template' => 'CRM/Financial/Form/PaypalPro.tpl',
         ));
@@ -137,6 +137,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param CRM_Core_Form $form
    */
   protected function addPaypalExpressCode(&$form) {
+    // @todo use $this->isBackOffice() instead, test.
     if (empty($form->isBackOffice)) {
       $form->_expressButtonName = $form->getButtonName('upload', 'express');
       $form->assign('expressButtonName', $form->_expressButtonName);

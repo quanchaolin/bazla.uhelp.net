@@ -14,7 +14,7 @@
             "reference": "fe0936ee26643249e916849d48e3a51d5f5e278b",
             "shasum": ""
         },
-        "time": "2012-12-21T11:40:51+00:00",
+        "time": "2012-12-21 11:40:51",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -41,17 +41,17 @@
     },
     {
         "name": "phpseclib/phpseclib",
-        "version": "1.0.5",
-        "version_normalized": "1.0.5.0",
+        "version": "1.0.6",
+        "version_normalized": "1.0.6.0",
         "source": {
             "type": "git",
             "url": "https://github.com/phpseclib/phpseclib.git",
-            "reference": "38fa7332e96bcc546ce6eb5cbaa1168c96839393"
+            "reference": "aa8368ed12ef389f20d3932d051a7207471ecbab"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/38fa7332e96bcc546ce6eb5cbaa1168c96839393",
-            "reference": "38fa7332e96bcc546ce6eb5cbaa1168c96839393",
+            "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/aa8368ed12ef389f20d3932d051a7207471ecbab",
+            "reference": "aa8368ed12ef389f20d3932d051a7207471ecbab",
             "shasum": ""
         },
         "require": {
@@ -68,7 +68,7 @@
             "ext-mcrypt": "Install the Mcrypt extension in order to speed up a wide variety of cryptographic operations.",
             "pear-pear/PHP_Compat": "Install PHP_Compat to get phpseclib working on PHP < 5.0.0."
         },
-        "time": "2016-10-22T17:53:16+00:00",
+        "time": "2017-05-08 05:58:24",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -162,7 +162,7 @@
         "require-dev": {
             "phpunit/phpunit": "3.7.*"
         },
-        "time": "2016-12-06T04:32:51+00:00",
+        "time": "2016-12-06 04:32:51",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -197,7 +197,7 @@
             "reference": "b419766515b3426c6da74b0e29e93d71c4f17099",
             "shasum": ""
         },
-        "time": "2015-05-06T18:49:49+00:00",
+        "time": "2015-05-06 18:49:49",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -233,7 +233,7 @@
             "reference": "b8af0cacdc3cbf1e41a586fcb78f506f4121a088",
             "shasum": ""
         },
-        "time": "2015-05-06T20:02:39+00:00",
+        "time": "2015-05-06 20:02:39",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -280,7 +280,7 @@
         "require-dev": {
             "phpunit/phpunit": "3.7.*"
         },
-        "time": "2016-05-11T00:36:29+00:00",
+        "time": "2016-05-11 00:36:29",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -318,6 +318,48 @@
         "homepage": "https://github.com/dompdf/dompdf"
     },
     {
+        "name": "electrolinux/phpquery",
+        "version": "0.9.6",
+        "version_normalized": "0.9.6.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/electrolinux/phpquery.git",
+            "reference": "6cb8afcfe8cd4ce45f2f8c27d561383037c27a3a"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/electrolinux/phpquery/zipball/6cb8afcfe8cd4ce45f2f8c27d561383037c27a3a",
+            "reference": "6cb8afcfe8cd4ce45f2f8c27d561383037c27a3a",
+            "shasum": ""
+        },
+        "time": "2013-03-21 12:39:33",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "phpQuery/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Tobiasz Cudnik",
+                "email": "tobiasz.cudnik@gmail.com",
+                "homepage": "https://github.com/TobiaszCudnik",
+                "role": "Developer"
+            },
+            {
+                "name": "didier Belot",
+                "role": "Packager"
+            }
+        ],
+        "description": "phpQuery is a server-side, chainable, CSS3 selector driven Document Object Model (DOM) API based on jQuery JavaScript Library",
+        "homepage": "http://code.google.com/p/phpquery/"
+    },
+    {
         "name": "pclzip/pclzip",
         "version": "2.8.2",
         "version_normalized": "2.8.2.0",
@@ -332,7 +374,7 @@
             "reference": "19dd1de9d3f5fc4d7d70175b4c344dee329f45fd",
             "shasum": ""
         },
-        "time": "2014-06-05T11:42:24+00:00",
+        "time": "2014-06-05 11:42:24",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -377,7 +419,7 @@
         "require-dev": {
             "phpunit/phpunit": "*"
         },
-        "time": "2015-02-10T20:07:52+00:00",
+        "time": "2015-02-10 20:07:52",
         "type": "class",
         "extra": {
             "branch-alias": {
@@ -414,6 +456,178 @@
         ]
     },
     {
+        "name": "pear/auth_sasl",
+        "version": "v1.1.0",
+        "version_normalized": "1.1.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/pear/Auth_SASL.git",
+            "reference": "db1ead3dc0bf986d2bab0dbc04d114800cf91dee"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/pear/Auth_SASL/zipball/db1ead3dc0bf986d2bab0dbc04d114800cf91dee",
+            "reference": "db1ead3dc0bf986d2bab0dbc04d114800cf91dee",
+            "shasum": ""
+        },
+        "require": {
+            "pear/pear_exception": "@stable"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "@stable"
+        },
+        "time": "2017-03-07 14:37:05",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Auth": "./"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "include-path": [
+            "./"
+        ],
+        "license": [
+            "BSD"
+        ],
+        "authors": [
+            {
+                "name": "Anish Mistry",
+                "email": "amistry@am-productions.biz",
+                "role": "Lead"
+            },
+            {
+                "name": "Richard Heyes",
+                "email": "richard@php.net",
+                "role": "Lead"
+            },
+            {
+                "name": "Michael Bretterklieber",
+                "email": "michael@bretterklieber.com",
+                "role": "Lead"
+            }
+        ],
+        "description": "Abstraction of various SASL mechanism responses"
+    },
+    {
+        "name": "pear/net_socket",
+        "version": "1.0.14",
+        "version_normalized": "1.0.14.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/pear/Net_Socket.git",
+            "reference": "fcd33efd77e4b35ce85489141ab9145343579fe8"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/pear/Net_Socket/zipball/fcd33efd77e4b35ce85489141ab9145343579fe8",
+            "reference": "fcd33efd77e4b35ce85489141ab9145343579fe8",
+            "shasum": ""
+        },
+        "require": {
+            "pear/pear_exception": "*"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "*"
+        },
+        "time": "2014-02-20 19:27:06",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Net": "./"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "include-path": [
+            "./"
+        ],
+        "license": [
+            "PHP License"
+        ],
+        "authors": [
+            {
+                "name": "Chuck Hagenbuch",
+                "email": "chuck@horde.org",
+                "role": "Lead"
+            },
+            {
+                "name": "Aleksander Machniak",
+                "email": "alec@php.net",
+                "role": "Lead"
+            },
+            {
+                "name": "Stig Bakken",
+                "email": "stig@php.net",
+                "role": "Lead"
+            }
+        ],
+        "description": "More info available on: http://pear.php.net/package/Net_Socket"
+    },
+    {
+        "name": "pear/net_smtp",
+        "version": "1.6.3",
+        "version_normalized": "1.6.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/pear/Net_SMTP.git",
+            "reference": "7b6240761adf6ee245098e238a25d5c35650d82c"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/pear/Net_SMTP/zipball/7b6240761adf6ee245098e238a25d5c35650d82c",
+            "reference": "7b6240761adf6ee245098e238a25d5c35650d82c",
+            "shasum": ""
+        },
+        "require": {
+            "pear/net_socket": "*",
+            "pear/pear_exception": "*",
+            "php": ">=4.0.5"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "*"
+        },
+        "suggest": {
+            "pear/auth_sasl": "Install optionally via your project's composer.json"
+        },
+        "time": "2015-08-02 17:20:17",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Net": "./"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "include-path": [
+            "./"
+        ],
+        "license": [
+            "PHP License"
+        ],
+        "authors": [
+            {
+                "name": "Jon Parise",
+                "email": "jon@php.net",
+                "homepage": "http://www.indelible.org",
+                "role": "Lead"
+            },
+            {
+                "name": "Chuck Hagenbuch",
+                "email": "chuck@horde.org",
+                "role": "Lead"
+            }
+        ],
+        "description": "An implementation of the SMTP protocol",
+        "homepage": "http://pear.github.io/Net_SMTP/",
+        "keywords": [
+            "email",
+            "mail",
+            "smtp"
+        ]
+    },
+    {
         "name": "pear/validate_finance_creditcard",
         "version": "dev-master",
         "version_normalized": "9999999-dev",
@@ -435,7 +649,7 @@
         "require-dev": {
             "phpunit/phpunit": "*"
         },
-        "time": "2016-09-12T08:01:21+00:00",
+        "time": "2016-09-12 08:01:21",
         "type": "library",
         "installation-source": "source",
         "autoload": {
@@ -461,8 +675,8 @@
     },
     {
         "name": "zendframework/zend-stdlib",
-        "version": "2.4.10",
-        "version_normalized": "2.4.10.0",
+        "version": "2.4.11",
+        "version_normalized": "2.4.11.0",
         "source": {
             "type": "git",
             "url": "https://github.com/zendframework/zend-stdlib.git",
@@ -492,7 +706,7 @@
             "zendframework/zend-serializer": "Zend\\Serializer component",
             "zendframework/zend-servicemanager": "To support hydrator plugin manager usage"
         },
-        "time": "2015-07-21T13:55:46+00:00",
+        "time": "2015-07-21 13:55:46",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -518,8 +732,8 @@
     },
     {
         "name": "zendframework/zend-validator",
-        "version": "2.4.10",
-        "version_normalized": "2.4.10.0",
+        "version": "2.4.11",
+        "version_normalized": "2.4.11.0",
         "source": {
             "type": "git",
             "url": "https://github.com/zendframework/zend-validator.git",
@@ -558,7 +772,7 @@
             "zendframework/zend-session": "Zend\\Session component",
             "zendframework/zend-uri": "Zend\\Uri component, required by the Uri and Sitemap\\Loc validators"
         },
-        "time": "2015-09-08T21:04:17+00:00",
+        "time": "2015-09-08 21:04:17",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -585,8 +799,8 @@
     },
     {
         "name": "zendframework/zend-escaper",
-        "version": "2.4.10",
-        "version_normalized": "2.4.10.0",
+        "version": "2.4.11",
+        "version_normalized": "2.4.11.0",
         "source": {
             "type": "git",
             "url": "https://github.com/zendframework/zend-escaper.git",
@@ -606,7 +820,7 @@
             "phpunit/phpunit": "~4.0",
             "satooshi/php-coveralls": "dev-master"
         },
-        "time": "2015-05-07T14:55:31+00:00",
+        "time": "2015-05-07 14:55:31",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -657,7 +871,7 @@
             "sebastian/phpcpd": "2.*",
             "squizlabs/php_codesniffer": "2.*"
         },
-        "time": "2016-07-07T17:26:55+00:00",
+        "time": "2016-07-07 17:26:55",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -727,7 +941,7 @@
             "ext-xsl": "Allows applying XSL style sheet to headers, to main document part, and to footers of an OOXML template",
             "ext-zip": "Allows writing OOXML and ODF"
         },
-        "time": "2016-07-31T08:53:39+00:00",
+        "time": "2016-07-31 08:53:39",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -808,7 +1022,7 @@
         "require": {
             "php": ">=5.3.3"
         },
-        "time": "2015-01-03T21:04:44+00:00",
+        "time": "2015-01-03 21:04:44",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -858,7 +1072,7 @@
             "php": ">=5.3.3",
             "symfony/filesystem": "~2.3"
         },
-        "time": "2015-01-03T08:01:13+00:00",
+        "time": "2015-01-03 08:01:13",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -917,7 +1131,7 @@
             "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them",
             "symfony/yaml": ""
         },
-        "time": "2015-01-25T04:37:39+00:00",
+        "time": "2015-01-25 04:37:39",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -976,7 +1190,7 @@
             "symfony/dependency-injection": "",
             "symfony/http-kernel": ""
         },
-        "time": "2015-01-29T18:20:43+00:00",
+        "time": "2015-01-29 18:20:43",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1025,7 +1239,7 @@
         "require": {
             "php": ">=5.3.3"
         },
-        "time": "2015-01-03T08:01:13+00:00",
+        "time": "2015-01-03 08:01:13",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1074,7 +1288,7 @@
         "require": {
             "php": ">=5.3.3"
         },
-        "time": "2015-02-08T07:07:45+00:00",
+        "time": "2015-02-08 07:07:45",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1122,7 +1336,7 @@
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2015-09-12T10:08:34+00:00",
+        "time": "2015-09-12 10:08:34",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1171,23 +1385,23 @@
     },
     {
         "name": "totten/ca-config",
-        "version": "v13.02.0",
-        "version_normalized": "13.02.0.0",
+        "version": "v17.05.0",
+        "version_normalized": "17.05.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/totten/ca_config.git",
-            "reference": "7a51033f4e18c1ac846a16c6de16050e735b01cf"
+            "reference": "461cf05f932897c37ca87e9a85283d4963b49f09"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/totten/ca_config/zipball/7a51033f4e18c1ac846a16c6de16050e735b01cf",
-            "reference": "7a51033f4e18c1ac846a16c6de16050e735b01cf",
+            "url": "https://api.github.com/repos/totten/ca_config/zipball/461cf05f932897c37ca87e9a85283d4963b49f09",
+            "reference": "461cf05f932897c37ca87e9a85283d4963b49f09",
             "shasum": ""
         },
         "require": {
             "php": ">=5.2"
         },
-        "time": "2013-02-13T03:40:18+00:00",
+        "time": "2017-05-10 20:08:17",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1223,7 +1437,7 @@
             "reference": "2612ee3ce88902632d45b93e379277e9d46b70a7",
             "shasum": ""
         },
-        "time": "2009-06-29T10:47:39+00:00",
+        "time": "2009-06-29 10:47:39",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1279,7 +1493,7 @@
             "url": "https://github.com/civicrm/zetacomponents-mail.git",
             "reference": "e0feff0e1860f16fa2b3c42795c0351db58120a0"
         },
-        "time": "2017-03-14T06:51:24+00:00",
+        "time": "2017-03-14 06:51:24",
         "type": "library",
         "installation-source": "source",
         "autoload": {

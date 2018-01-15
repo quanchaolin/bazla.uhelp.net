@@ -112,6 +112,13 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
+        'order_bys' => array(
+          'sort_name_a' => array(
+            'title' => ts('Contact A'),
+            'name' => 'sort_name',
+            'default_weight' => '1',
+          ),
+        ),
         'grouping' => 'contact_a_fields',
       ),
       'civicrm_contact_b' => array(
@@ -153,6 +160,13 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $contact_type,
             'type' => CRM_Utils_Type::T_STRING,
+          ),
+        ),
+        'order_bys' => array(
+          'sort_name_b' => array(
+            'title' => ts('Contact B'),
+            'name' => 'sort_name',
+            'default_weight' => '2',
           ),
         ),
         'grouping' => 'contact_b_fields',
@@ -220,6 +234,16 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'default' => TRUE,
           ),
         ),
+        'order_bys' => array(
+          'label_a_b' => array(
+            'title' => ts('Relationship A-B'),
+            'name' => 'label_a_b',
+          ),
+          'label_b_A' => array(
+            'title' => ts('Relationship B-A'),
+            'name' => 'label_b_a',
+          ),
+        ),
         'grouping' => 'relation-fields',
       ),
       'civicrm_relationship' => array(
@@ -272,6 +296,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           ),
           'end_date' => array(
             'title' => ts('End Date'),
+            'type' => CRM_Utils_Type::T_DATE,
+          ),
+          'active_period_date' => array(
+            'title' => ts('Active Period'),
             'type' => CRM_Utils_Type::T_DATE,
           ),
         ),
@@ -414,7 +442,12 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
             $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
 
-            $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
+            if ($fieldName == 'active_period_date') {
+              $clause = $this->activeClause($field['name'], $relative, $from, $to, $field['type']);
+            }
+            else {
+              $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
+            }
           }
           else {
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
@@ -554,7 +587,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     // For displaying relationship status.
     if (!$isStatusFilter && $relStatus) {
       $statistics['filters'][] = array(
-        'title' => 'Relationship Status',
+        'title' => ts('Relationship Status'),
         'value' => $relStatus,
       );
     }
@@ -579,10 +612,6 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
 
     $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
-  }
-
-  public function orderBy() {
-    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact_b']}.sort_name ";
   }
 
   public function postProcess() {
@@ -752,6 +781,44 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       $clause = "(start_date >= CURDATE() OR end_date < CURDATE())";
     }
     return $clause;
+  }
+
+  /**
+   * Get SQL where clause for a active period field.
+   *
+   * @param string $fieldName
+   * @param string $relative
+   * @param string $from
+   * @param string $to
+   * @param string $type
+   * @param string $fromTime
+   * @param string $toTime
+   *
+   * @return null|string
+   */
+  public function activeClause(
+    $fieldName,
+    $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = NULL
+    ) {
+    $clauses = array();
+    if (in_array($relative, array_keys($this->getOperationPair(CRM_Report_Form::OP_DATE)))) {
+      return NULL;
+    }
+
+    list($from, $to) = $this->getFromTo($relative, $from, $to, $fromTime, $toTime);
+
+    if ($from) {
+      $from = ($type == CRM_Utils_Type::T_DATE) ? substr($from, 0, 8) : $from;
+    }
+
+    if ($to) {
+      $to = ($type == CRM_Utils_Type::T_DATE) ? substr($to, 0, 8) : $to;
+    }
+
+    if ($from || $to) {
+      return CRM_Contact_BAO_Query::getRelationshipActivePeriodClauses($from, $to, FALSE);
+    }
+    return NULL;
   }
 
 }

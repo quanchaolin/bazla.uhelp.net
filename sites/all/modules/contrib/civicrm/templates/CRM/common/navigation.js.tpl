@@ -25,7 +25,6 @@
 *}// http://civicrm.org/licensing
 {capture assign=menuMarkup}{strip}
   <ul id="civicrm-menu">
-    {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
       <li id="crm-qsearch" class="menumain">
         <form action="{crmURL p='civicrm/contact/search/advanced' h=0 }" name="search_block" id="id_search_block" method="post">
           <div id="quickSearch">
@@ -50,7 +49,6 @@
           <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="job_title" name="quickSearchField"> {ts}Job Title{/ts}</label></li>
         </ul>
       </li>
-    {/if}
     {$navigation}
   </ul>
 {/strip}{/capture}// <script> Generated {$smarty.now|date_format:'%d %b %Y %H:%M:%S'}
@@ -94,6 +92,8 @@ $('#civicrm-menu').ready(function() {
   $('#sort_name_navigation')
     .autocomplete({
       source: function(request, response) {
+        //start spinning the civi logo
+        $('.crm-logo-sm').addClass('crm-i fa-spin fa-pulse');
         var
           option = $('input[name=quickSearchField]:checked'),
           params = {
@@ -119,6 +119,8 @@ $('#civicrm-menu').ready(function() {
             ret.push({value: '0', label: msg});
           }
           response(ret);
+          //stop spinning the civi logo
+          $('.crm-logo-sm').removeClass('crm-i fa-spin fa-pulse');          
         })
       },
       focus: function (event, ui) {
@@ -206,4 +208,7 @@ $('#civicrm-menu').ready(function() {
   $('#root-menu-div').on('click', 'a', $.Menu.closeAll);
 });
 $('#civicrm-menu').menuBar({arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'});
+$(window).on("beforeunload", function() {
+  $('.crm-logo-sm').addClass('crm-i fa-spin fa-pulse');
+});
 })(CRM.$);{/literal}

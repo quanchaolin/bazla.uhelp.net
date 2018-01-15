@@ -341,12 +341,14 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $this->applyFilter('__ALL__', 'trim');
     if (empty($this->_ccid)) {
-      $this->add('text', "email-{$this->_bltID}",
-        ts('Email Address'),
-        array('size' => 30, 'maxlength' => 60, 'class' => 'email'),
-        TRUE
-      );
-      $this->addRule("email-{$this->_bltID}", ts('Email is not valid.'), 'email');
+      if ($this->_emailExists == FALSE) {
+        $this->add('text', "email-{$this->_bltID}",
+          ts('Email Address'),
+          array('size' => 30, 'maxlength' => 60, 'class' => 'email'),
+          TRUE
+        );
+        $this->addRule("email-{$this->_bltID}", ts('Email is not valid.'), 'email');
+      }
     }
     else {
       $this->addElement('hidden', "email-{$this->_bltID}", 1);
@@ -727,11 +729,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         // For anonymous user check using dedupe rule
         // if user has Cancelled Membership
         if (!$memContactID) {
-          $dedupeParams = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
-          $dedupeParams['check_permission'] = FALSE;
-          $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual');
-          // if we find more than one contact, use the first one
-          $memContactID = CRM_Utils_Array::value(0, $ids);
+          $memContactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($fields, 'Individual', 'Unsupervised', array(), FALSE);
         }
         $currentMemberships = CRM_Member_BAO_Membership::getContactsCancelledMembership($memContactID,
           $is_test

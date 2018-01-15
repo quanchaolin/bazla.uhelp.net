@@ -246,14 +246,18 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
   public static function buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $isIncludeSoftCredits) {
     $contributions = $contacts = $notSent = array();
     foreach ($contributionIDs as $item => $contributionId) {
-      // get contribution information
-      $contribution = CRM_Utils_Token::getContributionTokenDetails(array('contribution_id' => $contributionId),
-        $returnProperties,
-        NULL,
-        $messageToken,
-        $task
-      );
-      $contribution = $contributions[$contributionId] = $contribution[$contributionId];
+      // basic return attributes needed, see below for there usage
+      $returnValues = array('contact_id', 'total_amount', 'contribution_campaign_title');
+      if (!empty($messageToken['contribution'])) {
+        $returnValues = array_merge($messageToken['contribution'], $returnValues);
+      }
+      // retrieve contribution tokens listed in $returnProperties using Contribution.Get API
+      $contribution = civicrm_api3('Contribution', 'getsingle', array(
+        'id' => $contributionId,
+        'return' => $returnValues,
+      ));
+      $contribution['campaign'] = CRM_Utils_Array::value('contribution_campaign_title', $contribution);
+      $contributions[$contributionId] = $contribution;
 
       if ($isIncludeSoftCredits) {
         //@todo find out why this happens & add comments

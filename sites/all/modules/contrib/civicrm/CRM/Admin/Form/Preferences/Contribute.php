@@ -166,34 +166,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     }
     $this->assign('htmlFields', $htmlFields);
     parent::buildQuickForm();
-    $this->addFormRule(array('CRM_Admin_Form_Preferences_Contribute', 'formRule'), $this);
-  }
-
-  /**
-   * Global validation rules for the form.
-   *
-   * @param array $values
-   *   posted values of the form
-   * @param $files
-   * @param $self
-   *
-   * @return array
-   *   list of errors to be posted back to the form
-   */
-  public static function formRule($values, $files, $self) {
-    $errors = array();
-    if (CRM_Utils_Array::value('deferred_revenue_enabled', $values)) {
-      $errorMessage = CRM_Financial_BAO_FinancialAccount::validateTogglingDeferredRevenue();
-      if ($errorMessage) {
-        // Since the error msg is too long and
-        // takes the whole space to display inline
-        // therefore setting blank text to highlight the field
-        // setting actual error msg to _qf_default to show in pop-up screen
-        $errors['deferred_revenue_enabled'] = ' ';
-        $errors['_qf_default'] = $errorMessage;
-      }
-    }
-    return $errors;
   }
 
   /**
@@ -205,12 +177,10 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     $defaults = Civi::settings()->get('contribution_invoice_settings');
     //CRM-16691: Changes made related to settings of 'CVV'.
     foreach (array('cvv_backoffice_required') as $setting) {
-      $settingMetaData = civicrm_api3('setting', 'getfields', array('name' => $setting));
       $defaults[$setting] = civicrm_api3('setting', 'getvalue',
         array(
           'name' => $setting,
           'group' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
-          'default_value' => CRM_Utils_Array::value('default', $settingMetaData['values'][$setting]),
         )
       );
     }

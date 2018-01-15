@@ -33,7 +33,7 @@
 class CRM_Utils_VersionCheck {
   const
     CACHEFILE_NAME = 'version-info-cache.json',
-    // after this length of time we fall back on poor-man's cron (7+ days)
+    // After which length of time we expire the cached version info (7+ days).
     CACHEFILE_EXPIRE = 605000;
 
   /**
@@ -70,7 +70,7 @@ class CRM_Utils_VersionCheck {
   /**
    * @var string
    */
-  public $pingbackUrl = 'http://latest.civicrm.org/stable.php?format=json';
+  public $pingbackUrl = 'https://latest.civicrm.org/stable.php?format=json';
 
   /**
    * Pingback params
@@ -106,7 +106,7 @@ class CRM_Utils_VersionCheck {
     // Populate remote $versionInfo from cache file
     $this->isInfoAvailable = $this->readCacheFile();
 
-    // Poor-man's cron fallback if scheduled job is enabled but has failed to run
+    // Fallback if scheduled job is enabled but has failed to run.
     $expiryTime = time() - self::CACHEFILE_EXPIRE;
     if (!empty($this->cronJob['is_active']) &&
       (!$this->isInfoAvailable || filemtime($this->cacheFile) < $expiryTime)
@@ -287,6 +287,7 @@ class CRM_Utils_VersionCheck {
         'MySQL' => CRM_CORE_DAO::singleValueQuery('SELECT VERSION()'),
         'communityMessagesUrl' => Civi::settings()->get('communityMessagesUrl'),
       );
+      $this->getDomainStats();
       $this->getPayProcStats();
       $this->getEntityStats();
       $this->getExtensionStats();
@@ -339,6 +340,7 @@ class CRM_Utils_VersionCheck {
       'CRM_Member_DAO_MembershipBlock' => 'is_active = 1',
       'CRM_Pledge_DAO_Pledge' => 'is_test = 0',
       'CRM_Pledge_DAO_PledgeBlock' => NULL,
+      'CRM_Mailing_Event_DAO_Delivered' => NULL,
     );
     foreach ($tables as $daoName => $where) {
       $dao = new $daoName();
@@ -378,6 +380,36 @@ class CRM_Utils_VersionCheck {
         'enabled' => $dao->is_active,
         'version' => isset($info->version) ? $info->version : NULL,
       );
+    }
+  }
+
+  /**
+   * Fetch stats about domain and add to 'stats' array.
+   */
+  private function getDomainStats() {
+    // Start with default value NULL, then check to see if there's a better
+    // value to be had.
+    $this->stats['domain_isoCode'] = NULL;
+    $params = array(
+      'id' => CRM_Core_Config::domainID(),
+    );
+    $domain_result = civicrm_api3('domain', 'getsingle', $params);
+    if (!empty($domain_result['contact_id'])) {
+      $address_params = array(
+        'contact_id' => $domain_result['contact_id'],
+        'is_primary' => 1,
+        'sequential' => 1,
+      );
+      $address_result = civicrm_api3('address', 'get', $address_params);
+      if ($address_result['count'] == 1 && !empty($address_result['values'][0]['country_id'])) {
+        $country_params = array(
+          'id' => $address_result['values'][0]['country_id'],
+        );
+        $country_result = civicrm_api3('country', 'getsingle', $country_params);
+        if (!empty($country_result['iso_code'])) {
+          $this->stats['domain_isoCode'] = $country_result['iso_code'];
+        }
+      }
     }
   }
 

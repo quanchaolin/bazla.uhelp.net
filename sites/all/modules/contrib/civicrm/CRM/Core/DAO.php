@@ -234,13 +234,16 @@ class CRM_Core_DAO extends DB_DataObject {
           break;
 
         case CRM_Utils_Type::T_DATE:
-        case CRM_Utils_Type::T_TIMESTAMP:
         case CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME:
           $this->$dbName = '19700101';
           if ($dbName == 'end_date') {
             // put this in the future
             $this->$dbName = '20200101';
           }
+          break;
+
+        case CRM_Utils_Type::T_TIMESTAMP:
+          $this->$dbName = '19700201000000';
           break;
 
         case CRM_Utils_Type::T_TIME:
@@ -342,6 +345,11 @@ class CRM_Core_DAO extends DB_DataObject {
   public function query($query, $i18nRewrite = TRUE) {
     // rewrite queries that should use $dbLocale-based views for multi-language installs
     global $dbLocale, $_DB_DATAOBJECT;
+
+    if (empty($_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5])) {
+      // Will force connection to be populated per CRM-20541.
+      new CRM_Core_DAO();
+    }
 
     $conn = &$_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5];
     $orig_options = $conn->options;
@@ -526,6 +534,9 @@ class CRM_Core_DAO extends DB_DataObject {
    *     * @return mixed Int (No. of rows affected) on success, false on failure, 0 on no data affected
    */
   public function delete($useWhere = FALSE) {
+    $preEvent = new \Civi\Core\DAO\Event\PreDelete($this);
+    \Civi::service('dispatcher')->dispatch("civi.dao.preDelete", $preEvent);
+
     $result = parent::delete($useWhere);
 
     $event = new \Civi\Core\DAO\Event\PostDelete($this, $result);

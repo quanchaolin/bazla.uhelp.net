@@ -825,8 +825,11 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
   $finalSort = array();
   $options['sort'] = NULL;
   if (!empty($sort)) {
-    foreach ((array) $sort as $s) {
-      if (CRM_Utils_Rule::mysqlOrderBy($s)) {
+    if (!is_array($sort)) {
+      $sort = array_map('trim', explode(',', $sort));
+    }
+    foreach ($sort as $s) {
+      if ($s == '(1)' || CRM_Utils_Rule::mysqlOrderBy($s)) {
         if ($entity && $action == 'get') {
           switch (trim(strtolower($s))) {
             case 'id':
@@ -1638,7 +1641,9 @@ function _civicrm_api3_validate_foreign_keys($entity, $action, &$params, $fields
   foreach ($fields as $fieldName => $fieldInfo) {
     if (!empty($fieldInfo['FKClassName'])) {
       if (!empty($params[$fieldName])) {
-        _civicrm_api3_validate_constraint($params[$fieldName], $fieldName, $fieldInfo);
+        foreach ((array) $params[$fieldName] as $fieldValue) {
+          _civicrm_api3_validate_constraint($fieldValue, $fieldName, $fieldInfo);
+        }
       }
       elseif (!empty($fieldInfo['required'])) {
         throw new Exception("DB Constraint Violation - $fieldName should possibly be marked as mandatory for $entity,$action API. If so, please raise a bug report.");
@@ -2080,6 +2085,10 @@ function _civicrm_api3_validate_integer(&$params, $fieldName, &$fieldInfo, $enti
       elseif (is_numeric($realContactId)) {
         $fieldValue = $realContactId;
       }
+      elseif (is_null($realContactId) && empty($fieldInfo['api.required']) && $fieldValue === 'user_contact_id') {
+        // If not mandatory this will be OK. If mandatory it should fail.
+        $fieldValue = NULL;
+      }
     }
     if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
       _civicrm_api3_api_match_pseudoconstant($fieldValue, $entity, $fieldName, $fieldInfo, $op);
@@ -2087,7 +2096,7 @@ function _civicrm_api3_validate_integer(&$params, $fieldName, &$fieldInfo, $enti
 
     // After swapping options, ensure we have an integer(s)
     foreach ((array) ($fieldValue) as $value) {
-      if ($value && !is_numeric($value) && $value !== 'null' && !is_array($value)) {
+      if ($value && !is_numeric($value) && $value !== 'null' && $value !== NULL && !is_array($value)) {
         throw new API_Exception("$fieldName is not a valid integer", 2001, array('error_field' => $fieldName, "type" => "integer"));
       }
     }

@@ -39,22 +39,33 @@ class CRM_Contact_BAO_Query {
   /**
    * The various search modes.
    *
+   * As of February 2017, entries not present for 4, 32, 64, 1024.
+   *
+   * MODE_ALL seems to be out of sync with the available constants;
+   * if this is intentionally excluding MODE_MAILING then that may
+   * bear documenting?
+   *
+   * Likewise if there's reason for the missing modes (4, 32, 64 etc).
+   *
    * @var int
    */
   const
     NO_RETURN_PROPERTIES = 'CRM_Contact_BAO_Query::NO_RETURN_PROPERTIES',
     MODE_CONTACTS = 1,
     MODE_CONTRIBUTE = 2,
+    // There is no 4,
     MODE_MEMBER = 8,
     MODE_EVENT = 16,
+    // No 32, no 64.
     MODE_GRANT = 128,
     MODE_PLEDGEBANK = 256,
     MODE_PLEDGE = 512,
+    // There is no 1024,
     MODE_CASE = 2048,
-    MODE_ALL = 17407,
     MODE_ACTIVITY = 4096,
     MODE_CAMPAIGN = 8192,
-    MODE_MAILING = 16384;
+    MODE_MAILING = 16384,
+    MODE_ALL = 17407;
 
   /**
    * The default set of return properties.
@@ -82,6 +93,7 @@ class CRM_Contact_BAO_Query {
   public $_paramLookup;
 
   public $_sort;
+
   /**
    * The set of output params
    *
@@ -98,42 +110,42 @@ class CRM_Contact_BAO_Query {
 
   /**
    * The name of the elements that are in the select clause
-   * used to extract the values
+   * used to extract the values.
    *
    * @var array
    */
   public $_element;
 
   /**
-   * The tables involved in the query
+   * The tables involved in the query.
    *
    * @var array
    */
   public $_tables;
 
   /**
-   * The table involved in the where clause
+   * The table involved in the where clause.
    *
    * @var array
    */
   public $_whereTables;
 
   /**
-   * The where clause
+   * Array of WHERE clause components.
    *
    * @var array
    */
   public $_where;
 
   /**
-   * The where string
+   * The WHERE clause as a string.
    *
    * @var string
    */
   public $_whereClause;
 
   /**
-   * Additional permission Where Clause
+   * Additional WHERE clause for permissions.
    *
    * @var string
    */
@@ -357,6 +369,7 @@ class CRM_Contact_BAO_Query {
     'street_unit',
     'supplemental_address_1',
     'supplemental_address_2',
+    'supplemental_address_3',
     'city',
     'postal_code',
     'postal_code_suffix',
@@ -1959,6 +1972,8 @@ class CRM_Contact_BAO_Query {
       case 'relation_start_date_low':
       case 'relation_end_date_high':
       case 'relation_end_date_low':
+      case 'relation_active_period_date_high':
+      case 'relation_active_period_date_low':
       case 'relation_target_name':
       case 'relation_status':
       case 'relation_date_low':
@@ -2370,6 +2385,7 @@ class CRM_Contact_BAO_Query {
           'street_unit',
           'supplemental_address_1',
           'supplemental_address_2',
+          'supplemental_address_3',
           'city',
           'postal_code',
           'postal_code_suffix',
@@ -2464,9 +2480,14 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * Where tables is sometimes used to create the from clause, but, not reliably, set this AND set tables
-   * It's unclear the intent - there is a 'simpleFrom' clause which takes whereTables into account & a fromClause which doesn't
-   * logic may have eroded
+   * Sometimes used to create the from clause, but, not reliably, set
+   * this AND set tables.
+   *
+   * It's unclear the intent - there is a 'simpleFrom' clause which
+   * takes whereTables into account & a fromClause which doesn't.
+   *
+   * logic may have eroded?
+   *
    * @return array
    */
   public function whereTables() {
@@ -2499,16 +2520,25 @@ class CRM_Contact_BAO_Query {
    * Create the from clause.
    *
    * @param array $tables
-   *   Tables that need to be included in this from clause.
-   *                      if null, return mimimal from clause (i.e. civicrm_contact)
+   *   Tables that need to be included in this from clause. If null,
+   *   return mimimal from clause (i.e. civicrm_contact).
    * @param array $inner
    *   Tables that should be inner-joined.
    * @param array $right
    *   Tables that should be right-joined.
-   *
    * @param bool $primaryLocation
+   *   Search on primary location. See note below.
    * @param int $mode
+   *   Determines search mode based on bitwise MODE_* constants.
    * @param string|NULL $apiEntity
+   *   Determines search mode based on entity by string.
+   *
+   * The $primaryLocation flag only seems to be used when
+   * locationType() has been called. This may be a search option
+   * exposed, or perhaps it's a "search all details" approach which
+   * predates decoupling of location types and primary fields?
+   *
+   * @see https://issues.civicrm.org/jira/browse/CRM-19967
    *
    * @return string
    *   the from clause
@@ -2951,31 +2981,42 @@ class CRM_Contact_BAO_Query {
     }
     $groupClause = array();
     if (count($regularGroupIDs) || empty($value)) {
+      // include child groups IDs if any
+      $childGroupIds = (array) CRM_Contact_BAO_Group::getChildGroupIds($regularGroupIDs);
+      foreach ($childGroupIds as $key => $id) {
+        if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'saved_search_id')) {
+          $smartGroupIDs[] = $id;
+          unset($childGroupIds[$key]);
+        }
+      }
+      if (count($childGroupIds)) {
+        $regularGroupIDs = array_merge($regularGroupIDs, $childGroupIds);
+      }
+
+      // if $regularGroupIDs is populated with regular child group IDs
+      //   then change the mysql operator to desired
+      if (count($regularGroupIDs) > 1) {
+        $op = strpos($op, 'IN') ? $op : ($op == '!=') ? 'NOT IN' : 'IN';
+      }
       $groupIds = implode(',', (array) $regularGroupIDs);
       $gcTable = "`civicrm_group_contact-{$groupIds}`";
       $joinClause = array("contact_a.id = {$gcTable}.contact_id");
+
+      if (strpos($op, 'IN') !== FALSE) {
+        $clause = "{$gcTable}.group_id $op ( $groupIds ) ";
+      }
+      elseif ($op == '!=') {
+        $clause = "{$gcTable}.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact cgc WHERE cgc.group_id = $groupIds )";
+      }
+      else {
+        $clause = "{$gcTable}.group_id $op $groupIds ";
+      }
+      $groupClause[] = "( {$clause} )";
+
       if ($statii) {
         $joinClause[] = "{$gcTable}.status IN (" . implode(', ', $statii) . ")";
       }
       $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
-      if (strpos($op, 'IN') !== FALSE) {
-        $clause = "{$gcTable}.group_id $op ( $groupIds ) %s ";
-      }
-      elseif ($op == '!=') {
-        $clause = "{$gcTable}.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact cgc WHERE cgc.group_id = $groupIds %s)";
-      }
-      else {
-        $clause = "{$gcTable}.group_id $op $groupIds %s ";
-      }
-
-      // include child groups IDs if any
-      $childGroupIds = CRM_Contact_BAO_Group::getChildGroupIds($regularGroupIDs);
-      $childClause = '';
-      if (count($childGroupIds)) {
-        $gcTable = ($op == '!=') ? 'cgc' : $gcTable;
-        $childClause = " OR {$gcTable}.group_id IN (" . implode(',', $childGroupIds) . ") ";
-      }
-      $groupClause[] = '(' . sprintf($clause, $childClause) . ')';
     }
 
     //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
@@ -4102,6 +4143,7 @@ civicrm_relationship.is_permission_a_b = 0
     }
 
     $this->addRelationshipDateClauses($grouping, $where);
+    $this->addRelationshipActivePeriodClauses($grouping, $where);
     if (!empty($relationType) && !empty($rType) && isset($rType->id)) {
       $where[$grouping][] = 'civicrm_relationship.relationship_type_id = ' . $rType->id;
     }
@@ -4167,6 +4209,64 @@ civicrm_relationship.is_permission_a_b = 0
   }
 
   /**
+   * Add start & end active period criteria in
+   * @param string $grouping
+   * @param array $where
+   *   = array to add where clauses to, in case you are generating a temp table.
+   * not the main query.
+   */
+  public function addRelationshipActivePeriodClauses($grouping, &$where) {
+    $dateValues = array();
+    $dateField = 'active_period_date';
+
+    $dateValueLow = $this->getWhereValues('relation_active_period_date_low', $grouping);
+    $dateValueHigh = $this->getWhereValues('relation_active_period_date_high', $grouping);
+    $dateValueLowFormated = $dateValueHighFormated = NULL;
+    if (!empty($dateValueLow) && !empty($dateValueHigh)) {
+      $dateValueLowFormated = date('Ymd', strtotime($dateValueLow[2]));
+      $dateValueHighFormated = date('Ymd', strtotime($dateValueHigh[2]));
+      $this->_qill[$grouping][] = (ts('Relationship was active between')) . " " . CRM_Utils_Date::customFormat($dateValueLowFormated) . " and " . CRM_Utils_Date::customFormat($dateValueHighFormated);
+    }
+    elseif (!empty($dateValueLow)) {
+      $dateValueLowFormated = date('Ymd', strtotime($dateValueLow[2]));
+      $this->_qill[$grouping][] = (ts('Relationship was active after')) . " " . CRM_Utils_Date::customFormat($dateValueLowFormated);
+    }
+    elseif (!empty($dateValueHigh)) {
+      $dateValueHighFormated = date('Ymd', strtotime($dateValueHigh[2]));
+      $this->_qill[$grouping][] = (ts('Relationship was active before')) . " " . CRM_Utils_Date::customFormat($dateValueHighFormated);
+    }
+
+    if ($activePeriodClauses = self::getRelationshipActivePeriodClauses($dateValueLowFormated, $dateValueHighFormated, TRUE)) {
+      $where[$grouping][] = $activePeriodClauses;
+    }
+  }
+
+  /**
+   * Get start & end active period criteria
+   */
+  public static function getRelationshipActivePeriodClauses($from, $to, $forceTableName) {
+    $tableName = $forceTableName ? 'civicrm_relationship.' : '';
+    if (!is_null($from) && !is_null($to)) {
+      return '(((' . $tableName . 'start_date >= ' . $from . ' AND ' . $tableName . 'start_date <= ' . $to . ') OR
+                (' . $tableName . 'end_date >= ' . $from . ' AND ' . $tableName . 'end_date <= ' . $to . ') OR
+                (' . $tableName . 'start_date <= ' . $from . ' AND ' . $tableName . 'end_date >= ' . $to . ' )) OR
+               (' . $tableName . 'start_date IS NULL AND ' . $tableName . 'end_date IS NULL) OR
+               (' . $tableName . 'start_date IS NULL AND ' . $tableName . 'end_date >= ' . $from . ') OR
+               (' . $tableName . 'end_date IS NULL AND ' . $tableName . 'start_date <= ' . $to . '))';
+    }
+    elseif (!is_null($from)) {
+      return '((' . $tableName . 'start_date >= ' . $from . ') OR
+               (' . $tableName . 'start_date IS NULL AND ' . $tableName . 'end_date IS NULL) OR
+               (' . $tableName . 'start_date IS NULL AND ' . $tableName . 'end_date >= ' . $from . '))';
+    }
+    elseif (!is_null($to)) {
+      return '((' . $tableName . 'start_date <= ' . $to . ') OR
+               (' . $tableName . 'start_date IS NULL AND ' . $tableName . 'end_date IS NULL) OR
+               (' . $tableName . 'end_date IS NULL AND ' . $tableName . 'start_date <= ' . $to . '))';
+    }
+  }
+
+  /**
    * Default set of return properties.
    *
    * @param int $mode
@@ -4212,6 +4312,7 @@ civicrm_relationship.is_permission_a_b = 0
           'street_address' => 1,
           'supplemental_address_1' => 1,
           'supplemental_address_2' => 1,
+          'supplemental_address_3' => 1,
           'city' => 1,
           'postal_code' => 1,
           'postal_code_suffix' => 1,
@@ -4356,8 +4457,9 @@ civicrm_relationship.is_permission_a_b = 0
 
     $sql = "$select $from $where $having";
 
-    // add group by
-    if ($query->_useGroupBy) {
+    // add group by only when API action is not getcount
+    //  otherwise query fetches incorrect count
+    if ($query->_useGroupBy && !$count) {
       $sql .= self::getGroupByFromSelectColumns($query->_select, 'contact_a.id');
     }
     if (!empty($sort)) {
@@ -6293,14 +6395,8 @@ AND   displayRelType.is_active = 1
    */
   public function convertGroupIDStringToLabelString(&$dao, $val) {
     $groupIDs = explode(',', $val);
-
-    // The pseudoConstant function does not actually cache.
-    static $allGroups;
-    if (!$allGroups) {
-      $allGroups = CRM_Core_PseudoConstant::group();
-    }
     // Note that groups that the user does not have permission to will be excluded (good).
-    $groups = array_intersect_key($allGroups, array_flip($groupIDs));
+    $groups = array_intersect_key(CRM_Core_PseudoConstant::group(), array_flip($groupIDs));
     return implode(', ', $groups);
 
   }

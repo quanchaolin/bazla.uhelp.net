@@ -198,6 +198,26 @@ function _civicrm_core_data(&$data, $enabled) {
     ),
   );
 
+  //Current Employer ID
+  $data['civicrm_contact']['employer_id'] = array(
+    'title' => t('Current Employer Id'),
+    'help' => t('Current Employer Id'),
+    'field' => array(
+      'handler' => 'civicrm_handler_field_contact_link',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+      'allow empty' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
   //DISPLAY Name for the Contact (Full Name with Prefixes and Suffixes)
   $data['civicrm_contact']['display_name'] = array(
     'title' => t('Display Name'),
@@ -590,6 +610,10 @@ function _civicrm_core_data(&$data, $enabled) {
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+      'allow empty' => TRUE,
     ),
     'argument' => array(
       'handler' => 'views_handler_argument_string',
@@ -2539,6 +2563,44 @@ function _civicrm_core_data(&$data, $enabled) {
   $data['civicrm_relationship']['description'] = array(
     'title' => t('Description'),
     'help' => t('Description of the relationship'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+      'allow empty' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
+  $data['civicrm_relationship']['is_permission_a_b'] = array(
+    'title' => t('Contact A has Permission Over Contact B?'),
+    'help' => t('Contact A has Permission Over Contact B?'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+      'allow empty' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
+  $data['civicrm_relationship']['is_permission_b_a'] = array(
+    'title' => t('Contact B has Permission Over Contact A?'),
+    'help' => t('Contact B has Permission Over Contact A?'),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,

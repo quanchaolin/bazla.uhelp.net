@@ -180,50 +180,6 @@ class CRM_Dedupe_Finder {
   }
 
   /**
-   * Return dupes of a given contact, using the default rule group (of a provided usage).
-   *
-   * @param int $cid
-   *   Contact id of the given contact.
-   * @param string $used
-   *   Dedupe rule group usage ('Unsupervised' or 'Supervised' or 'General').
-   * @param string $ctype
-   *   Contact type of the given contact.
-   *
-   * @return array
-   *   array of dupe contact_ids
-   */
-  public static function dupesOfContact($cid, $used = 'Unsupervised', $ctype = NULL) {
-    // if not provided, fetch the contact type from the database
-    if (!$ctype) {
-      $dao = new CRM_Contact_DAO_Contact();
-      $dao->id = $cid;
-      if (!$dao->find(TRUE)) {
-        CRM_Core_Error::fatal("contact id of $cid does not exist");
-      }
-      $ctype = $dao->contact_type;
-    }
-    $rgBao = new CRM_Dedupe_BAO_RuleGroup();
-    $rgBao->used = $used;
-    $rgBao->contact_type = $ctype;
-    if (!$rgBao->find(TRUE)) {
-      CRM_Core_Error::fatal("$used rule for $ctype does not exist");
-    }
-    $dupes = self::dupes($rgBao->id, array($cid));
-
-    // get the dupes for this cid
-    $result = array();
-    foreach ($dupes as $dupe) {
-      if ($dupe[0] == $cid) {
-        $result[] = $dupe[1];
-      }
-      elseif ($dupe[1] == $cid) {
-        $result[] = $dupe[0];
-      }
-    }
-    return $result;
-  }
-
-  /**
    * A hackish function needed to massage CRM_Contact_Form_$ctype::formRule()
    * object into a valid $params array for dedupe
    *
@@ -282,7 +238,7 @@ class CRM_Dedupe_Finder {
     }
 
     // handle custom data
-    $tree = CRM_Core_BAO_CustomGroup::getTree($ctype, CRM_Core_DAO::$_nullObject, NULL, -1);
+    $tree = CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1);
     CRM_Core_BAO_CustomGroup::postProcess($tree, $fields, TRUE);
     foreach ($tree as $key => $cg) {
       if (!is_int($key)) {

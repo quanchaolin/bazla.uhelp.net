@@ -1016,6 +1016,12 @@ class CRM_Core_Permission {
         'access CiviCRM',
         'delete in CiviCase',
       ),
+      'restore' => array(
+        'administer CiviCase',
+      ),
+      'merge' => array(
+        'administer CiviCase',
+      ),
       'default' => array(
         // At minimum the user needs one of the following. Finer-grained access is controlled by CRM_Case_BAO_Case::addSelectWhereClause
         array('access my cases and activities', 'access all cases and activities'),
@@ -1125,6 +1131,12 @@ class CRM_Core_Permission {
     );
     // Loc block is only used for events
     $permissions['loc_block'] = $permissions['event'];
+
+    $permissions['state_province'] = array(
+      'get' => array(
+        'access CiviCRM',
+      ),
+    );
 
     // Price sets are shared by several components, user needs access to at least one of them
     $permissions['price_set'] = array(

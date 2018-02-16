@@ -60,6 +60,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     }
     $params = $extendedParams;
     if (self::checkValidRelationship($params, $params, 0)) {
+######comment out this line to clear bad relationships
       throw new CRM_Core_Exception('Invalid Relationship');
     }
     $relationship = self::add($params);

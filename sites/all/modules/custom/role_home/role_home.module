@@ -1,0 +1,135 @@
+<?php
+/**
+ * Implements hook_permission()                 
+ */
+function role_home_permission() {
+  return array( 'manage role home configuration' => 
+		array('title' => t('Manage Role Home Configuration')));
+}
+
+/** 
+ * implementation of hook_menu
+*/
+function role_home_menu() {
+
+  $items = array();
+  $home = variable_get('site_frontpage');
+
+  $items[$home] =
+    array(
+	  'title' => 'Home',
+	  'description' => 
+	  "Menu callback before drupal_goto to the role's home page",
+	  'page callback' => 'role_home_page',
+	  'access arguments' => array('access content'),
+	  'type' => MENU_CALLBACK,
+	  );
+
+  $items['admin/config/role_home'] =
+    array(
+	  'title' => 'Role Home',
+	  'description' => 'The config form for the role home module',
+	 'page callback' => 'drupal_get_form',
+	 'page arguments' => array('role_home_settings_form'),
+	 'access arguments' => array('manage role home configuration'),
+	 'type' => MENU_NORMAL_ITEM,
+	 );
+
+
+  return $items;
+}
+
+/**
+ */
+function role_home_page() {
+  global $user;
+
+  $weights = array();
+  foreach($user->roles as $rid=>$role) {
+    $path = variable_get('role_home_id_'.$rid, 'user');
+    $weight = variable_get('role_home_weight_'.$rid, 0);
+    
+    $weights[$weight] = $path;
+
+    //if the variable isn't set yet, set to current value
+    $lowest_weight = isset($lowest_weight) ? $lowest_weight : $weight;
+
+    //if the current value is less then the lowest, set to current value
+    $lowest_weight = ($lowest_weight <= $weight) ? $lowest_weight : $weight; 
+    
+  }
+
+  drupal_goto($weights[$lowest_weight]);
+
+}
+
+
+/**
+ */
+function role_home_settings_form($form, &$form_state) {
+  //////////////////////////////////////////////////////////////////////////
+  //A TEXT FIELD FOR EACH ROLE GIVING THE PATH TO FORWARD TO WHEN THE /home
+  //PATH IS ENTERED
+  
+  $link = l("site information configuration page", 
+	    "admin/config/system/site-information");
+  
+  $form['role_home_config'] = 
+    array(
+	  '#type' => 'fieldset',
+	  '#title' => t('Contribution Pages and Events'),
+	  '#description' => "<i>".
+	    "Enter home page paths for each role. Note, this module will only 
+             work if you set the default front page on the ".$link." to 'home' 
+	     or whatever value you set below for the initial home page path."
+	  ."</i>",
+	  '#collapsible' => TRUE,
+	  '#collapsed' => FALSE,
+	  );
+
+  $form['role_home_config']['site_frontpage'] = 
+      array(
+	    '#type' => 'textfield', 
+	    '#title' => "Home Page Path",
+	    '#size' => 100,
+	    '#maxlength' => 100,
+	    '#required' => TRUE, //make this field required
+	    '#default_value' => variable_get('site_frontpage'),
+	    );
+
+
+  $sql = "SELECT rid, name FROM {role}";
+  $results = db_query($sql);
+  while ($result = $results->fetchObject()) {
+    $form['role_home_config']['role_home_weight_'.$result->rid] = 
+      array(
+	    '#type' => 'textfield', 
+	    '#title' => "The weight this role for determining path has in regards to users with multiple roles",
+	    '#size' => 3,
+	    '#maxlength' => 3,
+	    '#required' => TRUE, //make this field required
+	    '#default_value' => variable_get('role_home_weight_'.$result->rid,
+					     0),
+	    '#prefix' => "<table><tr><td>",
+	    );
+
+    $form['role_home_config']['role_home_id_'.$result->rid] = 
+      array(
+	    '#type' => 'textfield', 
+	    '#title' => "Path for ".$result->name,
+	    '#size' => 50,
+	    '#maxlength' => 100,
+	    '#required' => TRUE, //make this field required
+	    '#default_value' => variable_get('role_home_id_'.$result->rid),
+	    '#prefix' => "</td><td>",
+	    '#suffix' => "</td></tr></table>",
+	    );
+
+
+  }
+
+  
+
+
+  return system_settings_form($form);
+}

@@ -1,0 +1,7 @@
+name = Role Home
+description = A very simple module that allows you to set a home page page for each role
+package = Home Page
+
+core = 7.x
+php = 5.3
+

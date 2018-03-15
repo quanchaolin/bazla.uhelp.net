@@ -67,15 +67,16 @@ function student_util_set_help_year($contact_id, $year) {
   //save contact record from relatioship, setting year
 }
 function student_util_get_help_year($orig_start) {
+  
   //set $date to last Aug 31st
-  if (date('m') >= 9) {
+  if (date('m') >= 8) {
     $date = strtotime(date('Y').'-08-31');
   }
   else {
     $date = strtotime((date('Y')-1).'-08-31');
   }
 
-  if (date('m', $orig_start) >= 9) {
+  if (date('m', $orig_start) >= 8) {
     $start = strtotime(date('Y', $orig_start).'-08-31');
   }
   else {

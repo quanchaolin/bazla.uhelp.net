@@ -1,12 +1,12 @@
 <?php
 
 
-function student_util_help_year_form($form, &$form_state) { 
-  $form['help_year_fieldset'] = 
+function student_util_help_year_form($form, &$form_state) {
+  $form['help_year_fieldset'] =
     array(
 	  '#type' => 'fieldset',
 	  );
-  $form['help_year_fieldset']['submit_button'] = 
+  $form['help_year_fieldset']['submit_button'] =
     array(
 	  '#type' => 'submit',
 	  '#value' => t('Update Help Year'),
@@ -37,7 +37,7 @@ function student_util_update_help_year() {
 	$year = 0;
       }
       else {
-	$year = 
+	$year =
 	  student_util_get_help_year(strtotime($relationship['start_date']));
       }
       student_util_set_help_year($relationship['contact_id_b'], $year);
@@ -74,7 +74,7 @@ function student_util_get_help_year($orig_start) {
   else {
     $date = strtotime((date('Y')-1).'-08-31');
   }
-  
+
   if (date('m', $orig_start) >= 9) {
     $start = strtotime(date('Y', $orig_start).'-08-31');
   }
@@ -87,11 +87,15 @@ function student_util_get_help_year($orig_start) {
 
 function student_util_civicrm_postProcess($form_name, &$form) {
   if ($form_name == 'CRM_Contact_Form_Relationship') {
-    $relationship = $form->_submitValues;
-    if ($relationship['related_contact_id'] == 1) {
-      $year =
-	student_util_get_help_year(strtotime($relationship['start_date']));
-      student_util_set_help_year($form->_contactId, $year);
+  
+    // if this the student is enrolled at (relationship type)
+    if ($form->_relationshipTypeId == 50) {
+      $relationship = $form->_submitValues;
+      if ($relationship['related_contact_id'] == 1) {
+        $year =
+    student_util_get_help_year(strtotime($relationship['start_date']));
+        student_util_set_help_year($form->_contactId, $year);
+      }
     }
   }
 }

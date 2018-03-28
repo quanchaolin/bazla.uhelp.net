@@ -570,7 +570,8 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     $getCount,
     $skipPermissions,
     $mode,
-    $entity
+    $entity,
+    TRUE
   );
 
   return $entities;
@@ -603,7 +604,8 @@ function _civicrm_api3_get_query_object($params, $mode, $entity) {
   $newParams = CRM_Contact_BAO_Query::convertFormValues($inputParams, 0, FALSE, $entity);
   $query = new CRM_Contact_BAO_Query($newParams, $returnProperties, NULL,
     FALSE, FALSE, $mode,
-    empty($params['check_permissions'])
+    empty($params['check_permissions']),
+    TRUE, TRUE, NULL, 'AND', 'NULL', TRUE
   );
   list($select, $from, $where, $having) = $query->query();
 
@@ -922,8 +924,10 @@ function _civicrm_api3_build_fields_array(&$bao, $unique = TRUE) {
   if ($unique) {
     if (empty($fields['id'])) {
       $lowercase_entity = _civicrm_api_get_entity_name_from_camel(_civicrm_api_get_entity_name_from_dao($bao));
-      $fields['id'] = $fields[$lowercase_entity . '_id'];
-      unset($fields[$lowercase_entity . '_id']);
+      if (isset($fields[$lowercase_entity . '_id'])) {
+        $fields['id'] = $fields[$lowercase_entity . '_id'];
+        unset($fields[$lowercase_entity . '_id']);
+      }
     }
     return $fields;
   }
@@ -1681,6 +1685,12 @@ function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
   if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
     return;
   }
+
+  if ($fieldValue === 'null' && empty($fieldInfo['api.required'])) {
+    // This is the wierd & wonderful way PEAR sets null.
+    return;
+  }
+
   //should we check first to prevent it from being copied if they have passed in sql friendly format?
   if (!empty($params[$fieldInfo['name']])) {
     $fieldValue = _civicrm_api3_getValidDate($fieldValue, $fieldInfo['name'], $fieldInfo['type']);
@@ -2270,7 +2280,7 @@ function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldNam
   if (is_array($fieldValue)) {
     foreach ($fieldValue as &$value) {
       if (!is_array($value)) {
-        _civicrm_api3_api_match_pseudoconstant_value($value, $options, $fieldName);
+        _civicrm_api3_api_match_pseudoconstant_value($value, $options, $fieldName, CRM_Utils_Array::value('api.required', $fieldInfo));
       }
     }
     // TODO: unwrap the call to implodePadded from the conditional and do it always
@@ -2281,7 +2291,7 @@ function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldNam
     }
   }
   else {
-    _civicrm_api3_api_match_pseudoconstant_value($fieldValue, $options, $fieldName);
+    _civicrm_api3_api_match_pseudoconstant_value($fieldValue, $options, $fieldName, CRM_Utils_Array::value('api.required', $fieldInfo));
   }
 }
 
@@ -2291,10 +2301,14 @@ function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldNam
  * @param string $value field value
  * @param array $options array of options for this field
  * @param string $fieldName field name used in api call (not necessarily the canonical name)
+ * @param bool $isRequired
+ *   Is this a required field or is 'null' an acceptable option. We allow 'null' last
+ *   in case we have the weird situation of it being a valid option in which case our
+ *   brains will probably explode.
  *
  * @throws API_Exception
  */
-function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldName) {
+function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldName, $isRequired) {
   // If option is a key, no need to translate
   // or if no options are avaiable for pseudoconstant 'table' property
   if (array_key_exists($value, $options) || !$options) {
@@ -2313,6 +2327,10 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
   $options = array_map("strtolower", $options);
   $newValue = array_search($newValue, $options);
   if ($newValue === FALSE) {
+    if ($value === 'null' && !$isRequired) {
+      // CiviMagic syntax for Nulling out the field - let it through.
+      return;
+    }
     throw new API_Exception("'$value' is not a valid option for field $fieldName", 2001, array('error_field' => $fieldName));
   }
   $value = $newValue;
@@ -2499,4 +2517,19 @@ function _civicrm_api3_check_edit_permissions($bao_name, $params) {
       throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
     }
   }
+}
+
+/**
+ * Check if an entity has been modified since the last known modified_date
+ * @param string $modifiedDate Last knowm modified_date
+ * @param int $id Id of record to check
+ * @param string $entity API Entity
+ * @return bool
+ */
+function _civicrm_api3_compare_timestamps($modifiedDate, $id, $entity) {
+  $currentDbInfo = civicrm_api3($entity, 'getsingle', array('id' => $id));
+  if (strtotime($currentDbInfo['modified_date']) <= strtotime($modifiedDate)) {
+    return TRUE;
+  }
+  return FALSE;
 }

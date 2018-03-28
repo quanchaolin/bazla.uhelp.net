@@ -853,6 +853,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     //get the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
+    if (!isset($params['preferred_communication_method'])) {
+      // If this field is empty QF will trim it so we have to add it in.
+      $params['preferred_communication_method'] = 'null';
+    }
 
     $group = CRM_Utils_Array::value('group', $params);
     if (!empty($group) && is_array($group)) {
@@ -861,8 +865,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $params['group'][$value] = 1;
       }
     }
-
-    CRM_Contact_BAO_Contact_Optimizer::edit($params, $this->_preEditValues);
 
     if (!empty($params['image_URL'])) {
       CRM_Contact_BAO_Contact::processImageParams($params);
@@ -912,8 +914,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       CRM_Utils_Hook::pre('create', $params['contact_type'], NULL, $params);
     }
 
-    $customFields = CRM_Core_BAO_CustomField::getFields($params['contact_type'], FALSE, TRUE);
-
     //CRM-5143
     //if subtype is set, send subtype as extend to validate subtype customfield
     $customFieldExtends = (CRM_Utils_Array::value('contact_sub_type', $params)) ? $params['contact_sub_type'] : $params['contact_type'];
@@ -939,11 +939,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // process shared contact address.
     CRM_Contact_BAO_Contact_Utils::processSharedAddress($params['address']);
 
-    if (!array_key_exists('TagsAndGroups', $this->_editOptions) && !empty($params['group'])) {
+    if (!array_key_exists('TagsAndGroups', $this->_editOptions)) {
       unset($params['group']);
     }
-
-    if (!empty($params['contact_id']) && ($this->_action & CRM_Core_Action::UPDATE) && !empty($params['group'])) {
+    elseif (!empty($params['contact_id']) && ($this->_action & CRM_Core_Action::UPDATE)) {
       // figure out which all groups are intended to be removed
       $contactGroupList = CRM_Contact_BAO_GroupContact::getContactGroup($params['contact_id'], 'Added');
       if (is_array($contactGroupList)) {
@@ -992,7 +991,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     if (array_key_exists('TagsAndGroups', $this->_editOptions)) {
       //add contact to tags
-      CRM_Core_BAO_EntityTag::create($params['tag'], 'civicrm_contact', $params['contact_id']);
+      if (isset($params['tag']) && !empty($params['tag'])) {
+        $params['tag'] = array_flip(explode(',', $params['tag']));
+        CRM_Core_BAO_EntityTag::create($params['tag'], 'civicrm_contact', $params['contact_id']);
+      }
 
       //save free tags
       if (isset($params['contact_taglist']) && !empty($params['contact_taglist'])) {

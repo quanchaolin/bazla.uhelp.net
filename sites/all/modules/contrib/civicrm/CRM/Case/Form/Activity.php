@@ -72,7 +72,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
     $result = parent::preProcess();
 
-    $scheduleStatusId = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
+    $scheduleStatusId = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Scheduled');
     $this->assign('scheduleStatusId', $scheduleStatusId);
 
     if (!$this->_caseId && $this->_activityId) {
@@ -197,6 +197,11 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
     }
 
+    // Turn off the prompt which asks the user if they want to create separate
+    // activities when specifying multiple contacts "with" a new activity.
+    // Instead, always create one activity with all contacts together.
+    $this->supportsActivitySeparation = FALSE;
+
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext($url);
   }
@@ -253,7 +258,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
 
       // remove Open Case activity type since we're inside an existing case
-      $openCaseID = CRM_Core_OptionGroup::getValue('activity_type', 'Open Case', 'name');
+      $openCaseID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Open Case');
       unset($aTypes[$openCaseID]);
       asort($aTypes);
       $this->_fields['followup_activity_type_id']['attributes'] = array('' => '- select activity type -') + $aTypes;
@@ -589,7 +594,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     //CRM-5695
     //check for notification settings for assignee contacts
     $selectedContacts = array('contact_check');
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     if (Civi::settings()->get('activity_assignee_notification')) {
       $selectedContacts[] = 'assignee_contact_id';

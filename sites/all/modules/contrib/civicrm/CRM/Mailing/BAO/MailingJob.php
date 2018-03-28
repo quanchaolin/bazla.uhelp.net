@@ -498,10 +498,13 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   /**
    * Send the mailing.
    *
+   * @deprecated
+   *   This is used by CiviMail but will be made redundant by FlexMailer.
    * @param object $mailer
    *   A Mail object to send the messages.
    *
    * @param array $testParams
+   * @return bool
    */
   public function deliver(&$mailer, $testParams = NULL) {
     if (\Civi::settings()->get('experimentalFlexMailerEngine')) {
@@ -583,6 +586,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   }
 
   /**
+   * @deprecated
+   *   This is used by CiviMail but will be made redundant by FlexMailer.
    * @param array $fields
    *   List of intended recipients.
    *   Each recipient is an array with keys 'hash', 'contact_id', 'email', etc.
@@ -916,18 +921,11 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
       if (!$activityTypeID) {
         if ($mailing->sms_provider_id) {
           $mailing->subject = $mailing->name;
-          $activityTypeID = CRM_Core_OptionGroup::getValue(
-            'activity_type',
-            'Mass SMS',
-            'name'
+          $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Mass SMS'
           );
         }
         else {
-          $activityTypeID = CRM_Core_OptionGroup::getValue(
-            'activity_type',
-            'Bulk Email',
-            'name'
-          );
+          $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Bulk Email');
         }
         if (!$activityTypeID) {
           CRM_Core_Error::fatal();
@@ -969,7 +967,7 @@ AND    civicrm_activity.source_record_id = %2
         if (CRM_Core_BAO_Email::isMultipleBulkMail()) {
           static $targetRecordID = NULL;
           if (!$targetRecordID) {
-            $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+            $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
             $targetRecordID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
           }
 

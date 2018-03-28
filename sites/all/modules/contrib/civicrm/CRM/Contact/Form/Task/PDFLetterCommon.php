@@ -36,6 +36,8 @@
  */
 class CRM_Contact_Form_Task_PDFLetterCommon {
 
+  protected static $tokenCategories;
+
   /**
    * @return array
    *   Array(string $machineName => string $label).
@@ -76,9 +78,11 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @param int $cid
    */
   public static function preProcessSingle(&$form, $cid) {
-    $form->_contactIds = array($cid);
+    $form->_contactIds = explode(',', $cid);
     // put contact display name in title for single contact mode
-    CRM_Utils_System::setTitle(ts('Print/Merge Document for %1', array(1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name'))));
+    if (count($form->_contactIds) === 1) {
+      CRM_Utils_System::setTitle(ts('Print/Merge Document for %1', array(1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name'))));
+    }
   }
 
   /**
@@ -328,9 +332,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       $bao->savePdfFormat($formValues, $formValues['format_id']);
     }
 
-    $tokens = array();
-    CRM_Utils_Hook::tokens($tokens);
-    $categories = array_keys($tokens);
+    $categories = self::getTokenCategories();
 
     //time being hack to strip '&nbsp;'
     //from particular letter line, CRM-6798
@@ -352,6 +354,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * Process the form after the input has been submitted and validated.
    *
    * @param CRM_Core_Form $form
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function postProcess(&$form) {
     $formValues = $form->controller->exportValues($form->getName());
@@ -361,9 +365,13 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
     $html = $activityIds = array();
 
+    // CRM-21255 - Hrm, CiviCase 4+5 seem to report buttons differently...
+    $c = $form->controller->container();
+    $isLiveMode = ($buttonName == '_qf_PDF_upload') || isset($c['values']['PDF']['buttons']['_qf_PDF_upload']);
+
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
-    if ($buttonName == '_qf_PDF_upload') {
-      $activityIds = self::createActivities($form, $html_message, $form->_contactIds);
+    if ($isLiveMode) {
+      $activityIds = self::createActivities($form, $html_message, $form->_contactIds, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
     }
 
     if (!empty($formValues['document_file_path'])) {
@@ -411,7 +419,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     }
 
     $tee = NULL;
-    if (Civi::settings()->get('recordGeneratedLetters') === 'combined-attached') {
+    if ($isLiveMode && Civi::settings()->get('recordGeneratedLetters') === 'combined-attached') {
       if (count($activityIds) !== 1) {
         throw new CRM_Core_Exception("When recordGeneratedLetters=combined-attached, there should only be one activity.");
       }
@@ -463,6 +471,10 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @param CRM_Core_Form $form
    * @param string $html_message
    * @param array $contactIds
+   * @param string $subject
+   * @param int $campaign_id
+   * @param array $perContactHtml
+   *
    * @return array
    *   List of activity IDs.
    *   There may be 1 or more, depending on the system-settings
@@ -470,33 +482,19 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    *
    * @throws CRM_Core_Exception
    */
-  public static function createActivities($form, $html_message, $contactIds) {
-    //Added for CRM-12682: Add activity subject and campaign fields
-    $formValues = $form->controller->exportValues($form->getName());
+  public static function createActivities($form, $html_message, $contactIds, $subject, $campaign_id, $perContactHtml = array()) {
 
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
-    $activityTypeID = CRM_Core_OptionGroup::getValue(
-      'activity_type',
-      'Print PDF Letter',
-      'name'
-    );
     $activityParams = array(
-      'subject' => $formValues['subject'],
-      'campaign_id' => CRM_Utils_Array::value('campaign_id', $formValues),
-      'source_contact_id' => $userID,
-      'activity_type_id' => $activityTypeID,
+      'subject' => $subject,
+      'campaign_id' => $campaign_id,
+      'source_contact_id' => CRM_Core_Session::singleton()->getLoggedInContactID(),
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Print PDF Letter'),
       'activity_date_time' => date('YmdHis'),
       'details' => $html_message,
     );
     if (!empty($form->_activityId)) {
       $activityParams += array('id' => $form->_activityId);
     }
-
-    // This seems silly, but the old behavior was to first check `_cid`
-    // and then use the provided `$contactIds`. Probably not even necessary,
-    // but difficult to audit.
-    $contactIds = $form->_cid ? array($form->_cid) : $contactIds;
 
     $activityIds = array();
     switch (Civi::settings()->get('recordGeneratedLetters')) {
@@ -505,12 +503,22 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
       case 'multiple':
         // One activity per contact.
-        foreach ($contactIds as $contactId) {
+        foreach ($contactIds as $i => $contactId) {
           $fullParams = array(
             'target_contact_id' => $contactId,
           ) + $activityParams;
-          $activity = CRM_Activity_BAO_Activity::create($fullParams);
-          $activityIds[$contactId] = $activity->id;
+          if (!empty($form->_caseId)) {
+            $fullParams['case_id'] = $form->_caseId;
+          }
+          elseif (!empty($form->_caseIds[$i])) {
+            $fullParams['case_id'] = $form->_caseIds[$i];
+          }
+
+          if (isset($perContactHtml[$contactId])) {
+            $fullParams['details'] = implode('<hr>', $perContactHtml[$contactId]);
+          }
+          $activity = civicrm_api3('Activity', 'create', $fullParams);
+          $activityIds[$contactId] = $activity['id'];
         }
 
         break;
@@ -521,19 +529,18 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
         $fullParams = array(
           'target_contact_id' => $contactIds,
         ) + $activityParams;
-        $activity = CRM_Activity_BAO_Activity::create($fullParams);
-        $activityIds[] = $activity->id;
+        if (!empty($form->_caseId)) {
+          $fullParams['case_id'] = $form->_caseId;
+        }
+        elseif (!empty($form->_caseIds)) {
+          $fullParams['case_id'] = $form->_caseIds;
+        }
+        $activity = civicrm_api3('Activity', 'create', $fullParams);
+        $activityIds[] = $activity['id'];
         break;
 
       default:
         throw new CRM_Core_Exception("Unrecognized option in recordGeneratedLetters: " . Civi::settings()->get('recordGeneratedLetters'));
-    }
-
-    if (!empty($form->_caseId)) {
-      foreach ($activityIds as $activityId) {
-        $caseActivityParams = array('activity_id' => $activityId, 'case_id' => $form->_caseId);
-        CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
-      }
     }
 
     return $activityIds;
@@ -602,6 +609,20 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     else {
       throw new \CRM_Core_Exception("Cannot determine mime type");
     }
+  }
+
+  /**
+   * Get the categories required for rendering tokens.
+   *
+   * @return array
+   */
+  protected static function getTokenCategories() {
+    if (!isset(Civi::$statics[__CLASS__]['token_categories'])) {
+      $tokens = array();
+      CRM_Utils_Hook::tokens($tokens);
+      Civi::$statics[__CLASS__]['token_categories'] = array_keys($tokens);
+    }
+    return Civi::$statics[__CLASS__]['token_categories'];
   }
 
 }

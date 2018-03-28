@@ -37,6 +37,7 @@
 class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('Settings - Display Preferences'));
+    $optionValues = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
 
     $this->_varNames = array(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
@@ -70,34 +71,46 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
           'title' => ts('Include ICal Invite to Activity Assignees'),
           'weight' => 6,
         ),
+        'preserve_activity_tab_filter' => array(
+          'html_type' => 'checkbox',
+          'title' => ts('Preserve activity filters as a user preference'),
+          'weight' => 7,
+        ),
         'contact_ajax_check_similar' => array(
           'html_type' => 'checkbox',
           'title' => ts('Check for Similar Contacts'),
-          'weight' => 7,
+          'weight' => 8,
         ),
         'user_dashboard_options' => array(
           'html_type' => 'checkboxes',
           'title' => ts('Contact Dashboard'),
-          'weight' => 8,
+          'weight' => 9,
         ),
         'display_name_format' => array(
           'html_type' => 'textarea',
           'title' => ts('Individual Display Name Format'),
-          'weight' => 9,
+          'weight' => 10,
         ),
         'sort_name_format' => array(
           'html_type' => 'textarea',
           'title' => ts('Individual Sort Name Format'),
-          'weight' => 10,
+          'weight' => 11,
         ),
         'editor_id' => array(
           'html_type' => NULL,
-          'weight' => 11,
+          'weight' => 12,
         ),
         'ajaxPopupsEnabled' => array(
           'html_type' => 'checkbox',
           'title' => ts('Enable Popup Forms'),
-          'weight' => 12,
+          'weight' => 13,
+        ),
+        'do_not_notify_assignees_for' => array(
+          'html_type' => 'select',
+          'option_values' => $optionValues,
+          'attributes' => array('multiple' => 1, "class" => "huge crm-select2"),
+          'title' => ts('Do not notify assignees for'),
+          'weight' => 14,
         ),
       ),
     );

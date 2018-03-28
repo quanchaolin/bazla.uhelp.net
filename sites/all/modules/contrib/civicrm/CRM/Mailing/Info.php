@@ -79,7 +79,9 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       $result = civicrm_api3('ReportInstance', 'get', array(
         'sequential' => 1,
         'report_id' => 'mailing/' . $report));
-      $reportIds[$report] = $result['values'][0]['id'];
+      if (!empty($result['values'])) {
+        $reportIds[$report] = $result['values'][0]['id'];
+      }
     }
     $result = array();
     $result['crmMailing'] = include "$civicrm_root/ang/crmMailing.ang.php";
@@ -90,25 +92,11 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
 
-    // Get past mailings.
-    // CRM-16155 - Limit to a reasonable number.
-    $civiMails = civicrm_api3('Mailing', 'get', array(
-      'is_completed' => 1,
-      'mailing_type' => array('IN' => array('standalone', 'winner')),
-      'domain_id' => CRM_Core_Config::domainID(),
-      'return' => array('id', 'name', 'scheduled_date'),
-      'sequential' => 1,
-      'options' => array(
-        'limit' => 500,
-        'sort' => 'is_archived asc, scheduled_date desc',
-      ),
-    ));
     // Generic params.
     $params = array(
       'options' => array('limit' => 0),
       'sequential' => 1,
     );
-
     $groupNames = civicrm_api3('Group', 'get', $params + array(
       'is_active' => 1,
       'check_permissions' => TRUE,
@@ -141,19 +129,23 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     ));
     $enabledLanguages = CRM_Core_I18n::languages(TRUE);
     $isMultiLingual = (count($enabledLanguages) > 1);
+    // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
+    $requiredTokens = defined('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS') ? Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS, array()) : CRM_Utils_Token::getRequiredTokens();
     CRM_Core_Resources::singleton()
       ->addSetting(array(
         'crmMailing' => array(
           'templateTypes' => CRM_Mailing_BAO_Mailing::getTemplateTypes(),
-          'civiMails' => $civiMails['values'],
+          'civiMails' => array(),
           'campaignEnabled' => in_array('CiviCampaign', $config->enableComponents),
-          'groupNames' => $groupNames['values'],
+          'groupNames' => array(),
+          // @todo see if we can remove this by dynamically generating the test group list
+          'testGroupNames' => $groupNames['values'],
           'headerfooterList' => $headerfooterList['values'],
           'mesTemplate' => $mesTemplate['values'],
           'emailAdd' => $emailAdd['values'],
           'mailTokens' => $mailTokens['values'],
           'contactid' => $contactID,
-          'requiredTokens' => CRM_Utils_Token::getRequiredTokens(),
+          'requiredTokens' => $requiredTokens,
           'enableReplyTo' => (int) Civi::settings()->get('replyTo'),
           'disableMandatoryTokensCheck' => (int) Civi::settings()->get('disable_mandatory_tokens_check'),
           'fromAddress' => $fromAddress['values'],

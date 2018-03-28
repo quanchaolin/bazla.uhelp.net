@@ -70,7 +70,7 @@
 <table class="crm-info-panel">
   <tr>
     <td class="label">{ts}From{/ts}</td>
-    <td class="bold">{$displayName}</td>
+    <td class="bold"><a href="{crmURL p='civicrm/contact/view' q="cid=$contact_id"}">{$displayName}</a></td>
   </tr>
   <tr>
     <td class="label">{ts}Financial Type{/ts}</td>
@@ -104,7 +104,7 @@
   {/if}
   {if $invoicing && $tax_amount}
     <tr>
-      <td class="label">{ts}Total Tax Amount{/ts}</td>
+      <td class="label">{ts 1=$taxTerm}Total %1 Amount{/ts}</td>
       <td>{$tax_amount|crmMoney:$currency}</td>
     </tr>
   {/if}
@@ -217,9 +217,16 @@
     </tr>
   {/if}
 
+  {if $invoice_number}
+    <tr>
+      <td class="label">{ts}Invoice Number{/ts}</td>
+      <td>{$invoice_number}&nbsp;</td>
+    </tr>
+  {/if}
+
   {if $invoice_id}
     <tr>
-      <td class="label">{ts}Invoice ID{/ts}</td>
+      <td class="label">{ts}Invoice Reference{/ts}</td>
       <td>{$invoice_id}&nbsp;</td>
     </tr>
   {/if}

@@ -53,6 +53,8 @@
       <div class="help">
         {ts}Organize the tag hierarchy by clicking and dragging. Shift-click to select multiple tags to merge/move/delete.{/ts}
       </div>
+      <input class="crm-form-text big" name="filter_tag_tree" placeholder="{ts}Filter List{/ts}" allowclear="1"/>
+      <a class="crm-hover-button crm-clear-link" style="visibility:hidden;" title="{ts}Clear{/ts}"><i class="crm-i fa-times"></i></a>
     </div>
     {foreach from=$tagsets item=set}
       <div id="tagset-{$set.id}">
@@ -76,7 +78,7 @@
         noneSelectedTpl = _.template($('#noneSelectedTpl').html()),
         oneSelectedTpl = _.template($('#oneSelectedTpl').html()),
         moreSelectedTpl = _.template($('#moreSelectedTpl').html()),
-        tagsetHelpTpl = _.template($('#tagsetHelpTpl').html());
+        tagsetHeaderTpl = _.template($('#tagsetHeaderTpl').html());
 
       function formatTagSet(info) {
         info.date = CRM.utils.formatDate(info.created_date);
@@ -182,19 +184,20 @@
           tagSets[tagset].used_for = info.used_for;
           tagSets[tagset].is_reserved = info.is_reserved;
           formatTagSet(tagSets[tagset]);
-          $('.help', $panel).remove();
-          addHelp();
+          addTagsetHeader();
+          $(".tag-tree", $panel).jstree("search", '');
         }
 
-        function addHelp() {
-          $panel.prepend(tagsetHelpTpl(tagSets[tagset]));
+        function addTagsetHeader() {
+          $('.tagset-header', $panel).remove();
+          $panel.prepend(tagsetHeaderTpl(tagSets[tagset]));
           $("a[href='#tagset-" + tagset + "']").text(tagSets[tagset].name)
             .parent().toggleClass('is-reserved', tagSets[tagset].is_reserved == 1)
             .attr('title', ts('{/literal}{ts escape='js' 1='%1'}Tag Set for %1{/ts}{literal}', {'1': tagSets[tagset].used_for_label.join(', ')}));
         }
 
         if (tagset) {
-          addHelp();
+          addTagsetHeader();
         }
 
         function moveTagDialog(e) {
@@ -240,6 +243,9 @@
           .on('click', '.used-for-toggle', function() {
             $(this).attr('style', 'display: none !important;').next().show();
           })
+          .on('click', 'a.crm-clear-link', function() {
+            $('.tag-tree', $panel).jstree(true).refresh();
+          })
           .on('crmPopupFormSuccess crmFormSuccess', function(e, cts, data) {
             if ($(e.target).hasClass('tagset-action-delete')) {
               deleteTagset();
@@ -250,7 +256,7 @@
             }
           });
 
-        plugins = ['wholerow', 'changed'];
+        plugins = ['wholerow', 'changed', 'search'];
         if (!tagset) {
           // Allow drag-n-drop nesting of the tag tree
           plugins.push('dnd');
@@ -269,11 +275,26 @@
               },
               check_callback: true
             },
+            'search': {
+              'ajax' : {
+                url : CRM.url('civicrm/ajax/tagTree')
+              },
+              'show_only_matches': true
+            },
             plugins: plugins,
             dnd: {
               copy: false
             }
           });
+
+        $('input[name=filter_tag_tree]', $panel).on('keyup change', function() {
+          if ($(this).val() == null) {
+            $('.tag-tree', $panel).jstree(true).refresh();
+          }
+          else {
+            $(".tag-tree", $panel).jstree("search", $(this).val());
+          }
+        });
       }
 
       function newTagset() {
@@ -389,6 +410,9 @@
   div.tag-info input[type=color] {
     cursor: pointer;
   }
+  div.tag-info input[disabled] {
+    cursor: default;
+  }
   div.tag-info .tdl {
     font-weight: bold;
     color: #999;
@@ -432,15 +456,15 @@
 <script type="text/template" id="oneSelectedTpl">
   <div class="crm-entity" data-entity="Tag" data-id="<%= id %>">
     <h4>
-      <input type="color" value="<%= data.color %>" title="{ts}Select color{/ts}"/>
-      <span class="crm-editable" data-field="name"><%- text %></span>
+      <input type="color" value="<%= data.color %>" <% if (!data.is_reserved || adminReserved) {ldelim} %>title="{ts}Select color{/ts}" <% {rdelim} else {ldelim} %>disabled<% {rdelim} %> />
+      <span class="<% if (!data.is_reserved || adminReserved) {ldelim} %>crm-editable<% {rdelim} %>" data-field="name"><%- text %></span>
     </h4>
     <hr />
     <div><span class="tdl">{ts}Description:{/ts}</span>
-      <span class="crm-editable" data-field="description"><%- data.description %></span>
+      <span class="<% if (!data.is_reserved || adminReserved) {ldelim} %>crm-editable<% {rdelim} %>" data-field="description"><%- data.description %></span>
     </div>
     <div><span class="tdl">{ts}Selectable:{/ts}</span>
-      <span class="crm-editable" data-field="is_selectable" data-type="select"><% if (data.is_selectable) {ldelim} %> {ts}Yes{/ts} <% {rdelim} else {ldelim} %> {ts}No{/ts} <% {rdelim} %></span>
+      <span class="<% if (!data.is_reserved || adminReserved) {ldelim} %>crm-editable<% {rdelim} %>" data-field="is_selectable" data-type="select"><% if (data.is_selectable) {ldelim} %> {ts}Yes{/ts} <% {rdelim} else {ldelim} %> {ts}No{/ts} <% {rdelim} %></span>
     </div>
     <div><span class="tdl">{ts}Reserved:{/ts}</span>
       <span class="<% if (adminReserved) {ldelim} %>crm-editable<% {rdelim} %>" data-field="is_reserved" data-type="select"><% if (data.is_reserved) {ldelim} %> {ts}Yes{/ts} <% {rdelim} else {ldelim} %> {ts}No{/ts} <% {rdelim} %></span>
@@ -449,7 +473,7 @@
       <div>
         <span class="tdl">{ts}Used For:{/ts}</span>
         {literal}
-          <span class="crm-editable-enabled used-for-toggle">
+          <span class="<% if (!data.is_reserved || adminReserved) { %>crm-editable-enabled used-for-toggle<% } %>">
             <% if (!data.used_for.length) { %><i class="crm-i fa-pencil crm-editable-placeholder"></i><% } %>
             <% _.forEach(data.used_for, function(key, i) { %><%- (i ? ', ' : '') + usedFor[key] %><% }) %>
           </span>
@@ -518,11 +542,15 @@
   </div>
 </script>
 
-<script type="text/template" id="tagsetHelpTpl">
-  <div class="help">
-    <% if(is_reserved == 1) {ldelim} %><strong>{ts}Reserved{/ts}</strong><% {rdelim} %>
-    <% if(undefined === display_name) {ldelim} var display_name = null; {rdelim} %>
-    {ts 1="<%= used_for_label.join(', ') %>" 2="<%= date %>" 3="<%= display_name %>"}Tag Set for %1 (created %2 by %3).{/ts}
-    <% if(typeof description === 'string' && description.length) {ldelim} %><p><em><%- description %></em></p><% {rdelim} %>
+<script type="text/template" id="tagsetHeaderTpl">
+  <div class="tagset-header">
+    <div class="help">
+      <% if(is_reserved == 1) {ldelim} %><strong>{ts}Reserved{/ts}</strong><% {rdelim} %>
+      <% if(undefined === display_name) {ldelim} var display_name = null; {rdelim} %>
+      {ts 1="<%= used_for_label.join(', ') %>" 2="<%= date %>" 3="<%= display_name %>"}Tag Set for %1 (created %2 by %3).{/ts}
+      <% if(typeof description === 'string' && description.length) {ldelim} %><p><em><%- description %></em></p><% {rdelim} %>
+    </div>
+    <input class="crm-form-text big" name="filter_tag_tree" placeholder="{ts}Filter List{/ts}" allowclear="1"/>
+    <a class="crm-hover-button crm-clear-link" style="visibility:hidden;" title="{ts}Clear{/ts}"><i class="crm-i fa-times"></i></a>
   </div>
 </script>

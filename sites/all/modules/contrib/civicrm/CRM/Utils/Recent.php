@@ -116,7 +116,7 @@ class CRM_Utils_Recent {
 
     // make sure item is not already present in list
     for ($i = 0; $i < count(self::$_recent); $i++) {
-      if (self::$_recent[$i]['url'] == $url) {
+      if (self::$_recent[$i]['type'] === $type && self::$_recent[$i]['id'] === $id) {
         // delete item from array
         array_splice(self::$_recent, $i, 1);
         break;
@@ -162,7 +162,7 @@ class CRM_Utils_Recent {
     self::initialize();
     $tempRecent = self::$_recent;
 
-    self::$_recent = '';
+    self::$_recent = array();
 
     // make sure item is not already present in list
     for ($i = 0; $i < count($tempRecent); $i++) {
@@ -189,7 +189,7 @@ class CRM_Utils_Recent {
 
     $tempRecent = self::$_recent;
 
-    self::$_recent = '';
+    self::$_recent = array();
 
     // rebuild recent.
     for ($i = 0; $i < count($tempRecent); $i++) {

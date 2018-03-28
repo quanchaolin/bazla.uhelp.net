@@ -132,7 +132,16 @@
         {ts}When enabled, contacts who are assigned activities will automatically receive an email notification with a copy of the activity.{/ts}
       </td>
     </tr>
-
+    <tr class="crm-preferences-display-form-activity_types">
+      <td class="label">{$form.do_not_notify_assignees_for.label}</td>
+      <td>{$form.do_not_notify_assignees_for.html}</td>
+    </tr>
+    <tr class="crm-preferences-display-form-activity_types">
+      <td>&nbsp;</td>
+      <td class="description">
+        {ts}These activity types will be excluded from automated email notifications to assignees.{/ts}
+      </td>
+    </tr>
     <tr class="crm-preferences-display-form-block-activity_assignee_notification_ics">
       <td class="label"></td>
       <td>{$form.activity_assignee_notification_ics.html} {$form.activity_assignee_notification_ics.label}</td>
@@ -140,6 +149,16 @@
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
       <td class="description">{ts}When enabled, the assignee notification sent out above will also include an ical meeting invite.{/ts}
+      </td>
+    </tr>
+
+    <tr class="crm-preferences-display-form-block-preserve_activity_tab_filter">
+      <td class="label"></td>
+      <td>{$form.preserve_activity_tab_filter.html} {$form.preserve_activity_tab_filter.label}</td>
+    </tr>
+    <tr class="crm-preferences-display-form-block-description">
+      <td>&nbsp;</td>
+      <td class="description">{ts}When enabled, any filter settings a user selects on the contact's Activity tab will be remembered as they visit other contacts.{/ts}
       </td>
     </tr>
 
@@ -217,6 +236,12 @@
           }
           $('#contact_edit_preferences').val(params.toString());
         }
+
+        // show/hide activity types based on checkbox value
+        $('.crm-preferences-display-form-activity_types').toggle($('#activity_assignee_notification').is(":checked"));
+        $('#activity_assignee_notification').click(function() {
+          $('.crm-preferences-display-form-activity_types').toggle($(this).is(":checked"));
+        });
 
         var invoicesKey = '{/literal}{$invoicesKey}{literal}';
         var invoicing = '{/literal}{$invoicing}{literal}';

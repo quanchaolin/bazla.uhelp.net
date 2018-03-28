@@ -14,12 +14,95 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
 
+## CiviCRM 4.7.30
+
+Released February 7, 2018
+
+- **[Synopsis](release-notes/4.7.30.md#synopsis)**
+- **[Features](release-notes/4.7.30.md#features)**
+- **[Bugs resolved](release-notes/4.7.30.md#bugs)**
+- **[Miscellany](release-notes/4.7.30.md#misc)**
+- **[Credits](release-notes/4.7.30.md#credits)**
+- **[Feedback](release-notes/4.7.30.md#feedback)**
+
+## CiviCRM 4.7.29
+
+Released December 20, 2017
+
+- **[Synopsis](release-notes/4.7.29.md#synopsis)**
+- **[Features](release-notes/4.7.29.md#features)**
+- **[Bugs resolved](release-notes/4.7.29.md#bugs)**
+- **[Credits](release-notes/4.7.29.md#credits)**
+- **[Feedback](release-notes/4.7.29.md#feedback)**
+
+## CiviCRM 4.7.28
+
+Released December 6, 2017
+
+- **[Synopsis](release-notes/4.7.28.md#synopsis)**
+- **[Features](release-notes/4.7.28.md#features)**
+- **[Bugs resolved](release-notes/4.7.28.md#bugs)**
+- **[Miscellany](release-notes/4.7.28.md#misc)**
+- **[Credits](release-notes/4.7.28.md#credits)**
+- **[Feedback](release-notes/4.7.28.md#feedback)**
+
+## CiviCRM 4.7.27
+
+Released November 1, 2017
+
+- **[Synopsis](release-notes/4.7.27.md#synopsis)**
+- **[Features](release-notes/4.7.27.md#features)**
+- **[Bugs resolved](release-notes/4.7.27.md#bugs)**
+- **[Miscellany](release-notes/4.7.27.md#misc)**
+- **[Credits](release-notes/4.7.27.md#credits)**
+- **[Feedback](release-notes/4.7.27.md#feedback)**
+
+## CiviCRM 4.7.26
+
+Released November 1, 2017
+
+- **[Security](release-notes/4.7.26.md#security)**
+- **[Credits](release-notes/4.7.26.md#credits)**
+
+## CiviCRM 4.7.25
+
+Released October 4, 2017
+
+- **[Synopsis](release-notes/4.7.25.md#synopsis)**
+- **[Features](release-notes/4.7.25.md#features)**
+- **[Bugs resolved](release-notes/4.7.25.md#bugs)**
+- **[Miscellany](release-notes/4.7.25.md#misc)**
+- **[Credits](release-notes/4.7.25.md#credits)**
+- **[Feedback](release-notes/4.7.25.md#feedback)**
+
+## CiviCRM 4.7.24
+
+Released September 6, 2017
+
+- **[Synopsis](release-notes/4.7.24.md#synopsis)**
+- **[Features](release-notes/4.7.24.md#features)**
+- **[Bugs resolved](release-notes/4.7.24.md#bugs)**
+- **[Miscellany](release-notes/4.7.24.md#misc)**
+- **[Credits](release-notes/4.7.24.md#credits)**
+- **[Feedback](release-notes/4.7.24.md#feedback)**
+
+## CiviCRM 4.7.23
+
+Released August 2, 2017
+
+- **[Synopsis](release-notes/4.7.23.md#synopsis)**
+- **[Features](release-notes/4.7.23.md#features)**
+- **[Bugs resolved](release-notes/4.7.23.md#bugs)**
+- **[Miscellany](release-notes/4.7.23.md#misc)**
+- **[Credits](release-notes/4.7.23.md#credits)**
+- **[Feedback](release-notes/4.7.23.md#feedback)**
 
 ## CiviCRM 4.7.22
 
 Released July 12, 2017
 
 - **[Bugs resolved](release-notes/4.7.22.md#bugs)**
+- **[Credits](release-notes/4.7.22.md#credits)**
 
 ## CiviCRM 4.7.21
 

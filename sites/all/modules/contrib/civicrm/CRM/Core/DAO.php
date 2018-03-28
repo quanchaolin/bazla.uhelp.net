@@ -64,7 +64,24 @@ class CRM_Core_DAO extends DB_DataObject {
     BULK_INSERT_COUNT = 200,
     BULK_INSERT_HIGH_COUNT = 200,
     QUERY_FORMAT_WILDCARD = 1,
-    QUERY_FORMAT_NO_QUOTES = 2;
+    QUERY_FORMAT_NO_QUOTES = 2,
+
+    /**
+     * Serialized string separated by and bookended with VALUE_SEPARATOR
+     */
+    SERIALIZE_SEPARATOR_BOOKEND = 1,
+    /**
+     * @deprecated format separated by VALUE_SEPARATOR
+     */
+    SERIALIZE_SEPARATOR_TRIMMED = 2,
+    /**
+     * Recommended serialization format
+     */
+    SERIALIZE_JSON = 3,
+    /**
+     * @deprecated format using php serialize()
+     */
+    SERIALIZE_PHP = 4;
 
   /**
    * Define entities that shouldn't be created or deleted when creating/ deleting
@@ -118,8 +135,15 @@ class CRM_Core_DAO extends DB_DataObject {
     }
     $factory = new CRM_Contact_DAO_Factory();
     CRM_Core_DAO::setFactory($factory);
+    $currentModes = CRM_Utils_SQL::getSqlModes();
     if (CRM_Utils_Constant::value('CIVICRM_MYSQL_STRICT', CRM_Utils_System::isDevelopment())) {
-      CRM_Core_DAO::executeQuery('SET SESSION sql_mode = STRICT_TRANS_TABLES');
+      if (CRM_Utils_SQL::supportsFullGroupBy() && !in_array('ONLY_FULL_GROUP_BY', $currentModes) && CRM_Utils_SQL::isGroupByModeInDefault()) {
+        $currentModes[] = 'ONLY_FULL_GROUP_BY';
+      }
+      if (!in_array('STRICT_TRANS_TABLES', $currentModes)) {
+        $currentModes = array_merge(array('STRICT_TRANS_TABLES'), $currentModes);
+      }
+      CRM_Core_DAO::executeQuery("SET SESSION sql_mode = %1", array(1 => array(implode(',', $currentModes), 'String')));
     }
     CRM_Core_DAO::executeQuery('SET NAMES utf8');
     CRM_Core_DAO::executeQuery('SET @uniqueID = %1', array(1 => array(CRM_Utils_Request::id(), 'String')));
@@ -1033,6 +1057,22 @@ FROM   civicrm_domain
   }
 
   /**
+   * Returns a singular value.
+   *
+   * @return mixed|NULL
+   */
+  public function fetchValue() {
+    $result = $this->getDatabaseResult();
+    $row = $result->fetchRow();
+    $ret = NULL;
+    if ($row) {
+      $ret = $row[0];
+    }
+    $this->free();
+    return $ret;
+  }
+
+  /**
    * Get all the result records as mapping between columns.
    *
    * @param string $keyColumn
@@ -1072,7 +1112,7 @@ FROM   civicrm_domain
       empty($searchValue) ||
       trim(strtolower($searchValue)) == 'null'
     ) {
-      // adding this year since developers forget to check for an id
+      // adding this here since developers forget to check for an id
       // or for the 'null' (which is a bad DAO kludge)
       // and hence we get the first value in the db
       CRM_Core_Error::fatal();
@@ -1233,43 +1273,17 @@ FROM   civicrm_domain
     $i18nRewrite = TRUE,
     $trapException = FALSE
   ) {
-    $queryStr = self::composeQuery($query, $params, $abort);
-    //CRM_Core_Error::debug( 'q', $queryStr );
-    if (!$daoName) {
-      $dao = new CRM_Core_DAO();
-    }
-    else {
-      $dao = new $daoName();
-    }
 
-    if ($trapException) {
-      CRM_Core_Error::ignoreException();
-    }
-
-    // set the DAO object to use an unbuffered query
-    $dao->setOptions(array('result_buffering' => 0));
-
-    $result = $dao->query($queryStr, $i18nRewrite);
-
-    if ($trapException) {
-      CRM_Core_Error::setCallback();
-    }
-
-    if (is_a($result, 'DB_Error')) {
-      return $result;
-    }
-
-    // since it is unbuffered, ($dao->N==0) is true.  This blocks the standard fetch() mechanism.
-    $dao->N = TRUE;
-
-    if ($freeDAO ||
-      preg_match('/^(insert|update|delete|create|drop|replace)/i', $queryStr)
-    ) {
-      // we typically do this for insert/update/delete stataments OR if explicitly asked to
-      // free the dao
-      $dao->free();
-    }
-    return $dao;
+    return self::executeQuery(
+      $query,
+      $params,
+      $abort,
+      $daoName,
+      $freeDAO,
+      $i18nRewrite,
+      $trapException,
+      array('result_buffering' => 0)
+    );
   }
 
   /**
@@ -1284,6 +1298,7 @@ FROM   civicrm_domain
    * @param bool $freeDAO
    * @param bool $i18nRewrite
    * @param bool $trapException
+   * @param array $options
    *
    * @return CRM_Core_DAO|object
    *   object that holds the results of the query
@@ -1297,7 +1312,8 @@ FROM   civicrm_domain
     $daoName = NULL,
     $freeDAO = FALSE,
     $i18nRewrite = TRUE,
-    $trapException = FALSE
+    $trapException = FALSE,
+    $options = array()
   ) {
     $queryStr = self::composeQuery($query, $params, $abort);
 
@@ -1312,7 +1328,16 @@ FROM   civicrm_domain
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     }
 
+    if ($dao->isValidOption($options)) {
+      $dao->setOptions($options);
+    }
+
     $result = $dao->query($queryStr, $i18nRewrite);
+
+    // since it is unbuffered, ($dao->N==0) is true.  This blocks the standard fetch() mechanism.
+    if (CRM_Utils_Array::value('result_buffering', $options) === 0) {
+      $dao->N = TRUE;
+    }
 
     if (is_a($result, 'DB_Error')) {
       return $result;
@@ -1326,6 +1351,37 @@ FROM   civicrm_domain
       $dao->free();
     }
     return $dao;
+  }
+
+  /**
+   * Wrapper to validate internal DAO options before passing to DB_mysql/DB_Common level
+   *
+   * @param array $options
+   *
+   * @return bool
+   *   Provided options are valid
+   */
+  public function isValidOption($options) {
+    $isValid = FALSE;
+    $validOptions = array(
+      'result_buffering',
+      'persistent',
+      'ssl',
+      'portability',
+    );
+
+    if (empty($options)) {
+      return $isValid;
+    }
+
+    foreach (array_keys($options) as $option) {
+      if (!in_array($option, $validOptions)) {
+        return FALSE;
+      }
+      $isValid = TRUE;
+    }
+
+    return $isValid;
   }
 
   /**
@@ -2209,7 +2265,7 @@ SELECT contact_id
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     // If a given bao does not override this function
     $baoName = get_called_class();
-    return CRM_Core_PseudoConstant::get($baoName, $fieldName, array(), $context);
+    return CRM_Core_PseudoConstant::get($baoName, $fieldName, $props, $context);
   }
 
   /**
@@ -2527,7 +2583,7 @@ SELECT contact_id
     foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
       $clauses[$field] = NULL;
       if ($vals) {
-        $clauses[$field] = "`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals);
+        $clauses[$field] = "(`$tableAlias`.`$field` IS NULL OR (`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals) . '))';
       }
     }
     return $clauses;
@@ -2552,6 +2608,61 @@ SELECT contact_id
       return FALSE;
     }
     return TRUE;
+  }
+
+  /**
+   * Transform an array to a serialized string for database storage.
+   *
+   * @param array|NULL $value
+   * @param $serializationType
+   * @return string|NULL
+   */
+  public static function serializeField($value, $serializationType) {
+    if ($value === NULL) {
+      return NULL;
+    }
+    switch ($serializationType) {
+      case self::SERIALIZE_SEPARATOR_BOOKEND:
+        return $value === array() ? '' : CRM_Utils_Array::implodePadded($value);
+
+      case self::SERIALIZE_SEPARATOR_TRIMMED:
+        return is_array($value) ? implode(self::VALUE_SEPARATOR, $value) : $value;
+
+      case self::SERIALIZE_JSON:
+        return is_array($value) ? json_encode($value) : $value;
+
+      case self::SERIALIZE_PHP:
+        return is_array($value) ? serialize($value) : $value;
+    }
+  }
+
+  /**
+   * Transform a serialized string from the database into an array.
+   *
+   * @param string|null $value
+   * @param $serializationType
+   * @return array|null
+   */
+  public static function unSerializeField($value, $serializationType) {
+    if ($value === NULL) {
+      return NULL;
+    }
+    if ($value === '') {
+      return array();
+    }
+    switch ($serializationType) {
+      case self::SERIALIZE_SEPARATOR_BOOKEND:
+        return (array) CRM_Utils_Array::explodePadded($value);
+
+      case self::SERIALIZE_SEPARATOR_TRIMMED:
+        return explode(self::VALUE_SEPARATOR, trim($value));
+
+      case self::SERIALIZE_JSON:
+        return strlen($value) ? json_decode($value, TRUE) : array();
+
+      case self::SERIALIZE_PHP:
+        return strlen($value) ? unserialize($value) : array();
+    }
   }
 
 }

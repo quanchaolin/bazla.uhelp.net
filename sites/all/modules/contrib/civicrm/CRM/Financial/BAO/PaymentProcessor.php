@@ -508,6 +508,7 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
      WHERE con.id = %1";
     }
     elseif ($component == 'recur') {
+      // @deprecated - use getPaymentProcessorForRecurringContribution.
       $sql = "
     SELECT cr.payment_processor_id as ppID1, NULL as ppID2, cr.is_test
       FROM civicrm_contribution_recur cr
@@ -543,9 +544,25 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
         // The function looks to load the payment processor ID from the contribution page, which
         // can support multiple processors.
       }
+      $paymentProcessor['payment_processor_type'] = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, $paymentProcessor['payment_processor_type_id'], 'name');
       $result = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
     }
     return $result;
+  }
+
+  /**
+   * Get the payment processor associated with a recurring contribution series.
+   *
+   * @param int $contributionRecurID
+   *
+   * @return \CRM_Core_Payment
+   */
+  public static function getPaymentProcessorForRecurringContribution($contributionRecurID) {
+    $paymentProcessorId = civicrm_api3('ContributionRecur', 'getvalue', array(
+      'id' => $contributionRecurID,
+      'return' => 'payment_processor_id',
+    ));
+    return Civi\Payment\System::singleton()->getById($paymentProcessorId);
   }
 
 }

@@ -1234,6 +1234,8 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * @param bool $permissionedContact
    *   to return only permissioned Contact
    * @param array $params
+   * @param bool $includeTotalCount
+   *   Should we return a count of total accessable relationships
    *
    * @return array|int
    *   relationship records
@@ -1244,7 +1246,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     $count = 0, $relationshipId = 0,
     $links = NULL, $permissionMask = NULL,
     $permissionedContact = FALSE,
-    $params = array()
+    $params = array(), $includeTotalCount = FALSE
   ) {
     $values = array();
     if (!$contactId && !$relationshipId) {
@@ -1278,11 +1280,11 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     }
 
     // building the query string
-    $queryString = $select1 . $from1 . $where1 . $select2 . $from2 . $where2 . $order . $limit;
+    $queryString = $select1 . $from1 . $where1 . $select2 . $from2 . $where2;
 
     $relationship = new CRM_Contact_DAO_Relationship();
 
-    $relationship->query($queryString);
+    $relationship->query($queryString . $order . $limit);
     $row = array();
     if ($count) {
       $relationshipCount = 0;
@@ -1292,6 +1294,10 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       return $relationshipCount;
     }
     else {
+
+      if ($includeTotalCount) {
+        $values['total_relationships'] = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM ({$queryString}) AS r");
+      }
 
       $mask = NULL;
       if ($status != self::INACTIVE) {
@@ -2068,20 +2074,13 @@ AND cc.sort_name LIKE '%$name%'";
       $params['rp'], 0, 0,
       $links, $mask,
       $permissionedContacts,
-      $params
+      $params, TRUE
     );
 
     $contactRelationships = array();
-    $params['total'] = 0;
+    $params['total'] = $relationships['total_relationships'];
+    unset($relationships['total_relationships']);
     if (!empty($relationships)) {
-      // FIXME: we cannot directly determine total permissioned relationship, hence re-fire query
-      $permissionedRelationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
-        $relationshipStatus,
-        0, 0, 0,
-        NULL, NULL,
-        $permissionedContacts
-      );
-      $params['total'] = count($permissionedRelationships);
 
       // format params
       foreach ($relationships as $relationshipId => $values) {

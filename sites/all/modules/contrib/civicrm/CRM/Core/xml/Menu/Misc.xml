@@ -18,6 +18,11 @@
      <weight>0</weight>
   </item>
   <item>
+    <path>civicrm/export/standalone</path>
+    <title>Export</title>
+    <page_callback>CRM_Export_Controller_Standalone</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/options/acl_role</path>
      <title>ACL Roles</title>
      <page_callback>CRM_Admin_Page_Options</page_callback>
@@ -89,7 +94,7 @@
      <path>civicrm/api</path>
      <page_callback>CRM_Admin_Page_APIExplorer</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
-     <title>CiviCRM API</title>
+     <title>CiviCRM API v3</title>
   </item>
   <item>
      <path>civicrm/ajax/apiexample</path>

@@ -108,7 +108,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
       // get user info of main contact.
       $config = CRM_Core_Config::singleton();
-      $config->doNotResetCache = 1;
+      CRM_Core_Config::setPermitCacheFlushMode(FALSE);
 
       $mainUfId = CRM_Core_BAO_UFMatch::getUFId($this->_cid);
       $mainUser = NULL;
@@ -230,6 +230,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
+    $this->unsavedChangesWarn = FALSE;
     CRM_Utils_System::setTitle(ts('Merge %1 contacts', array(1 => $this->_contactType)));
     $buttons = array();
 

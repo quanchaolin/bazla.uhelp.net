@@ -41,20 +41,19 @@ class CRM_Upgrade_Incremental_General {
   /**
    * The recommended PHP version.
    */
-  const MIN_RECOMMENDED_PHP_VER = '5.5';
+  const RECOMMENDED_PHP_VER = '7.0';
+
+  /**
+   * The previous recommended PHP version.
+   */
+  const MIN_RECOMMENDED_PHP_VER = '5.6';
 
   /**
    * The minimum PHP version required to install Civi.
    *
    * @see install/index.php
    */
-  const MIN_INSTALL_PHP_VER = '5.3.4';
-
-  /**
-   * The minimum PHP version required to avoid known
-   * limits or defects.
-   */
-  const MIN_DEFECT_PHP_VER = '5.3.23';
+  const MIN_INSTALL_PHP_VER = '5.4';
 
   /**
    * Compute any messages which should be displayed before upgrade.
@@ -65,13 +64,15 @@ class CRM_Upgrade_Incremental_General {
    * @param $latestVer
    */
   public static function setPreUpgradeMessage(&$preUpgradeMessage, $currentVer, $latestVer) {
+    $dateFormat = Civi::Settings()->get('dateformatshortdate');
     if (version_compare(phpversion(), self::MIN_RECOMMENDED_PHP_VER) < 0) {
-      $preUpgradeMessage .= '<p>' .
-        ts('This webserver is running an outdated version of PHP (%1). It is strongly recommended to upgrade to PHP %2 or later, as older versions can present a security risk.', array(
-          1 => phpversion(),
-          2 => self::MIN_RECOMMENDED_PHP_VER,
-        )) .
-        '</p>';
+      $preUpgradeMessage .= '<p>';
+      $preUpgradeMessage .= ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but future releases will require PHP %2 or above. We recommend PHP version %3.', array(
+         1 => $latestVer,
+         2 => self::MIN_RECOMMENDED_PHP_VER,
+         3 => self::RECOMMENDED_PHP_VER,
+      ));
+      $preUpgradeMessage .= '</p>';
     }
 
     // http://issues.civicrm.org/jira/browse/CRM-13572
@@ -104,6 +105,15 @@ class CRM_Upgrade_Incremental_General {
       // after the upgrade.  But that's speculative.  For now, we'll leave this
       // advanced feature in the hands of the sysadmin.
       $preUpgradeMessage .= '<br />' . ts('This database uses InnoDB Full Text Search for optimized searching. The upgrade procedure has not been tested with this feature. You should disable (and later re-enable) the feature by navigating to "Administer => System Settings => Miscellaneous".');
+    }
+
+    $ftAclSetting = Civi::settings()->get('acl_financial_type');
+    $financialAclExtension = civicrm_api3('extension', 'get', array('key' => 'biz.jmaconsulting.financialaclreport'));
+    if ($ftAclSetting && (($financialAclExtension['count'] == 1 && $financialAclExtension['status'] != 'Installed') || $financialAclExtension['count'] !== 1)) {
+      $preUpgradeMessage .= '<br />' . ts('CiviCRM will in the future require the extension %1 for CiviCRM Reports to work correctly with the Financial Type ACLs. The extension can be downloaded <a href="%2">here</a>', array(
+        1 => 'biz.jmaconsulting.financialaclreport',
+        2 => 'https://github.com/JMAConsulting/biz.jmaconsulting.financialaclreport',
+      ));
     }
   }
 

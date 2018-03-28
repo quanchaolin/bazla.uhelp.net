@@ -1141,12 +1141,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   /**
    * @param string|int|array|null $value
    * @param CRM_Core_BAO_CustomField|int|array|string $field
-   * @param $contactId
+   * @param int $entityId
    *
    * @return string
    * @throws \Exception
    */
-  public static function displayValue($value, $field, $contactId = NULL) {
+  public static function displayValue($value, $field, $entityId = NULL) {
     $field = is_array($field) ? $field['id'] : $field;
     $fieldId = is_object($field) ? $field->id : (int) str_replace('custom_', '', $field);
 
@@ -1160,7 +1160,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     $fieldInfo = array('options' => $field->getOptions()) + (array) $field;
 
-    return self::formatDisplayValue($value, $fieldInfo, $contactId);
+    return self::formatDisplayValue($value, $fieldInfo, $entityId);
   }
 
   /**
@@ -1234,8 +1234,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
                 break;
 
               default:
-                // if time is not selected remove time from value
-                $value = substr($value, 0, 10);
+                //If time is not selected remove time from value.
+                $value = $value ? date('Y-m-d', strtotime($value)) : '';
             }
             $customFormat = implode(" ", $customTimeFormat);
           }
@@ -1247,7 +1247,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         // In the context of displaying a profile, show file/image
         if ($value) {
           if ($entityId) {
-            $url = self::getFileURL($entityId, $field['id']);
+            if (CRM_Utils_Rule::positiveInteger($value)) {
+              $fileId = $value;
+            }
+            else {
+              $fileId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_File', $value, 'id', 'uri');
+            }
+            $url = self::getFileURL($entityId, $field['id'], $fileId);
             if ($url) {
               $display = $url['file_url'];
             }
@@ -1264,6 +1270,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
             }
           }
         }
+        break;
+
+      case 'Link':
+        $display = $display ? "<a href=\"$display\" target=\"_blank\">$display</a>" : $display;
         break;
 
       case 'TextArea':

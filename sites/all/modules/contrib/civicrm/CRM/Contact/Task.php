@@ -77,6 +77,11 @@ class CRM_Contact_Task {
    */
   static $_optionalTasks = NULL;
 
+  public static function tasks() {
+    self::initTasks();
+    return self::$_tasks;
+  }
+
   public static function initTasks() {
     if (!self::$_tasks) {
       self::$_tasks = array(
@@ -109,7 +114,7 @@ class CRM_Contact_Task {
           'result' => FALSE,
         ),
         self::EMAIL_CONTACTS => array(
-          'title' => ts('Email - send now (to 50 or less)'),
+          'title' => ts('Email - send now (to %1 or less)', array(1 => Civi::settings()->get('simple_mail_limit'))),
           'class' => 'CRM_Contact_Form_Task_Email',
           'result' => TRUE,
           'url' => 'civicrm/task/send-email',
@@ -398,7 +403,7 @@ class CRM_Contact_Task {
     self::initTasks();
 
     foreach (self::$_tasks as $task => $value) {
-      if (!empty($value['url']) && (
+      if ((!empty($value['url']) || $task == self::EXPORT_CONTACTS) && (
         (is_array($value['class']) && in_array($className, $value['class'])) ||
          ($value['class'] == $className)
         )

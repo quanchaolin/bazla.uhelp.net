@@ -1,0 +1,49 @@
+<?php 
+
+	/**
+	*Implements hook_form_alter()
+	*/
+	function applicantvalidation_form_alter(&$form, &$form_state, $form_id){
+		//dpm()
+		//drupal_set_message($form_id); 
+		if($form_id == webform_client_form_40961){
+				//var_dump($form);
+			//drupal_set_message($form_state[values]); 
+			//dpm($form['#validate']);
+			 $form['#validate'][] = 'applicantvalidation_form_validate';
+			 //dpm($form['#validate']);
+    
+		}
+	}
+
+	function applicantvalidation_form_validate($form, &$form_state){
+		//dpm($form_state);
+		//dpm($form_state['values']['civicrm_1_contact_1_cg7_custom_14']);
+		//gettinh the gpa field
+    	$gpa = $form_state['values']['submitted']['civicrm_1_contact_1_fieldset_fieldset']['civicrm_2_contact_1_fieldset_fieldset']['civicrm_1_contact_1_cg7_custom_14'];
+
+
+    	//regex string format for valid decimal
+    	$re = "/[0-9]\.\d\d/";
+
+    	if (preg_match($re, $gpa)) {
+    		//check if entered value  is of length three and valid
+    		if(strlen($gpa) != 4){
+    			error_form($gpa);
+    		}else{
+    			drupal_set_message("Secondary school GPA is valid  ");
+    		}
+		    
+		} else {
+		    error_form($gpa);
+		}
+    	
+	}
+
+	function error_form($value){
+		form_set_error('civicrm_1_contact_1_cg7_custom_14',"Secondary school GPA ".$value." not valid  <br/> This should be an amount out of 10 with 2 decimal places. E.g. 8.53 or 7.99 or 9.10");
+	}
+
+ 
+
+?>

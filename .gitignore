@@ -4,7 +4,7 @@
 /check.php*
 /test.php*
 /test.txt*
-
+/.well-known
 
 
 # Ignore everything in default directory

@@ -70,3 +70,62 @@ function uhelp_dev_secondary_schools_contact_array($school_cid) {
 
   return $$var_name;
 }
+
+//function that calculate number of interns and employers a prospecive employer has
+function uhelp_dev_count_interns_and_employees($cid,$array_of_relationship_ids){
+  
+  $count = array();
+  $count[0] = 0;
+//for each id of relationship
+  foreach ($array_of_relationship_ids as $pos=>$value) {
+        civicrm_initialize();
+        $result = civicrm_api3('Relationship', 'get', array(
+          'sequential' => 1,
+          'contact_id_b' => $cid,
+          'relationship_type_id' => $value,
+        )); 
+
+        //if contact has relationship
+        if($result['count'] > 0){
+                //initialized result count to zero for return statement
+                $count[0] = 0;
+                 
+              
+               foreach ($result['values'] as $pos=>$value1){
+                //id of contact to verify
+               $contact_id_a =  $result['values'][$pos]['contact_id_a'];
+              // dpm($contact_id_a);
+               //check if id of relationship type was  intern or  employer 
+               if( $value == 15){
+                   //get its contacts which are interns
+                   $result2 = civicrm_api3('Contact', 'get', array(
+                    'sequential' => 1,
+                    'contact_sub_type' => array("Former_student_DNF_", "Alumni", "Student"),
+                    'id' => $contact_id_a,
+                  ));
+              }else if( $value == 5){
+                  //get its contacts which are employees
+                   $result2 = civicrm_api3('Contact', 'get', array(
+                    'sequential' => 1,
+                    'id' => $contact_id_a,
+                    'contact_sub_type' => "Alumni", 
+                  ));
+              }
+              // dpm("for relationship ".$pos ."  and result".$result2['count']);
+               //if($result2['count'] > 0){
+               $count[0] = $count[0]+$result2['count'];
+             //}
+             //  dpm("Alumni check for id :".$contact_id_a."  2nd api call values'count is: ".$result2['count']);
+             // dpm("count is : ".$count[0]);
+            }  
+      }
+     // dpm("employees : ",$count[0]);
+      return $count[0];
+  //$count[0] = $result['count'] ;
+  //dpm("values: ",$result['values']);
+        //dpm("count intens", $count[0]);
+
+
+}
+
+}

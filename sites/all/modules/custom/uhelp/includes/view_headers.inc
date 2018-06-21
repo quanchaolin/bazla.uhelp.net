@@ -211,8 +211,7 @@ function uhelp_view_headers_recruitment_overview() {
 }
 
 
-function uhelp_view_headers_get_result_nids(
-  $select_less_query, $query_args) {
+function uhelp_view_headers_get_result_nids($select_less_query, $query_args) {
 
   $ret = "";
   $query = "";
@@ -266,3 +265,485 @@ function uhelp_view_headers_add_grade_view_field($row) {
     }
     return $link;
 }
+
+function uhelp_view_headers_get_alum_overview_contact_getter($alum_cid,$type_of_data) {
+
+  if ($type_of_data == "current_salary") {
+  
+    $alum_data = "0";
+  
+    $result = civicrm_api3('Relationship', 'get', array(
+      'sequential' => 1,
+      'relationship_type_id' => 5,
+      'contact_id_a' => $alum_cid,
+      'is_active' => 1,
+    ));
+    if ($result['count'] != 0) {
+//    $alum_data["ap_travay"] = "yes";
+
+      $result2 = civicrm_api3('Contact', 'get', array(
+      'debug' => 1,
+      'sequential' => 1,
+      'return' => array("custom_90", "custom_91", "custom_85", "custom_88"),
+      'id' => $alum_cid,
+//      'custom_85' => $result['values'][0]['contact_id_b'],
+    ));
+// we will need at some point to convert currencies so we can add and average
+// example url for free api
+// http://free.currencyconverterapi.com/api/v5/convert?q=HTG_USD&compact=y
+//https://free.currencyconverterapi.com/api/v5/convert?q=USD_PHP,PHP_USD&compact=ultra&date=2017-12-31
+    $alum_data = $result2;
+    }
+  return $result2;
+  
+  }
+ 
+  if ($type_of_data == "degree") { 
+      $alum_data = "Undergraduade";
+      
+      $result = civicrm_api3('Contact', 'get', array(
+      'debug' => 1,
+      'sequential' => 1,
+      'return' => array("custom_92"),
+      'id' => $alum_cid,
+      'custom_92' => "masters",
+      ));
+      if ($result['count'] != 0) {
+        $alum_data = "Masters";
+      }
+      $result = civicrm_api3('Contact', 'get', array(
+      'debug' => 1,
+      'sequential' => 1,
+      'return' => array("custom_92"),
+      'id' => $alum_cid,
+      'custom_92' => "doctorate",
+      ));
+      if ($result['count'] != 0) {
+        $alum_data = "Doctorate";
+      }
+    
+  }    
+    
+  
+  if ($type_of_data == "ap_travay") {
+  // is there an active relationship of type 5
+//    $alum_data["ap_travay"] = "no";
+    $alum_data = "no";
+    $result = civicrm_api3('Relationship', 'get', array(
+      'sequential' => 1,
+      'relationship_type_id' => 5,
+      'contact_id_a' => $alum_cid,
+      'is_active' => 1,
+    ));
+    if ($result['count'] != 0) {
+//    $alum_data["ap_travay"] = "yes";
+    $alum_data = "yes";
+    }
+  
+  }
+  
+    if ($type_of_data == "employer") {
+  // is there an active relationship of type 5
+//    $alum_data["ap_travay"] = "no";
+    $alum_data = "no employment data";
+    $result = civicrm_api3('Relationship', 'get', array(
+      'sequential' => 1,
+      'relationship_type_id' => 5,
+      'contact_id_a' => $alum_cid,
+      'start_date' => array('IS NOT NULL' => 1),
+      'options' => array('sort' => "start_date"),
+    ));
+    if ($result['count'] != 0) {
+      $which_result = ($result['count'] -1);
+      $most_recent_job = $result['values'][$which_result];
+      
+      $result2 = civicrm_api3('Contact', 'get', array(
+      'sequential' => 1,
+      'id' => $most_recent_job[contact_id_b],
+    ));
+      $alum_data=$result2['values'][0]['display_name'];
+    
+    }
+  
+  }
+  
+      if ($type_of_data == "job_title") {
+  // is there an active relationship of type 5
+//    $alum_data["ap_travay"] = "no";
+    $alum_data = " ";
+    $result = civicrm_api3('Relationship', 'get', array(
+      'sequential' => 1,
+      'relationship_type_id' => 5,
+      'contact_id_a' => $alum_cid,
+      'start_date' => array('IS NOT NULL' => 1),
+      'options' => array('sort' => "start_date"),
+    ));
+    if ($result['count'] != 0) {
+      $which_result = ($result['count'] -1);
+      $most_recent_job = $result['values'][$which_result];
+      $alum_data =$most_recent_job[description];
+//    $alum_data["ap_travay"] = "yes";
+          
+    }
+  
+  }
+
+
+    if ($type_of_data == "end_year") {
+  // is there an active relationship of type 5
+//    $alum_data["ap_travay"] = "no";
+    $alum_data = "";
+    $result = civicrm_api3('Relationship', 'get', array(
+      'sequential' => 1,
+      'relationship_type_id' => 50,
+      'contact_id_a' => 1,
+      'contact_id_b' =>$alum_cid,
+//      'is_active' => 1,
+    ));
+
+    if ($result['count'] != 0) {
+//    $alum_data["ap_travay"] = "yes";
+    $alum_data = $result = substr($result[values][0]['end_date'], 0, 4);
+    }
+  
+  }
+
+
+
+  if ($type_of_data == "recent_activity") {
+
+    $most_recent_activity_data = array();
+
+    $most_recent_activity_data['meeting']['subject'] = "no data";
+    $most_recent_activity_data['meeting']['time'] = "";
+        
+    $result_meeting = civicrm_api3('Activity', 'get', array(
+      'debug' => 1,
+      'sequential' => 1,
+      'target_contact_id' => $alum_cid,
+      'options' => array('sort' => "activity_date_time"),
+      'activity_type_id' => "Meeting",
+    ));
+
+    if ($result_meeting['count'] != 0) {
+      $which_result = ($result_meeting['count'] -1);
+      $most_recent_meeting = $result_meeting['values'][$which_result];
+    $most_recent_activity_data['meeting']['subject'] = $most_recent_meeting['subject'];
+    $most_recent_activity_data['meeting']['time'] = date("M, Y", strtotime($most_recent_meeting['activity_date_time']));
+    }
+    
+
+
+    $most_recent_activity_data['phone']['subject'] = "no data";
+    $most_recent_activity_data['phone']['time'] = "";
+        
+    $result_phone = civicrm_api3('Activity', 'get', array(
+      'debug' => 1,
+      'sequential' => 1,
+      'target_contact_id' => $alum_cid,
+      'options' => array('sort' => "activity_date_time"),
+      'activity_type_id' => "Phone Call",
+    ));
+
+    if ($result_phone['count'] != 0) {
+      $which_result = ($result_phone['count'] -1);
+      $most_recent_phone = $result_phone['values'][$which_result];
+    $most_recent_activity_data['phone']['subject'] = $most_recent_phone['subject'];
+    $most_recent_activity_data['phone']['time'] = date("M, Y", strtotime($most_recent_phone['activity_date_time']));
+    }
+
+
+    $most_recent_activity_data['event']['subject'] = "no data";
+    $most_recent_activity_data['event']['time'] = "";
+        
+    $result_event = civicrm_api3('Activity', 'get', array(
+      'debug' => 1,
+      'sequential' => 1,
+      'target_contact_id' => $alum_cid,
+      'options' => array('sort' => "activity_date_time"),
+      'activity_type_id' => "Event Registration",
+    ));
+
+    if ($result_event['count'] != 0) {
+      $which_result = ($result_event['count'] -1);
+      $most_recent_event = $result_event['values'][$which_result];
+    $most_recent_activity_data['event']['subject'] = $most_recent_event['subject'];
+    $most_recent_activity_data['event']['time'] = date("M, Y", strtotime($most_recent_event['activity_date_time']));
+    }
+
+    return $most_recent_activity_data;
+  
+  }
+
+
+  if ($type_of_data == "alumni_status") {
+  // is there an active relationship of type 5
+//    $alum_data["ap_travay"] = "no";
+    $alum_data = "";
+    $result = civicrm_api3('Contact', 'get', array(
+      'debug' => 1,
+      'sequential' => 1,
+      'tag' => 33,
+      'id' => $alum_cid,
+    )); 
+    if ($result['count'] != 0) {
+//    $alum_data["ap_travay"] = "yes";
+    $alum_data = "A ";
+    }
+
+    $result = civicrm_api3('Contact', 'get', array(
+      'debug' => 1,
+      'sequential' => 1,
+      'tag' => 34,
+      'id' => $alum_cid,
+    )); 
+    if ($result['count'] != 0) {
+//    $alum_data["ap_travay"] = "yes";
+    $alum_data .= "B ";
+    }
+  
+      $result = civicrm_api3('Contact', 'get', array(
+      'debug' => 1,
+      'sequential' => 1,
+      'tag' => 35,
+      'id' => $alum_cid,
+    )); 
+    if ($result['count'] != 0) {
+//    $alum_data["ap_travay"] = "yes";
+    $alum_data .= "C ";
+    }
+  
+  
+  }
+  
+
+  if ($type_of_data == "korem_status") {
+  // is there an active relationship of type 5
+//    $alum_data["ap_travay"] = "no";
+    $alum_data = "";
+    $result = civicrm_api3('Contact', 'get', array(
+      'debug' => 1,
+      'sequential' => 1,
+      'tag' => 74,
+      'id' => $alum_cid,
+    )); 
+    if ($result['count'] != 0) {
+//    $alum_data["ap_travay"] = "yes";
+    $alum_data = "Active KOREMIST ";
+    }
+
+    $result = civicrm_api3('Contact', 'get', array(
+      'debug' => 1,
+      'sequential' => 1,
+      'tag' => 75,
+      'id' => $alum_cid,
+    )); 
+    if ($result['count'] != 0) {
+//    $alum_data["ap_travay"] = "yes";
+    $alum_data .= "Deferred KOREMIST ";
+    }
+  
+      $result = civicrm_api3('Contact', 'get', array(
+      'debug' => 1,
+      'sequential' => 1,
+      'tag' => 73,
+      'id' => $alum_cid,
+    )); 
+    if ($result['count'] != 0) {
+//    $alum_data["ap_travay"] = "yes";
+    $alum_data .= "Has not started KOREM contributions";
+    }
+  
+  
+  }
+  
+  
+  
+  if ($type_of_data == "education_status") {
+  
+    $alum_data = "no";
+    $result = civicrm_api3('Relationship', 'get', array(
+      'sequential' => 1,
+      'relationship_type_id' => 50,
+      'contact_id_b' => $alum_cid,
+      'is_active' => 1,
+    ));
+    if ($result['count'] != 0) {
+//    $alum_data["ap_travay"] = "yes";
+    $alum_data = "yes";
+    }
+  
+  
+//  $alum_data["education_status"] = "enrolled";
+  
+  }
+  
+  if ($type_of_data == "ap_travay_nan_ayiti") {
+ 
+    $alum_data = "no";
+    $result = civicrm_api3('Relationship', 'get', array(
+      'sequential' => 1,
+      'relationship_type_id' => 5,
+      'contact_id_a' => $alum_cid,
+      'is_active' => 1,
+    ));
+    if ($result['count'] != 0) {
+//  load employer 
+//      dsm($result['values']);
+      $employer_cid = $result['values'][0]['contact_id_b'];
+      $is_in_haiti = civicrm_api3('Contact', 'get', array(
+        'sequential' => 1,
+        'id' => $employer_cid,
+      ));
+    
+      if ($is_in_haiti['values'][0]['country_id'] == "1094") {
+        $alum_data = "yes";
+      }  
+    }
+   
+  
+//  $alum_data["working_in_haiti"] = "yes";
+  
+  
+  }
+  
+  if ($type_of_data == "thesis_status") {
+  
+    $alum_data = "incomplete"; 
+    $result = civicrm_api3('Contact', 'get', array(
+      'debug' => 1,
+      'sequential' => 1,
+      'id' => $alum_cid,
+      'tag' => 33,
+    ));
+    
+    if ($result['count'] > 0) {
+    $alum_data = "complete"; 
+    }
+  }
+
+  return $alum_data;
+}
+
+function uhelp_view_headers_alumni_overview() {
+  $view = views_get_current_view();
+  $count_query = $view->build_info['count_query'];
+  $count_query_string = $count_query->__toString();
+
+  $select_less_query =substr($count_query_string,
+			     strpos($count_query_string, "FROM"));
+  $select_less_query =substr($select_less_query, 0, 
+			     strpos($select_less_query, "ORDER"));
+  $exposed_input = $view->exposed_input;
+
+  $query_args = $count_query->getArguments();
+//  dsm($view);
+//  dsm($count_query);
+  $view->query->limit = 100000;
+  
+//  dsm($count_query_string);
+//   $view = views_get_view($view->vid);
+//    $view->build($view->current_display);
+  $view->query->set_limit(NULL); // reset the work done by the pager
+  $view->query->set_offset(NULL);
+  $pager = $view->display_handler->get_option('pager');
+  $pager['type'] = 'none';
+  $view->display_handler->set_option('pager', $pager);
+  $view->query->pager->options['items_per_page'] = 0;
+  $view->execute($view);
+// dsm($view->result);
+  //initialize counters 
+  $pa_travay = 0;
+  $wi_travay = 0;
+  $total_salary = 0;
+  $total_with_salary = 0;
+  $pa_enrolled = 0;
+  $wi_enrolled = 0;
+  $wi_ayiti = 0;
+  $pa_ayiti = 0;
+  $incomplete_thesis = 0;
+  $complete_thesis = 0;
+  
+  foreach ($view->result as $alum) {
+//  dsm($alum);
+  $ap_travay = uhelp_view_headers_get_alum_overview_contact_getter($alum->id,"ap_travay");
+  $current_salary = uhelp_view_headers_get_alum_overview_contact_getter($alum->id,"current_salary");
+  $education_status = uhelp_view_headers_get_alum_overview_contact_getter($alum->id,"education_status");
+  $ap_travay_nan_ayiti = uhelp_view_headers_get_alum_overview_contact_getter($alum->id,"ap_travay_nan_ayiti");
+  $thesis_status = uhelp_view_headers_get_alum_overview_contact_getter($alum->id,"thesis_status");
+//   dsm($ap_travay);
+   
+    if ($ap_travay == "no") {
+      $pa_travay++;
+    }   
+    if ($ap_travay == "yes") {
+      $wi_travay++;
+    } 
+    
+//    $total_salary = $total_salary+$current_salary;
+    
+    
+    
+    if ($education_status == "no") {
+      $pa_enrolled++;
+    }   
+    if ($education_status == "yes") {
+      $wi_enrolled++;
+    } 
+    
+    if ($ap_travay_nan_ayiti == "no") {
+      $pa_ayiti++;
+    }   
+    if ($ap_travay_nan_ayiti == "yes") {
+      $wi_ayiti++;
+    } 
+    
+    if ($thesis_status == "incomplete") {
+      $incomplete_thesis++;
+    }   
+    if ($thesis_status == "complete") {
+      $complete_thesis++;
+    } 
+    
+//   dsm($current_salary);
+    if ($current_salary["values"][0]["custom_90"] > 0) {
+      $total_with_salary++;
+      $total_salary = intval($total_salary) + intval($current_salary["values"][0]["custom_90"]);
+//      dsm($total_salary);
+//      dsm($total_with_salary);
+    } 
+
+//   dsm($education_status);
+//   dsm($ap_travay_nan_ayiti);
+//   dsm($thesis_status);
+  }
+//  dsm($pa_travay);
+//  dsm($wi_travay);  
+  
+  
+  
+  
+  $header = array();
+  $rows = array();
+  $rows[0] = array();
+  $header[] = "completed thesis";
+  $header[] = "employed";
+  $header[] = "average current salary";
+  $header[] = "enrolled in school";
+  $header[] = "working in Haiti";
+  $header[] = "total alum";
+  $rows[0][] = $complete_thesis. " ( ". round(($complete_thesis*100)/$view->total_rows,2)."% )";
+  $rows[0][] = $wi_travay. " ( ". round(($wi_travay*100)/$view->total_rows,2)."% )";
+  $rows[0][] = "$".round($total_salary/$total_with_salary,2)." ( ".$total_with_salary." alumni with current salary records )";
+  $rows[0][] = $wi_enrolled. " ( ". round(($wi_enrolled*100)/$view->total_rows,2)."% )";;
+  $rows[0][] = $wi_ayiti. " ( ". round(($wi_ayiti*100)/$view->total_rows,2)."% )";;
+  $rows[0][] = $view->total_rows;
+
+  
+//  dsm($count_query_string);
+//dsm($rows);
+  $output .= theme('table', array('header' => $header, 'rows' => $rows));
+  return $output;
+}
+
+ 

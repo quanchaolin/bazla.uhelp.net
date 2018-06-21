@@ -129,3 +129,58 @@ function uhelp_dev_count_interns_and_employees($cid,$array_of_relationship_ids){
 }
 
 }
+
+function uhelp_dev_get_employee_help_year($contact_a_id) { 
+
+
+
+  $years = 0;
+  $months = 0; 
+  $days = 0;
+
+  civicrm_initialize();
+  //find all relationships to help
+  $result = civicrm_api3('Relationship', 'get', array(
+    'sequential' => 1,
+    'contact_id_a' =>$contact_a_id,
+    'contact_id_b' => 1,
+    'relationship_type_id' => 5,
+  ));
+
+//for each employment relationship
+  if ($result && isset($result['values']) && $result['values']) {
+//dpm($result['count']);
+    
+    foreach($result['values'] as $k=>$relationship) {
+     //if the relationship end exists and not empty
+      if ($relationship['start_date'] && $relationship['start_date'] != " ") {
+        if ($relationship['end_date'] && $relationship['end_date'] != " " ) {
+          $date1 = new DateTime("".$relationship['start_date']);
+          $date2 = new DateTime("".$relationship['end_date'] );
+          $dateDiff = $date1->diff($date2);
+          $years = $years + $dateDiff->y;
+          $days =  $days +$dateDiff->d;
+          $months = $months + $dateDiff->m;
+        }
+        else { 
+          $date1 = new DateTime($relationship['start_date']);
+          $date2 = new DateTime('now');
+          $dateDiff = $date1->diff($date2);
+          $years = $years + $dateDiff->y;
+          $months = $months + $dateDiff->m;
+          $days =  $days +$dateDiff->d;
+        }
+      }
+
+      
+    }
+      //add extra month to years ,until remaining days less than 1 month
+    if($days >= 30){
+      $months = $months + floor(($days % 365) / 30.5);
+      $years = $years + floor(($days / 365));
+      $days = floor(($days % 365) % 30.5);
+    }
+  }
+  return $years > 0 ? ($years."yr  ".$months."m") : ($months > 0 ? $months."m": "incorrect" );
+}
+

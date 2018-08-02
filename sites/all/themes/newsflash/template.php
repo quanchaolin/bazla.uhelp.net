@@ -17,7 +17,13 @@ function get_newsflash_style() {
   }
   if (theme_get_setting('newsflash_pickstyle')) {
     if (isset($_COOKIE["newsflashstyle"])) {
-      $style = $_COOKIE["newsflashstyle"];
+      $style = check_plain($_COOKIE["newsflashstyle"]);
+      $color = array('blue', 'red', 'green', 'copper', 'black', 'aqua', 'violet');
+      if (in_array($style, $color)) {
+        $style = $style;
+      } else {
+        $style = "blue";
+      }
     }
   }
   return $style;

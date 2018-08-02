@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -63,7 +63,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   public function preProcess() {
     $caseIds = CRM_Utils_Request::retrieve('caseid', 'String', $this);
     $this->_caseId = explode(',', $caseIds);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     if (!$this->_context) {
       $this->_context = 'caseActivity';
     }
@@ -100,8 +100,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     if ($this->_caseId &&
       !CRM_Core_Permission::check('access all cases and activities')
     ) {
-      $session = CRM_Core_Session::singleton();
-      $allCases = CRM_Case_BAO_Case::getCases(TRUE, $session->get('userID'), 'any');
+      $params = array('type' => 'any');
+      $allCases = CRM_Case_BAO_Case::getCases(TRUE, $params);
       if (count(array_intersect($this->_caseId, array_keys($allCases))) == 0) {
         CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
       }

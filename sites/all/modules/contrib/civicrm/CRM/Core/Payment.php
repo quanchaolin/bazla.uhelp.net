@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -102,6 +102,17 @@ abstract class CRM_Core_Payment {
    * @var string
    */
   protected $cancelUrl;
+
+  /**
+   * Processor type label.
+   *
+   * (Deprecated parameter but used in some messages).
+   *
+   * @deprecated
+   *
+   * @var string
+   */
+  public $_processorName;
 
   /**
    * The profile configured to show on the billing form.
@@ -489,10 +500,10 @@ abstract class CRM_Core_Payment {
         if (array_keys($params) == array('is_recur_installments', 'is_email_receipt')) {
           $gotText = ts('Your recurring contribution will be processed automatically.');
           if ($params['is_recur_installments']) {
-            $gotText .= ts(' You can specify the number of installments, or you can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.');
+            $gotText .= ' ' . ts('You can specify the number of installments, or you can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.');
           }
           if ($params['is_email_receipt']) {
-            $gotText .= ts(' You will receive an email receipt for each recurring contribution.');
+            $gotText .= ' ' . ts('You will receive an email receipt for each recurring contribution.');
           }
         }
         break;
@@ -999,6 +1010,19 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Get the currency for the transaction.
+   *
+   * Handle any inconsistency about how it is passed in here.
+   *
+   * @param $params
+   *
+   * @return string
+   */
+  protected function getAmount($params) {
+    return CRM_Utils_Money::format($params['amount'], NULL, NULL, TRUE);
+  }
+
+  /**
    * Get url to return to after cancelled or failed transaction.
    *
    * @param string $qfKey
@@ -1158,7 +1182,7 @@ abstract class CRM_Core_Payment {
    */
   public function doPayment(&$params, $component = 'contribute') {
     $this->_component = $component;
-    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
 
     // If we have a $0 amount, skip call to processor and set payment_status to Completed.
     // Conceivably a processor might override this - perhaps for setting up a token - but we don't
@@ -1526,6 +1550,18 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
    * @return bool
    */
   public function supportsEditRecurringContribution() {
+    return FALSE;
+  }
+
+  /**
+   * Checks if payment processor supports recurring contributions
+   *
+   * @return bool
+   */
+  public function supportsRecurring() {
+    if (!empty($this->_paymentProcessor['is_recur'])) {
+      return TRUE;
+    }
     return FALSE;
   }
 

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -610,6 +610,9 @@ function civicrm_views_get_filter($data_type, $html_type = NULL, $option_group_i
 
     case "County":
       return array('handler' => 'civicrm_handler_filter_pseudo_constant', 'pseudo class' => 'CRM_Core_PseudoConstant', 'pseudo method' => 'county', 'allow empty' => TRUE);
+
+    case "ContactReference":
+      return array('handler' => 'civicrm_handler_filter_contact_ref');
 
     default:
       return array('handler' => 'views_handler_filter_string', 'allow empty' => TRUE);

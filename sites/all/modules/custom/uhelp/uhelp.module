@@ -108,7 +108,7 @@ function uhelp_node_presave($node) {
 	$period = taxonomy_term_load($node->field_academic_period
 				     [LANGUAGE_NONE][0]['tid']);
 	
-	$auto_title .=  $period->name.": ";
+	$auto_title .=  $period->name." ";
       }
 
 
@@ -122,7 +122,8 @@ function uhelp_node_presave($node) {
 	if ($university_cid) {
 	  $university = uhelp_get_contact($university_cid);
 	  if ($university) {
-	    $auto_title .= $university['display_name'];
+// no longer needed
+//	    $auto_title .= $university['display_name'];
 	  }
 	}
       }
@@ -152,7 +153,7 @@ function uhelp_node_presave($node) {
 	  $auto_title .= $university['nick_name'];
 	}
 	else if ($university) {
-	  $auto_title .= $university['display_name'];
+//	  $auto_title .= $university['display_name'];
 	}
       }
       //NO LONGER USING FACULTY IN COURSE TITLE

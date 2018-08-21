@@ -8,6 +8,7 @@ define('HELP_CLASS_LATEST_TIME', 18);
 define('HELP_CLASS_SCHEDULE_THROTTLE', 1500);
 define('HELP_DEPARTMENT_FACULTY_RELATIONSHIP_TYPE', 18);
 define('HELP_FACULTY_UNIVERSITY_RELATIONSHIP_TYPE', 31);
+define('HELP_STUDENT_UNIVERSITY_RELATIONSHIP_TYPE', 54);
 define('HELP_DEPARTMENT_FIELD_OF_STUDY_RELATIONSHIP_TYPE', 27);
 define('UHELP_ENGLISH_SEL_CLASS_COURSE_ID', 59);
 define('UHELP_ACADEMIC_PERIOD_VOCABULARY_NAME', 'academic_period');
@@ -108,7 +109,7 @@ function uhelp_node_presave($node) {
 	$period = taxonomy_term_load($node->field_academic_period
 				     [LANGUAGE_NONE][0]['tid']);
 	
-	$auto_title .=  $period->name." ";
+	$auto_title .=  $period->name." : ";
       }
 
 
@@ -118,12 +119,14 @@ function uhelp_node_presave($node) {
 	$department_cid =
 	  uhelp_get_department_for_field_of_study($field_of_study_cid);
 	$faculty_cid = uhelp_get_faculty_for_department($department_cid);
-	$university_cid = uhelp_get_university_for_faculty($faculty_cid);
+  $student_cid = CRM_Core_BAO_UFMatch::getContactID($node->uid);
+
+	$university_cid = uhelp_get_university_for_student($student_cid);
 	if ($university_cid) {
 	  $university = uhelp_get_contact($university_cid);
 	  if ($university) {
 // no longer needed
-//	    $auto_title .= $university['display_name'];
+    $auto_title .= $university['display_name'];
 	  }
 	}
       }
@@ -223,6 +226,27 @@ function uhelp_get_university_for_faculty($faculty_cid) {
   return $university_cid;
 
 }
+
+function uhelp_get_university_for_student($student_cid) {
+  $university_cid = 0;
+  civicrm_initialize( );
+  $params = array(
+		  'version' => 3,
+		  'sequential' => 1,
+		  'relationship_type_id' =>
+		  HELP_STUDENT_UNIVERSITY_RELATIONSHIP_TYPE,
+		  'contact_id_a' => $student_cid,
+		  );
+  $result = civicrm_api('Relationship', 'get', $params);
+
+  if (!$result['is_error']) {
+    $university_cid = $result['values'][0]['contact_id_b'];
+  }
+  return $university_cid;
+
+}
+
+
 
 function uhelp_get_faculty_for_department($department_cid) {
   $faculty_cid = 0;

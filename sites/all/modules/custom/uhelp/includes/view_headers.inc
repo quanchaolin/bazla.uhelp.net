@@ -266,6 +266,63 @@ function uhelp_view_headers_add_grade_view_field($row) {
     return $link;
 }
 
+function uhelp_view_headers_add_grade_sp1_view_field($row) {
+    $sql = 
+      "SELECT grade.field_eval_grade_value, grade.entity_id
+       FROM field_data_field_eval_student stu
+       INNER JOIN field_data_field_eval_class eval
+       ON stu.entity_id = eval.entity_id
+       INNER JOIN field_data_field_eval_grade grade
+       ON grade.entity_id = eval.entity_id
+        WHERE stu.field_eval_student_target_id = ".$row->uid."
+       AND eval.field_eval_class_target_id = ".$row->nid; 
+
+    $result = db_query($sql)->fetchObject();
+
+    if (!$result) {
+        $link = l(t("Add Grade"), "node/add/course-grade-or-evaluation", 
+        array('query'=>array('field_eval_class'=>$row->nid,
+        'field_eval_student'=>$row->uid,
+        'destination'=>"node/".$row->nid)));
+    }
+    else {
+        $link = l($result->field_eval_grade_value, 
+        "node/".$result->entity_id."/edit",
+            array('query'=>array('destination'=>"node/".$row->nid)));
+
+    }
+    return $link;
+}
+
+function uhelp_view_headers_add_grade_sp2_view_field($row) {
+    $sql = 
+      "SELECT grade.field_eval_grade_value, grade.entity_id
+       FROM field_data_field_eval_student stu
+       INNER JOIN field_data_field_eval_class eval
+       ON stu.entity_id = eval.entity_id
+       INNER JOIN field_data_field_eval_grade grade
+       ON grade.entity_id = eval.entity_id
+        WHERE stu.field_eval_student_target_id = ".$row->uid."
+       AND eval.field_eval_class_target_id = ".$row->nid; 
+    
+    $result = db_query($sql)->fetchObject();
+    $result =  db_query_range($sql,1,1)->fetchObject();
+    if (!$result) {
+        $link = l(t("Add Grade"), "node/add/course-grade-or-evaluation", 
+        array('query'=>array('field_eval_class'=>$row->nid,
+        'field_eval_student'=>$row->uid,
+        'destination'=>"node/".$row->nid)));
+    }
+    else {
+        $link = l($result->field_eval_grade_value, 
+        "node/".$result->entity_id."/edit",
+            array('query'=>array('destination'=>"node/".$row->nid)));
+
+    }
+    return $link;
+}
+
+
 function uhelp_view_headers_get_alum_overview_contact_getter($alum_cid,$type_of_data) {
 
   if ($type_of_data == "current_salary") {

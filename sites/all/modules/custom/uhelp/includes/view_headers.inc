@@ -471,8 +471,8 @@ function uhelp_view_headers_get_alum_overview_contact_getter($alum_cid,$type_of_
 
     $most_recent_activity_data = array();
 
-    $most_recent_activity_data['meeting']['subject'] = "no data";
-    $most_recent_activity_data['meeting']['time'] = "";
+//    $most_recent_activity_data['meeting']['subject'] = "no data";
+//    $most_recent_activity_data['meeting']['time'] = "";
         
     $result_meeting = civicrm_api3('Activity', 'get', array(
       'debug' => 1,
@@ -485,14 +485,15 @@ function uhelp_view_headers_get_alum_overview_contact_getter($alum_cid,$type_of_
     if ($result_meeting['count'] != 0) {
       $which_result = ($result_meeting['count'] -1);
       $most_recent_meeting = $result_meeting['values'][$which_result];
-    $most_recent_activity_data['meeting']['subject'] = $most_recent_meeting['subject'];
+    $most_recent_activity_data['meeting']['subject'] ="<b>Meeting:  </b>". $most_recent_meeting['subject'];
     $most_recent_activity_data['meeting']['time'] = date("M, Y", strtotime($most_recent_meeting['activity_date_time']));
+      $most_recent_activity_data['meeting']['sort_time'] = $most_recent_meeting['activity_date_time'];
     }
     
 
 
-    $most_recent_activity_data['phone']['subject'] = "no data";
-    $most_recent_activity_data['phone']['time'] = "";
+//    $most_recent_activity_data['phone']['subject'] = "no data";
+//    $most_recent_activity_data['phone']['time'] = "";
         
     $result_phone = civicrm_api3('Activity', 'get', array(
       'debug' => 1,
@@ -505,10 +506,74 @@ function uhelp_view_headers_get_alum_overview_contact_getter($alum_cid,$type_of_
     if ($result_phone['count'] != 0) {
       $which_result = ($result_phone['count'] -1);
       $most_recent_phone = $result_phone['values'][$which_result];
-    $most_recent_activity_data['phone']['subject'] = $most_recent_phone['subject'];
+    $most_recent_activity_data['phone']['subject'] = "<b>Phone:  </b>".$most_recent_phone['subject'];
     $most_recent_activity_data['phone']['time'] = date("M, Y", strtotime($most_recent_phone['activity_date_time']));
+      $most_recent_activity_data['phone']['sort_time'] = $most_recent_phone['activity_date_time'];
     }
 
+
+//    $most_recent_activity_data['event']['subject'] = "no data";
+//    $most_recent_activity_data['event']['time'] = "";
+        
+    $result_event = civicrm_api3('Activity', 'get', array(
+      'debug' => 1,
+      'sequential' => 1,
+      'target_contact_id' => $alum_cid,
+      'options' => array('sort' => "activity_date_time"),
+      'activity_type_id' => "Event Registration",
+    ));
+
+    if ($result_event['count'] != 0) {
+      $which_result = ($result_event['count'] -1);
+      $most_recent_event = $result_event['values'][$which_result];
+    $most_recent_activity_data['event']['subject'] = "<b>Event:  </b>".$most_recent_event['subject'];
+    $most_recent_activity_data['event']['time'] = date("M, Y", strtotime($most_recent_event['activity_date_time']));
+    $most_recent_activity_data['event']['sort_time'] = $most_recent_event['activity_date_time'];
+    }
+
+//dsm($most_recent_activity_data, "before");
+    foreach ($most_recent_activity_data as $key => $part) {
+      $sort[$key] = strtotime($part['sort_time']);
+    }
+    array_multisort($sort, SORT_DESC, $most_recent_activity_data);
+//dsm($most_recent_activity_data, "after");
+
+    return reset($most_recent_activity_data);
+  
+  }
+
+## individual functions that match the above. 
+
+  if ($type_of_data == "recent_activity_phone") {
+
+    $most_recent_activity_data = array();
+
+    $most_recent_activity_data['meeting']['subject'] = "no data";
+    $most_recent_activity_data['meeting']['time'] = "";
+                
+    $result_phone = civicrm_api3('Activity', 'get', array(
+      'debug' => 1,
+      'sequential' => 1,
+      'target_contact_id' => $alum_cid,
+      'options' => array('sort' => "activity_date_time"),
+      'activity_type_id' => "Phone Call",
+    ));
+
+    if ($result_phone['count'] != 0) {
+      $which_result = ($result_phone['count'] -1);
+      $most_recent_phone = $result_phone['values'][$which_result];
+    $most_recent_activity_data['phone']['subject'] = "<b>Phone:  </b>".$most_recent_phone['subject'];
+    $most_recent_activity_data['phone']['time'] = date("M, Y", strtotime($most_recent_phone['activity_date_time']));
+      $most_recent_activity_data['phone']['sort_time'] = $most_recent_phone['activity_date_time'];
+    }
+
+    return $most_recent_activity_data['phone'];
+  
+  }
+
+  if ($type_of_data == "recent_activity_event") {
+
+    $most_recent_activity_data = array();
 
     $most_recent_activity_data['event']['subject'] = "no data";
     $most_recent_activity_data['event']['time'] = "";
@@ -524,13 +589,43 @@ function uhelp_view_headers_get_alum_overview_contact_getter($alum_cid,$type_of_
     if ($result_event['count'] != 0) {
       $which_result = ($result_event['count'] -1);
       $most_recent_event = $result_event['values'][$which_result];
-    $most_recent_activity_data['event']['subject'] = $most_recent_event['subject'];
+    $most_recent_activity_data['event']['subject'] = "<b>Event:  </b>".$most_recent_event['subject'];
     $most_recent_activity_data['event']['time'] = date("M, Y", strtotime($most_recent_event['activity_date_time']));
+    $most_recent_activity_data['event']['sort_time'] = $most_recent_event['activity_date_time'];
     }
 
-    return $most_recent_activity_data;
+    return $most_recent_activity_data['event'];
   
   }
+
+  if ($type_of_data == "recent_activity_meeting") {
+
+    $most_recent_activity_data = array();
+
+    $most_recent_activity_data['meeting']['subject'] = "no data";
+    $most_recent_activity_data['meeting']['time'] = "";
+        
+    $result_meeting = civicrm_api3('Activity', 'get', array(
+      'debug' => 1,
+      'sequential' => 1,
+      'target_contact_id' => $alum_cid,
+      'options' => array('sort' => "activity_date_time"),
+      'activity_type_id' => "Meeting",
+    ));
+
+    if ($result_meeting['count'] != 0) {
+      $which_result = ($result_meeting['count'] -1);
+      $most_recent_meeting = $result_meeting['values'][$which_result];
+    $most_recent_activity_data['meeting']['subject'] ="<b>Meeting:  </b>". $most_recent_meeting['subject'];
+    $most_recent_activity_data['meeting']['time'] = date("M, Y", strtotime($most_recent_meeting['activity_date_time']));
+      $most_recent_activity_data['meeting']['sort_time'] = $most_recent_meeting['activity_date_time'];
+    }
+    
+    return $most_recent_activity_data['meeting'];
+  
+  }
+
+
 
 
   if ($type_of_data == "alumni_status") {

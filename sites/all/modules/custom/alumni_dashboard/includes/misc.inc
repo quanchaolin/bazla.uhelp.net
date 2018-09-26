@@ -172,17 +172,152 @@ function alumni_dashboard_civicrm_get_options($gid) {
 }
 
 
+
+
 function alumni_dashboard_civicrm_post($op, $object_name, $object_id,
 				       &$object_ref) {
+ 
+				      
   if ($object_name == 'Individual') {
     alumni_dashboard_update_employer_relationships($object_id, $object_ref);
+// dsm($object_ref);
   }
 }
 
-function alumni_dashboard_civicrm_postProcess($form_name, &$form) {
+function alumni_dashboard_civicrm_preProcess($form_name, &$form) {
+    dsm($form_name);
+if ($form->_flagSubmitted) {
+    
   if ($form_name == 'CRM_Contact_Form_CustomData') {
-    alumni_dashboard_update_employer_relationships($form->_entityId);
+ //   alumni_dashboard_update_employer_relationships($form->_entityId);
+// only act if this is the work history field group 
+    if ($form->_groupID == "26") {    
+  //    dsm($form);
+      //pull out the values that were submitted 
+       $fields_to_set = array_filter($form->_submitValues, function($k){
+         return preg_match('#custom_\d#', $k);
+         }, ARRAY_FILTER_USE_KEY);   
+//      dsm($fields_to_set);
+  
+       $relationshipID = array_filter($fields_to_set, function($k){
+         return preg_match('#custom_143_\d#', $k);
+       $relationshipID = array_values($relationshipID);
+         }, ARRAY_FILTER_USE_KEY);
+       $relationshipKey=key($relationshipID);
+       $relationshipID =reset($relationshipID);
+       $employerID = array_filter($fields_to_set, function($k){
+         return preg_match('#custom_85_\d#', $k);
+         }, ARRAY_FILTER_USE_KEY);
+       $employerKey=key($employerID);  
+       $employerID =reset($employerID);
+       
+       $jobTitle = array_filter($fields_to_set, function($k){
+         return preg_match('#custom_86_\d#', $k);
+         }, ARRAY_FILTER_USE_KEY);
+       $jobTitleKey=key($jobTitle);  
+       $jobTitle =reset($jobTitle);
+       
+       $jobStart = array_filter($fields_to_set, function($k){
+         return preg_match('#custom_87_\d#', $k);
+         }, ARRAY_FILTER_USE_KEY);
+       $jobStartKey=key($jobStart);           
+       $jobStart =reset($jobStart);
+       if (empty($jobStart)) {
+          $jobStart = "";
+ 
+          }
+       $jobEnd = array_filter($fields_to_set, function($k){
+         return preg_match('#custom_88_\d#', $k);
+         }, ARRAY_FILTER_USE_KEY);
+       $jobEndKey=key($jobEnd);  
+       $jobEnd =reset($jobEnd);
+              if (empty($jobEnd)) {
+          $jobEnd = "";
+          }
+//                   dsm($jobEnd,"end");
+       
+      $currentcontact = $form->_entityId;
+//$employerstringx= reset($fields_to_set);
+//$employerstring =array_slice($employerID, 0, 1);
+
+//dsm($employerstring);  
+//dsm($jobStart);
+//dsm($jobEnd);
+
+$isactive =1;
+
+        //  $form->_submitValues[$relationshipKey] = "1234";
+//          $form->_elements[13]->_attributes['value'] = "1234";
+          //dsm($form);
+ //         return $form;
+       if (!empty($relationshipID)) {
+//       dsm("update");
+//      set relationship values 
+
+$params=array(
+           "id"=> $relationshipID,
+           'contact_id_a' => $currentcontact,
+           'contact_id_b' => $employerID,
+           'relationship_type_id' => 5, 
+           'is_active' => $isactive,
+           'description' => $jobTitle,
+           );
+           
+           if (!empty($jobStart)) {
+           $params['start_date'] = $jobStart;
+           }
+           if (!empty($jobEnd)) {
+           $params['end_date'] = $jobEnd;
+           }                      
+         $result = civicrm_api3('Relationship', 'create', $params);
+
+       }else{
+  //     dsm("new");
+// set relationship values and bring back the id 
+// set the field to the right id 
+
+         $params=array(
+           'contact_id_a' => $currentcontact,
+           'contact_id_b' => $employerID,
+           'relationship_type_id' => 5, 
+           'is_active' => $isactive,
+           'description' => $jobTitle,
+           );
+           
+           if (!empty($jobStart)) {
+           $params['start_date'] = $jobStart;
+           }
+           if (!empty($jobEnd)) {
+           $params['end_date'] = $jobEnd;
+           }                      
+         $result = civicrm_api3('Relationship', 'create', $params);
+        
+         $form->_submitValues[$relationshipKey] = $result['id'];
+//    dsm($result['id']);   
+//         
+//dsm("rel created");
+//          $form->_submitValues[$relationshipKey] = "1234";
+//          $form->_elements[13]['_attributes']['value'] = "1234";
+       }                     
+    }
   }
+}
+}
+
+function alumni_dashboard_update_employer_relationship_tab_add($contact_id,$values) {
+
+// update the 
+
+}
+
+function alumni_dashboard_update_employer_relationship_tab_edit($contact_id,$values) {
+
+
+}
+
+function alumni_dashboard_update_employer_relationship_tab_delete($contact_id) {
+
+
 }
 
 function alumni_dashboard_update_employer_relationships($contact_id,

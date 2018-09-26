@@ -1,0 +1,7 @@
+name = Eric Test
+description = module for eric to test various funcitons during discovery and dev
+package = Openflows
+
+core = 7.x
+php = 5.3
+

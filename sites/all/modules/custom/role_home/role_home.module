@@ -1,25 +1,25 @@
 <?php
 /**
- * Implements hook_permission()                 
+ * Implements hook_permission()
  */
 function role_home_permission() {
-  return array( 'manage role home configuration' => 
+  return array( 'manage role home configuration' =>
 		array('title' => t('Manage Role Home Configuration')));
 }
 
-/** 
+/**
  * implementation of hook_menu
 */
 function role_home_menu() {
 
   $items = array();
   $home = variable_get('site_frontpage');
-
+  dpm($home, 'home');
+  
   $items[$home] =
     array(
 	  'title' => 'Home',
-	  'description' => 
-	  "Menu callback before drupal_goto to the role's home page",
+	  'description' => "Menu callback before drupal_goto to the role's home page",
 	  'page callback' => 'role_home_page',
 	  'access arguments' => array('access content'),
 	  'type' => MENU_CALLBACK,
@@ -30,7 +30,7 @@ function role_home_menu() {
 	  'title' => 'Role Home',
 	  'description' => 'The config form for the role home module',
 	 'page callback' => 'drupal_get_form',
-	 'page arguments' => array('role_home_settings_form'),
+	 'page arguments' => array('role_home_admin_form'),
 	 'access arguments' => array('manage role home configuration'),
 	 'type' => MENU_NORMAL_ITEM,
 	 );
@@ -42,94 +42,184 @@ function role_home_menu() {
 /**
  */
 function role_home_page() {
+
   global $user;
 
   $weights = array();
+  // get the stored settings
+  $settings = variable_get('role_home_role_settings');
+
+  $lowest_weight = null;
+  
   foreach($user->roles as $rid=>$role) {
-    $path = variable_get('role_home_id_'.$rid, 'user');
-    $weight = variable_get('role_home_weight_'.$rid, 0);
-    
+    $path = isset($settings[$rid]['role_path']) ?
+        $settings[$rid]['role_path'] : NULL;
+    $weight = isset($settings[$rid]['role_weight']) ?
+        $settings[$rid]['role_weight'] : NULL;
+
     $weights[$weight] = $path;
 
     //if the variable isn't set yet, set to current value
     $lowest_weight = isset($lowest_weight) ? $lowest_weight : $weight;
-
-    //if the current value is less then the lowest, set to current value
-    $lowest_weight = ($lowest_weight <= $weight) ? $lowest_weight : $weight; 
     
+    //if the current value is less then the lowest, set to current value
+    $lowest_weight = ($lowest_weight <= $weight) ? $lowest_weight : $weight;
   }
 
   drupal_goto($weights[$lowest_weight]);
+}
+
+/**
+  * Configuration form for role home
+  */
+function role_home_admin_form($form, &$form_state) {
+  $link = l("site information configuration page",
+	    "admin/config/system/site-information");
+
+  // get the stored settings
+  $settings = variable_get('role_home_role_settings');
+
+  // get all roles and cycle thru them
+  $sql = "SELECT rid, name FROM {role}";
+  $results = db_query($sql);
+
+  while ($result = $results->fetchObject()) {
+    //if(isset($settings) && !array_key_exists($result->rid, $settings)) {
+     //continue;
+    //}
+    if(isset($settings[$result->rid])) {
+      $id = $result->rid;
+      $role_path = $settings[$id]['role_path'];
+      $role_weight = $settings[$id]['role_weight'];
+    }
+    else {
+      $id = $result->rid;
+      $role_path = 'user';
+      $role_weight = 100;
+    }
+    // Build the table rows
+    $rows[$id] = array(
+      'data' => array(
+        // Cell for cross drag & drop element
+        array('class' => array('item-cross')),
+        // Role ID
+        array('data' => array('#markup' => drupal_placeholder($id),)),
+        // Role Name
+        array('data' => array('#markup' => drupal_placeholder($result->name),)),
+        // Role Path
+        array('data' => array(
+          '#type' => 'textfield',
+          '#title' => t('Path for @title', array('@title' => $result->name)),
+          '#title_display' => 'invisible',
+          '#size' => 50,
+          '#maxlength' => 100,
+          '#required' => TRUE, //make this field required
+          '#default_value' => $role_path,
+        )),
+        // Weight item for the tabledrag
+        array(
+          'data' => array(
+            '#type' => 'weight',
+            '#title' => t('Weight for @title', array('@title' => $result->name)),
+            '#title_display' => 'invisible',
+            '#default_value'=>$role_weight,
+            '#delta' => 500,
+            '#attributes' => array('class' => array('item-order-weight'),),
+        )),
+      ),
+      'class' => array('draggable'),
+    );
+
+        // Build rows of the form elements in the table.
+    $row_elements[$id] =
+      array(
+        'role'.$id => &$rows[$id]['data'][1]['data'],
+        'role_name_'.$id => &$rows[$id]['data'][2]['data'],
+        'role_path_'.$id => &$rows[$id]['data'][3]['data'],
+        'rank_weight_'.$id => &$rows[$id]['data'][4]['data'],
+	    );
+  }
+
+  uasort($rows, function($a, $b) {
+      return $a['data'][4]['data']['#default_value'] >=
+	$b['data'][4]['data']['#default_value'];
+    });
+
+  $form = array();
+
+  $form['role_home']['frontpage'] = array(
+	  '#type' => 'fieldset',
+	  '#title' => t('Home Page Configuration'),
+	  '#description' => "<i>".
+	    "Enter home page paths for each role. Note, this module will only
+             work if you set the default front page on the ".$link." to 'home'
+	     or whatever value you set below for the initial home page path."
+	  ."</i>",
+	);
+
+  $form['role_home']['frontpage']['site_frontpage'] = array(
+    '#type' => 'textfield',
+    '#title' => "Home Page Path",
+    '#size' => 100,
+    '#maxlength' => 100,
+    '#required' => TRUE, //make this field required
+    '#default_value' => variable_get('site_frontpage'),
+   );
+
+  $form['role_home']['path_settings'] = array(
+	  '#type' => 'fieldset',
+	  '#title' => t('Role Path Configuration'),
+	  '#description' => "<i>".
+	    "The weight assigned to each role for determines the priority the path has for users with multiple roles."
+	  ."</i>",
+	);
+
+  // add this to parent form
+  $form['role_home']['path_settings']['roles'] =
+    array(
+      '#theme' => 'table',
+      // The row form elements need to be processed and build,
+      // therefore pass them as element children.
+      'elements' => $row_elements,
+      '#header' => array(
+        array('data' => t('Sort'),),
+        array('data' => t('Role ID')),
+        array('data' => t('Role Name')),
+        array('data' => t('Role Path')),
+        array('data' => t('Weight')),
+      ),
+      '#rows' => $rows,
+      '#attributes' => array('id' => 'item-order'),
+      '#tree' => TRUE,
+      //'#sufix'=>'</div>',
+	  );
+  drupal_add_tabledrag('item-order', 'order', 'sibling','item-order-weight');
+
+  $form['actions'] = array(
+    '#type' => 'actions',
+  );
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save changes')
+  );
+
+  return $form;
 
 }
 
-
 /**
+ * Form submission handler for role_home_admin_form().
  */
-function role_home_settings_form($form, &$form_state) {
-  //////////////////////////////////////////////////////////////////////////
-  //A TEXT FIELD FOR EACH ROLE GIVING THE PATH TO FORWARD TO WHEN THE /home
-  //PATH IS ENTERED
-  
-  $link = l("site information configuration page", 
-	    "admin/config/system/site-information");
-  
-  $form['role_home_config'] = 
-    array(
-	  '#type' => 'fieldset',
-	  '#title' => t('Contribution Pages and Events'),
-	  '#description' => "<i>".
-	    "Enter home page paths for each role. Note, this module will only 
-             work if you set the default front page on the ".$link." to 'home' 
-	     or whatever value you set below for the initial home page path."
-	  ."</i>",
-	  '#collapsible' => TRUE,
-	  '#collapsed' => FALSE,
-	  );
-
-  $form['role_home_config']['site_frontpage'] = 
-      array(
-	    '#type' => 'textfield', 
-	    '#title' => "Home Page Path",
-	    '#size' => 100,
-	    '#maxlength' => 100,
-	    '#required' => TRUE, //make this field required
-	    '#default_value' => variable_get('site_frontpage'),
-	    );
-
-
-  $sql = "SELECT rid, name FROM {role}";
-  $results = db_query($sql);
-  while ($result = $results->fetchObject()) {
-    $form['role_home_config']['role_home_weight_'.$result->rid] = 
-      array(
-	    '#type' => 'textfield', 
-	    '#title' => "The weight this role for determining path has in regards to users with multiple roles",
-	    '#size' => 3,
-	    '#maxlength' => 3,
-	    '#required' => TRUE, //make this field required
-	    '#default_value' => variable_get('role_home_weight_'.$result->rid,
-					     0),
-	    '#prefix' => "<table><tr><td>",
-	    );
-
-    $form['role_home_config']['role_home_id_'.$result->rid] = 
-      array(
-	    '#type' => 'textfield', 
-	    '#title' => "Path for ".$result->name,
-	    '#size' => 50,
-	    '#maxlength' => 100,
-	    '#required' => TRUE, //make this field required
-	    '#default_value' => variable_get('role_home_id_'.$result->rid),
-	    '#prefix' => "</td><td>",
-	    '#suffix' => "</td></tr></table>",
-	    );
-
-
+function role_home_admin_form_submit($form, &$form_state) {
+  foreach ($form_state['values']['roles']['elements'] as $id => $data) {
+    //dpm($data, 'data_' .$id);
+    $settings[$id] = array(
+      'role_id' => $id,
+      'role_path' => $data['role_path_'.$id],
+      'role_weight' => $data['rank_weight_'.$id],
+    );
   }
-
-  
-
-
-  return system_settings_form($form);
+  //store the values in an array in variable table
+  variable_set('role_home_role_settings', $settings);
+  drupal_set_message(t('The role paths and their order have been saved.'));
 }

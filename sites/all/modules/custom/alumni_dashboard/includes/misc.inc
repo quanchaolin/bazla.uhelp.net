@@ -180,19 +180,19 @@ function alumni_dashboard_civicrm_post($op, $object_name, $object_id,
 				      
   if ($object_name == 'Individual') {
     alumni_dashboard_update_employer_relationships($object_id, $object_ref);
-// dsm($object_ref);
+// //dsm($object_ref);
   }
 }
 
 function alumni_dashboard_civicrm_preProcess($form_name, &$form) {
-    dsm($form_name);
+    //dsm($form_name);
 if ($form->_flagSubmitted) {
     
   if ($form_name == 'CRM_Contact_Form_CustomData') {
  //   alumni_dashboard_update_employer_relationships($form->_entityId);
 // only act if this is the work history field group 
     if ($form->_groupID == "26") {    
-      dsm($form);
+      //dsm($form);
       //pull out the values that were submitted 
        $fields_to_set = array_filter($form->_submitValues, function($k){
          return preg_match('#custom_\.*#', $k);
@@ -210,8 +210,8 @@ if ($form->_flagSubmitted) {
          }, ARRAY_FILTER_USE_KEY);
        $employerKey=key($employerID);  
        $employerID =reset($employerID);
-       dsm($employerID);
-       dsm($employerKey);
+       //dsm($employerID);
+       //dsm($employerKey);
        
        
        
@@ -241,15 +241,15 @@ if ($form->_flagSubmitted) {
               if (empty($jobEnd)) {
           $jobEnd = "";
           }
-//                   dsm($jobEnd,"end");
+//                   //dsm($jobEnd,"end");
        
       $currentcontact = $form->_entityId;
 //$employerstringx= reset($fields_to_set);
 //$employerstring =array_slice($employerID, 0, 1);
 
 //dsm($employerstring);  
-dsm($jobStart);
-dsm($jobEnd);
+//dsm($jobStart);
+//dsm($jobEnd);
 
 $isactive =1;
 
@@ -258,7 +258,7 @@ $isactive =1;
           //dsm($form);
  //         return $form;
        if (!empty($relationshipID)) {
-       dsm("update");
+       //dsm("update");
 //      set relationship values 
 
 $params=array(
@@ -279,7 +279,7 @@ $params=array(
          $result = civicrm_api3('Relationship', 'create', $params);
 
        }else{
-       dsm("new");
+       //dsm("new");
 // set relationship values and bring back the id 
 // set the field to the right id 
 
@@ -297,13 +297,13 @@ $params=array(
            if (!empty($jobEnd)) {
            $params['end_date'] = $jobEnd;
            }                      
-dsm($params);
+//dsm($params);
          $result = civicrm_api3('Relationship', 'create', $params);
         
      //    $form->_submitValues[$relationshipKey] = $result['id'];
-    dsm($result['id']);   
+    //dsm($result['id']);   
 //         
-dsm("rel created");
+//dsm("rel created");
 //          $form->_submitValues[$relationshipKey] = "1234";
 //          $form->_elements[13]['_attributes']['value'] = "1234";
        }                     

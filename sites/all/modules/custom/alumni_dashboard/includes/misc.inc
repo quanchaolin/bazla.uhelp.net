@@ -192,33 +192,40 @@ if ($form->_flagSubmitted) {
  //   alumni_dashboard_update_employer_relationships($form->_entityId);
 // only act if this is the work history field group 
     if ($form->_groupID == "26") {    
-  //    dsm($form);
+      dsm($form);
       //pull out the values that were submitted 
        $fields_to_set = array_filter($form->_submitValues, function($k){
-         return preg_match('#custom_\d#', $k);
+         return preg_match('#custom_\.*#', $k);
          }, ARRAY_FILTER_USE_KEY);   
 //      dsm($fields_to_set);
   
        $relationshipID = array_filter($fields_to_set, function($k){
-         return preg_match('#custom_143_\d#', $k);
+         return preg_match('#custom_143_\.*#', $k);
        $relationshipID = array_values($relationshipID);
          }, ARRAY_FILTER_USE_KEY);
        $relationshipKey=key($relationshipID);
        $relationshipID =reset($relationshipID);
        $employerID = array_filter($fields_to_set, function($k){
-         return preg_match('#custom_85_\d#', $k);
+         return preg_match('#custom_85_\.*#', $k);
          }, ARRAY_FILTER_USE_KEY);
        $employerKey=key($employerID);  
        $employerID =reset($employerID);
+       dsm($employerID);
+       dsm($employerKey);
+       
+       
+       
+       
+       
        
        $jobTitle = array_filter($fields_to_set, function($k){
-         return preg_match('#custom_86_\d#', $k);
+         return preg_match('#custom_86_\.*#', $k);
          }, ARRAY_FILTER_USE_KEY);
        $jobTitleKey=key($jobTitle);  
        $jobTitle =reset($jobTitle);
        
        $jobStart = array_filter($fields_to_set, function($k){
-         return preg_match('#custom_87_\d#', $k);
+         return preg_match('#custom_87_\.*#', $k);
          }, ARRAY_FILTER_USE_KEY);
        $jobStartKey=key($jobStart);           
        $jobStart =reset($jobStart);
@@ -227,7 +234,7 @@ if ($form->_flagSubmitted) {
  
           }
        $jobEnd = array_filter($fields_to_set, function($k){
-         return preg_match('#custom_88_\d#', $k);
+         return preg_match('#custom_88_\.*#', $k);
          }, ARRAY_FILTER_USE_KEY);
        $jobEndKey=key($jobEnd);  
        $jobEnd =reset($jobEnd);
@@ -241,8 +248,8 @@ if ($form->_flagSubmitted) {
 //$employerstring =array_slice($employerID, 0, 1);
 
 //dsm($employerstring);  
-//dsm($jobStart);
-//dsm($jobEnd);
+dsm($jobStart);
+dsm($jobEnd);
 
 $isactive =1;
 
@@ -251,7 +258,7 @@ $isactive =1;
           //dsm($form);
  //         return $form;
        if (!empty($relationshipID)) {
-//       dsm("update");
+       dsm("update");
 //      set relationship values 
 
 $params=array(
@@ -272,7 +279,7 @@ $params=array(
          $result = civicrm_api3('Relationship', 'create', $params);
 
        }else{
-  //     dsm("new");
+       dsm("new");
 // set relationship values and bring back the id 
 // set the field to the right id 
 
@@ -290,12 +297,13 @@ $params=array(
            if (!empty($jobEnd)) {
            $params['end_date'] = $jobEnd;
            }                      
+dsm($params);
          $result = civicrm_api3('Relationship', 'create', $params);
         
-         $form->_submitValues[$relationshipKey] = $result['id'];
-//    dsm($result['id']);   
+     //    $form->_submitValues[$relationshipKey] = $result['id'];
+    dsm($result['id']);   
 //         
-//dsm("rel created");
+dsm("rel created");
 //          $form->_submitValues[$relationshipKey] = "1234";
 //          $form->_elements[13]['_attributes']['value'] = "1234";
        }                     

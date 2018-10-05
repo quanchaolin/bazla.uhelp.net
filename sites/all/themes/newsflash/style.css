@@ -1109,3 +1109,8 @@ ul.action-links a {
   padding-top:1em;
   padding-bottom:1em;
 }
+
+.crm-container .crm-section, .crm-container div.crm-field-wrapper {
+ clear: both;
+}
+

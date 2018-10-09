@@ -47,9 +47,9 @@ new DateTime($end_date_field,
         t("Please use 24 hour time. Class sessions can not start before 07:00"));
     }
 
-    if ($end_time < 7) {
+    if ($end_time > 20) {
       form_set_error("field_class_schedule_endtime",
-        t("Please use 24 hour time. Class sessions can not end before 07:00"));
+        t("Please use 24 hour time. Class sessions can not end after 20:00"));
     }
 
     if (!isset ($node->field_class_schedule['und'][0]['rrule'])) {
@@ -59,7 +59,7 @@ new DateTime($end_date_field,
 
   }
 
-  else if($node->type=='help_class' || $node->type=='university_class') {
+  else if($node->type=='help_class' || $node->type=='university_class' || $node->type=='service_project') {
 
     $button = $form_state['clicked_button']['#value'];
     if ($button == 'Delete') {

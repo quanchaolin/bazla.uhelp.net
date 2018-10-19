@@ -14,7 +14,6 @@ function role_home_menu() {
 
   $items = array();
   $home = variable_get('site_frontpage');
-  dpm($home, 'home');
   
   $items[$home] =
     array(
